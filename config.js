@@ -36,7 +36,7 @@ let wines = [
         // description: "Fresco e mineral, com aromas cítricos e florais. Final elegante.",
         price: 147.90,
         stock: 6,
-        image: "images/luca.png"
+        image: "images/luca_malbec.png"
     },
     {
         id: 3,
