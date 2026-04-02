@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍷 Vinheria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --vinho:     #7A2832;
+            --vinho-dk:  #4A1820;
+            --ouro:      #C9A84C;
+            --ouro-lt:   #E8D5A3;
+            --creme:     #FDF6EC;
+            --dark:      #1A1010;
+            --cinza:     #6B5B5B;
+            --ok:        #2E7D32;
+            --alerta:    #E65100;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--dark);
+            color: var(--creme);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: linear-gradient(160deg, var(--vinho-dk) 0%, var(--vinho) 60%, #8B3040 100%);
+            padding: 3rem 2rem 2.5rem;
+            text-align: center;
+            border-bottom: 2px solid var(--ouro);
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='%23C9A84C' opacity='.15'/%3E%3C/svg%3E") repeat;
+        }
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 600;
+            color: var(--ouro-lt);
+            letter-spacing: 2px;
+            position: relative;
+        }
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            color: rgba(232,213,163,.7);
+            font-size: 1.1rem;
+            margin-top: .4rem;
+            position: relative;
+        }
+
+        /* ── LAYOUT ── */
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* ── BUSCA ── */
+        .search-wrap { position: relative; flex: 1; min-width: 220px; }
+        .search-wrap input {
+            width: 100%;
+            padding: .85rem 1rem .85rem 2.8rem;
+            border: 1.5px solid rgba(201,168,76,.3);
+            border-radius: 40px;
+            background: rgba(255,255,255,.06);
+            color: var(--creme);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .95rem;
+            transition: .3s;
+        }
+        .search-wrap input:focus { outline: none; border-color: var(--ouro); background: rgba(255,255,255,.1); }
+        .search-wrap::before { content: '🔍'; position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); font-size: 1rem; }
+
+        /* ── FILTROS ── */
+        .filters { display: flex; gap: .5rem; flex-wrap: wrap; }
+        .btn-filter {
+            padding: .5rem 1.1rem;
+            border: 1.5px solid rgba(201,168,76,.35);
+            background: transparent;
+            color: var(--ouro-lt);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            transition: .25s;
+        }
+        .btn-filter:hover, .btn-filter.active {
+            background: var(--vinho);
+            border-color: var(--ouro);
+            color: var(--ouro-lt);
+        }
+
+        /* ── CARRINHO (ícone fixo) ── */
+        .cart-fab {
+            position: fixed;
+            top: 1.5rem; right: 1.5rem;
+            width: 58px; height: 58px;
+            background: var(--vinho);
+            border: 2px solid var(--ouro);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            z-index: 900;
+            box-shadow: 0 4px 24px rgba(0,0,0,.45);
+            transition: .3s;
+        }
+        .cart-fab:hover { transform: scale(1.1); background: var(--vinho-dk); }
+        .cart-badge {
+            position: absolute; top: -4px; right: -4px;
+            background: var(--ouro); color: var(--vinho-dk);
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            font-size: .75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ── GRID DE VINHOS ── */
+        .wine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 2rem;
+        }
+
+        .wine-card {
+            background: linear-gradient(145deg, rgba(255,255,255,.07) 0%, rgba(255,255,255,.03) 100%);
+            border: 1px solid rgba(201,168,76,.15);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: .35s;
+            position: relative;
+        }
+        .wine-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(201,168,76,.5);
+            box-shadow: 0 18px 40px rgba(0,0,0,.5);
+        }
+
+        .wine-img-wrap { position: relative; height: 320px; overflow: hidden; }
+        .wine-img-wrap img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform .4s;
+            background: #2a1a1a;
+        }
+        .wine-card:hover .wine-img-wrap img { transform: scale(1.05); }
+
+        /* Fallback se imagem não carregar */
+        .wine-img-wrap img.error-img {
+            object-fit: contain;
+            padding: 2rem;
+            opacity: .4;
+        }
+
+        .type-badge {
+            position: absolute; top: 1rem; left: 1rem;
+            padding: .3rem .8rem;
+            border-radius: 12px;
+            font-size: .75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .8px;
+        }
+        .type-tinto    { background: #6B0000; color: #ffcccc; }
+        .type-branco   { background: #F5F5DC; color: #444; }
+        .type-rose     { background: #E8A4B8; color: #6B0030; }
+        .type-espumante{ background: #C9A84C; color: #2a1a00; }
+
+        .wine-body { padding: 1.4rem; }
+        .wine-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ouro-lt);
+            margin-bottom: .3rem;
+            line-height: 1.3;
+        }
+        .wine-meta {
+            font-size: .82rem;
+            color: #9e8e8e;
+            margin-bottom: .7rem;
+        }
+        .wine-desc { font-size: .9rem; color: #c5b5b5; line-height: 1.55; }
+
+        .wine-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(201,168,76,.2);
+        }
+        .price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: var(--ouro);
+        }
+        .stock-info { text-align: right; }
+        .stock-label { font-size: .75rem; color: #888; }
+        .stock-val { font-weight: 600; font-size: 1rem; }
+        .s-ok  { color: #66BB6A; }
+        .s-med { color: #FFA726; }
+        .s-low { color: #EF5350; }
+
+        /* quantidade */
+        .qty-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .qty-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid var(--ouro);
+            background: transparent;
+            color: var(--ouro);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: .2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .qty-btn:hover { background: var(--ouro); color: var(--vinho-dk); }
+        .qty-val { font-size: 1.2rem; font-weight: 600; min-width: 32px; text-align: center; }
+
+        .btn-add {
+            width: 100%;
+            margin-top: .9rem;
+            padding: .9rem;
+            background: linear-gradient(135deg, var(--vinho) 0%, var(--vinho-dk) 100%);
+            color: var(--ouro-lt);
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+        .btn-add:hover:not(:disabled) { opacity: .85; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(122,40,50,.5); }
+        .btn-add:disabled { background: #3a3030; color: #666; cursor: not-allowed; }
+
+        /* ── MODAL CARRINHO ── */
+        .overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .overlay.open { display: flex; animation: fadeIn .25s; }
+        @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+
+        .modal {
+            background: #1e1212;
+            border: 1.5px solid var(--ouro);
+            border-radius: 18px;
+            width: 100%; max-width: 560px;
+            max-height: 90vh;
+            display: flex; flex-direction: column;
+            animation: slideUp .3s;
+        }
+        @keyframes slideUp { from {transform:translateY(30px);opacity:0} to {transform:translateY(0);opacity:1} }
+
+        .modal-hd {
+            background: linear-gradient(135deg, var(--vinho) 0%, var(--vinho-dk) 100%);
+            padding: 1.3rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+        .modal-hd h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--ouro-lt); }
+        .btn-close {
+            background: none; border: none; color: var(--creme);
+            font-size: 1.3rem; cursor: pointer; width: 36px; height: 36px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: .2s;
+        }
+        .btn-close:hover { background: rgba(255,255,255,.12); transform: rotate(90deg); }
+
+        .cart-list { flex: 1; overflow-y: auto; padding: 1.2rem; }
+
+        .empty-msg { text-align: center; padding: 3rem; color: #6b5b5b; }
+        .empty-msg div { font-size: 3rem; margin-bottom: 1rem; }
+
+        .cart-item {
+            display: flex; gap: .9rem;
+            padding: 1rem;
+            background: rgba(255,255,255,.04);
+            border-radius: 10px;
+            margin-bottom: .8rem;
+            border: 1px solid rgba(201,168,76,.12);
+        }
+        .ci-img { width: 72px; height: 72px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(201,168,76,.25); flex-shrink: 0; }
+        .ci-info { flex: 1; }
+        .ci-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--ouro-lt); }
+        .ci-price { font-size: .9rem; color: #998888; margin: .2rem 0; }
+        .ci-row { display: flex; align-items: center; gap: .5rem; margin-top: .4rem; }
+        .ci-qbtn {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 1px solid var(--ouro); background: transparent;
+            color: var(--ouro); cursor: pointer; font-size: .9rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ci-subtotal { margin-left: auto; color: var(--ouro); font-weight: 600; font-size: .95rem; }
+        .ci-del { color: #c0504d; cursor: pointer; font-size: 1.1rem; transition: .2s; flex-shrink: 0; }
+        .ci-del:hover { transform: scale(1.2); }
+
+        .modal-ft { padding: 1.3rem; border-top: 1px solid rgba(122,40,50,.4); }
+        .total-row {
+            display: flex; justify-content: space-between;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.1rem;
+            color: var(--ouro-lt);
+        }
+        .total-row span:last-child { color: var(--ouro); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-bottom: 1rem; }
+        @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+        .fld label { display: block; font-size: .8rem; color: #9e8e8e; margin-bottom: .3rem; }
+        .fld input {
+            width: 100%; padding: .7rem .9rem;
+            border: 1.5px solid rgba(122,40,50,.5);
+            border-radius: 8px;
+            background: rgba(255,255,255,.05);
+            color: var(--creme);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+        }
+        .fld input:focus { outline: none; border-color: var(--ouro); }
+
+        .btn-wpp {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #25D366 0%, #1a9e50 100%);
+            color: white;
+            border: none; border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.05rem; font-weight: 700;
+            cursor: pointer; transition: .3s;
+            display: flex; align-items: center; justify-content: center; gap: .6rem;
+        }
+        .btn-wpp:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,.35); }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 2rem; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            padding: .9rem 1.8rem;
+            border-radius: 40px;
+            font-size: .95rem; font-weight: 500;
+            z-index: 2000;
+            opacity: 0; transition: .35s;
+            white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.ok  { background: var(--ok); color: #fff; }
+        .toast.err { background: #c62828; color: #fff; }
+
+        /* ── PAINEL ADMIN ── */
+        .admin-trigger {
+            position: fixed; bottom: 1.5rem; left: 1.5rem;
+            background: rgba(0,0,0,.6);
+            border: 1px solid rgba(201,168,76,.2);
+            color: rgba(201,168,76,.4);
+            padding: .5rem .9rem;
+            border-radius: 8px;
+            font-size: .75rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: .2s;
+        }
+        .admin-trigger:hover { color: var(--ouro); border-color: var(--ouro); }
+
+        .admin-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.85);
+            backdrop-filter: blur(6px);
+            z-index: 1100;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .admin-overlay.open { display: flex; }
+
+        .admin-panel {
+            background: #1a1010;
+            border: 1.5px solid var(--ouro);
+            border-radius: 16px;
+            width: 100%; max-width: 900px;
+            margin: auto;
+            overflow: hidden;
+        }
+        .admin-hd {
+            background: var(--vinho-dk);
+            padding: 1.2rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(201,168,76,.3);
+        }
+        .admin-hd h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--ouro); }
+        .admin-body { padding: 1.5rem; }
+
+        .admin-note {
+            background: rgba(201,168,76,.08);
+            border: 1px solid rgba(201,168,76,.2);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: .85rem;
+            color: #c5b5b5;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .admin-note strong { color: var(--ouro-lt); }
+
+        .wine-admin-list { display: flex; flex-direction: column; gap: 1rem; }
+
+        .wine-admin-item {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(201,168,76,.15);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        .wai-top {
+            display: flex; gap: .8rem; align-items: center; margin-bottom: .8rem;
+        }
+        .wai-thumb {
+            width: 60px; height: 60px; object-fit: cover;
+            border-radius: 6px; border: 1px solid rgba(201,168,76,.3);
+            background: #2a1a1a; flex-shrink: 0;
+        }
+        .wai-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--ouro-lt); }
+        .wai-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: .6rem;
+        }
+        .wai-fld label { display: block; font-size: .75rem; color: #888; margin-bottom: .25rem; }
+        .wai-fld input, .wai-fld select, .wai-fld textarea {
+            width: 100%;
+            padding: .55rem .7rem;
+            border: 1px solid rgba(122,40,50,.4);
+            border-radius: 6px;
+            background: rgba(255,255,255,.05);
+            color: var(--creme);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+        }
+        .wai-fld textarea { resize: vertical; height: 60px; }
+        .wai-fld input:focus, .wai-fld select:focus, .wai-fld textarea:focus { outline: none; border-color: var(--ouro); }
+        .wai-fld select option { background: #1a1010; }
+
+        .admin-actions { display: flex; gap: .8rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .btn-admin {
+            padding: .75rem 1.4rem;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: .2s;
+            border: none;
+        }
+        .btn-save   { background: var(--ok); color: #fff; }
+        .btn-add-wine { background: var(--vinho); color: var(--ouro-lt); }
+        .btn-save:hover { opacity: .85; }
+        .btn-del-wine { background: #c62828; color: #fff; margin-left: auto; }
+
+        .login-box { padding: 2.5rem; text-align: center; }
+        .login-box h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--ouro); margin-bottom: 1.2rem; }
+        .login-box input {
+            width: 100%; max-width: 280px;
+            padding: .8rem 1rem; border-radius: 8px;
+            border: 1.5px solid rgba(201,168,76,.3);
+            background: rgba(255,255,255,.05);
+            color: var(--creme); font-size: 1rem;
+            display: block; margin: 0 auto 1rem;
+            text-align: center; letter-spacing: 4px;
+        }
+        .login-box input:focus { outline: none; border-color: var(--ouro); }
+        .btn-login {
+            padding: .7rem 2rem;
+            background: var(--vinho); color: var(--ouro-lt);
+            border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .cart-fab { top: auto; bottom: 1.5rem; right: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Carrega configurações ANTES do script principal -->
+<script src="config.js"></script>
+
+<header>
+    <h1>🍷 <span id="storeTitle"></span></h1>
+    <p class="subtitle">Seleção exclusiva dos melhores vinhos</p>
+</header>
+
+<!-- Ícone do carrinho -->
+<div class="cart-fab" onclick="openCart()">
+    🛒
+    <span class="cart-badge" id="cartBadge">0</span>
+</div>
+
+<div class="container">
+    <div class="controls">
+        <div class="search-wrap">
+            <input type="text" id="searchInput" placeholder="Buscar vinhos..." oninput="renderWines()">
+        </div>
+        <div class="filters" id="filters">
+            <button class="btn-filter active" data-f="todos" onclick="setFilter(this)">Todos</button>
+            <button class="btn-filter" data-f="tinto"     onclick="setFilter(this)">Tintos</button>
+            <button class="btn-filter" data-f="branco"    onclick="setFilter(this)">Brancos</button>
+            <button class="btn-filter" data-f="rose"      onclick="setFilter(this)">Rosés</button>
+            <button class="btn-filter" data-f="espumante" onclick="setFilter(this)">Espumantes</button>
+        </div>
+    </div>
+    <div class="wine-grid" id="wineGrid"></div>
+</div>
+
+<!-- Modal: Carrinho -->
+<div class="overlay" id="cartOverlay" onclick="overlayClick(event,'cartOverlay')">
+    <div class="modal">
+        <div class="modal-hd">
+            <h2>🛒 Seu Pedido</h2>
+            <button class="btn-close" onclick="closeCart()">✕</button>
+        </div>
+        <div class="cart-list" id="cartList"></div>
+        <div class="modal-ft">
+            <div class="total-row">
+                <span>Total:</span>
+                <span id="cartTotal">R$ 0,00</span>
+            </div>
+            <div class="form-row">
+                <div class="fld">
+                    <label>Seu Nome *</label>
+                    <input type="text" id="custName" placeholder="Nome completo">
+                </div>
+                <div class="fld">
+                    <label>Telefone *</label>
+                    <input type="tel" id="custPhone" placeholder="(11) 99999-9999">
+                </div>
+            </div>
+            <button class="btn-wpp" onclick="sendWhatsApp()">
+                📱 Enviar Pedido via WhatsApp
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Admin -->
+<div class="admin-overlay" id="adminOverlay" onclick="overlayClick(event,'adminOverlay')">
+    <div class="admin-panel">
+        <div class="admin-hd">
+            <h2>⚙️ Painel Admin</h2>
+            <button class="btn-close" onclick="closeAdmin()">✕</button>
+        </div>
+
+        <!-- Login -->
+        <div id="loginBox" class="login-box">
+            <h3>🔒 Área Restrita</h3>
+            <input type="password" id="adminPwd" placeholder="••••••••" onkeyup="if(event.key==='Enter')doLogin()">
+            <br>
+            <button class="btn-login" onclick="doLogin()">Entrar</button>
+        </div>
+
+        <!-- Conteúdo admin (oculto até login) -->
+        <div id="adminContent" style="display:none">
+            <div class="admin-body">
+                <div class="admin-note">
+                    <strong>📌 Dica:</strong> As alterações feitas aqui ficam salvas na sessão atual.<br>
+                    Para salvar <strong>permanentemente</strong>, clique em "Gerar config.js" e substitua o arquivo <code>config.js</code> no seu repositório.
+                    <br><br>
+                    <strong>🖼️ Fotos locais:</strong> coloque seus arquivos de imagem na pasta <code>images/</code> e use o caminho <code>images/nome-do-arquivo.jpg</code> no campo "Imagem".
+                </div>
+                <div class="wine-admin-list" id="adminList"></div>
+                <div class="admin-actions">
+                    <button class="btn-admin btn-add-wine" onclick="addWineAdmin()">➕ Novo Vinho</button>
+                    <button class="btn-admin btn-save" onclick="applyAdmin()">✅ Aplicar Alterações</button>
+                    <button class="btn-admin" style="background:var(--ouro);color:var(--vinho-dk)" onclick="exportConfig()">💾 Gerar config.js</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botão admin discreto -->
+<button class="admin-trigger" onclick="openAdmin()">⚙ admin</button>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── ESTADO ──
+let cart      = [];
+let filter    = 'todos';
+let adminAuth = false;
+let nextId    = Math.max(...wines.map(w=>w.id)) + 1;
+
+// Título
+document.getElementById('storeTitle').textContent = STORE_NAME;
+
+// ── RENDERIZAR VINHOS ──
+function renderWines() {
+    const grid  = document.getElementById('wineGrid');
+    const q     = document.getElementById('searchInput').value.toLowerCase();
+    grid.innerHTML = '';
+
+    const visible = wines.filter(w => {
+        if (filter !== 'todos' && w.type !== filter) return false;
+        if (q && !w.name.toLowerCase().includes(q) && !w.origin.toLowerCase().includes(q)) return false;
+        return true;
+    });
+
+    if (!visible.length) {
+        grid.innerHTML = '<p style="color:#6b5b5b;grid-column:1/-1;text-align:center;padding:3rem">Nenhum vinho encontrado.</p>';
+        return;
+    }
+
+    visible.forEach(w => {
+        const sc = w.stock > 10 ? 's-ok' : w.stock > 5 ? 's-med' : 'stock-low';
+        const st = w.stock === 0 ? 'Esgotado' : `${w.stock} unid.`;
+        const card = document.createElement('div');
+        card.className = 'wine-card';
+        card.innerHTML = `
+            <div class="wine-img-wrap">
+                <img src="${w.image}" alt="${w.name}" onerror="this.src='https://via.placeholder.com/300x320/2a1a1a/C9A84C?text=🍷';this.classList.add('error-img')">
+                <span class="type-badge type-${w.type}">${w.type}</span>
+            </div>
+            <div class="wine-body">
+                <div class="wine-name">${w.name}</div>
+                <div class="wine-meta">📍 ${w.origin} &nbsp;|&nbsp; 🗓️ ${w.year}</div>
+                <div class="wine-desc">${w.description}</div>
+                <div class="wine-footer">
+                    <div class="price">R$ ${w.price.toFixed(2).replace('.',',')}</div>
+                    <div class="stock-info">
+                        <div class="stock-label">Estoque</div>
+                        <div class="stock-val ${sc}">${st}</div>
+                    </div>
+                </div>
+                ${w.stock > 0 ? `
+                    <div class="qty-row">
+                        <button class="qty-btn" onclick="changeQty(${w.id},-1)">−</button>
+                        <span class="qty-val" id="qty-${w.id}">1</span>
+                        <button class="qty-btn" onclick="changeQty(${w.id},1)">+</button>
+                    </div>
+                    <button class="btn-add" onclick="addCart(${w.id})">🛒 Adicionar ao Pedido</button>
+                ` : `<button class="btn-add" disabled>🚫 Esgotado</button>`}
+            </div>`;
+        grid.appendChild(card);
+    });
+}
+
+function setFilter(btn) {
+    document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filter = btn.dataset.f;
+    renderWines();
+}
+
+function changeQty(id, d) {
+    const el  = document.getElementById(`qty-${id}`);
+    const max = wines.find(w => w.id === id).stock;
+    let v     = Math.min(max, Math.max(1, +el.textContent + d));
+    el.textContent = v;
+}
+
+// ── CARRINHO ──
+function addCart(id) {
+    const wine = wines.find(w => w.id === id);
+    const qty  = +document.getElementById(`qty-${id}`).textContent;
+    const ex   = cart.find(c => c.id === id);
+
+    if (ex) {
+        if (ex.qty + qty > wine.stock) { toast('Quantidade máxima de estoque atingida!', 'err'); return; }
+        ex.qty += qty;
+    } else {
+        cart.push({ id, name: wine.name, price: wine.price, qty, image: wine.image });
+    }
+
+    document.getElementById(`qty-${id}`).textContent = '1';
+    updateBadge();
+    toast('Item adicionado! 🍷');
+}
+
+function updateBadge() {
+    document.getElementById('cartBadge').textContent = cart.reduce((s, c) => s + c.qty, 0);
+}
+
+function openCart() {
+    renderCart();
+    document.getElementById('cartOverlay').classList.add('open');
+}
+function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); }
+
+function renderCart() {
+    const list = document.getElementById('cartList');
+    if (!cart.length) {
+        list.innerHTML = '<div class="empty-msg"><div>🍷</div><p>Seu carrinho está vazio</p></div>';
+        document.getElementById('cartTotal').textContent = 'R$ 0,00';
+        return;
+    }
+    let total = 0;
+    list.innerHTML = '';
+    cart.forEach((item, i) => {
+        const sub = item.price * item.qty;
+        total += sub;
+        const el = document.createElement('div');
+        el.className = 'cart-item';
+        el.innerHTML = `
+            <img class="ci-img" src="${item.image}" alt="${item.name}"
+                 onerror="this.src='https://via.placeholder.com/72x72/2a1a1a/C9A84C?text=🍷'">
+            <div class="ci-info">
+                <div class="ci-name">${item.name}</div>
+                <div class="ci-price">R$ ${item.price.toFixed(2).replace('.',',')}</div>
+                <div class="ci-row">
+                    <button class="ci-qbtn" onclick="adjustCart(${i},-1)">−</button>
+                    <span>${item.qty}</span>
+                    <button class="ci-qbtn" onclick="adjustCart(${i},1)">+</button>
+                    <span class="ci-subtotal">R$ ${sub.toFixed(2).replace('.',',')}</span>
+                </div>
+            </div>
+            <span class="ci-del" onclick="delCart(${i})" title="Remover">🗑️</span>`;
+        list.appendChild(el);
+    });
+    document.getElementById('cartTotal').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
+}
+
+function adjustCart(i, d) {
+    const wine = wines.find(w => w.id === cart[i].id);
+    const nq   = cart[i].qty + d;
+    if (nq < 1) { delCart(i); return; }
+    if (nq > wine.stock) { toast('Limite de estoque!', 'err'); return; }
+    cart[i].qty = nq;
+    renderCart(); updateBadge();
+}
+
+function delCart(i) { cart.splice(i, 1); renderCart(); updateBadge(); }
+
+// ── WHATSAPP ──
+function sendWhatsApp() {
+    const name  = document.getElementById('custName').value.trim();
+    const phone = document.getElementById('custPhone').value.trim();
+    if (!name || !phone)  { toast('Preencha seu nome e telefone!', 'err'); return; }
+    if (!cart.length)     { toast('Adicione itens ao carrinho!', 'err'); return; }
+
+    let msg = `🍷 *PEDIDO - ${STORE_NAME}*%0A%0A`;
+    msg    += `👤 *Cliente:* ${name}%0A`;
+    msg    += `📱 *Contato:* ${phone}%0A%0A`;
+    msg    += `*ITENS:*%0A━━━━━━━━━━━━━━━━%0A`;
+
+    let total = 0;
+    cart.forEach((c, i) => {
+        const sub = c.price * c.qty;
+        total += sub;
+        msg += `%0A${i+1}. ${c.name}%0A`;
+        msg += `   ${c.qty}x R$ ${c.price.toFixed(2)} = R$ ${sub.toFixed(2)}%0A`;
+    });
+
+    msg += `%0A━━━━━━━━━━━━━━━━%0A`;
+    msg += `*TOTAL: R$ ${total.toFixed(2)}* 🍷`;
+
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+    toast('Abrindo WhatsApp... 📱');
+}
+
+// ── ADMIN ──
+function openAdmin() {
+    document.getElementById('adminOverlay').classList.add('open');
+    if (!adminAuth) {
+        document.getElementById('loginBox').style.display = '';
+        document.getElementById('adminContent').style.display = 'none';
+    }
+}
+function closeAdmin() { document.getElementById('adminOverlay').classList.remove('open'); }
+
+function doLogin() {
+    if (document.getElementById('adminPwd').value === ADMIN_PASSWORD) {
+        adminAuth = true;
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('adminContent').style.display = '';
+        renderAdminList();
+    } else {
+        toast('Senha incorreta!', 'err');
+    }
+}
+
+function renderAdminList() {
+    const list = document.getElementById('adminList');
+    list.innerHTML = '';
+    wines.forEach((w, idx) => {
+        const el = document.createElement('div');
+        el.className = 'wine-admin-item';
+        el.id = `wai-${w.id}`;
+        el.innerHTML = `
+            <div class="wai-top">
+                <img class="wai-thumb" id="thumb-${w.id}" src="${w.image}" alt="" onerror="this.src='https://via.placeholder.com/60x60/2a1a1a/C9A84C?text=🍷'">
+                <div class="wai-name">${w.name}</div>
+            </div>
+            <div class="wai-fields">
+                <div class="wai-fld" style="grid-column:span 2">
+                    <label>Nome do Vinho</label>
+                    <input id="wn-${w.id}" value="${w.name}">
+                </div>
+                <div class="wai-fld">
+                    <label>Tipo</label>
+                    <select id="wt-${w.id}">
+                        ${['tinto','branco','rose','espumante'].map(t=>`<option ${w.type===t?'selected':''}>${t}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="wai-fld">
+                    <label>Ano</label>
+                    <input id="wy-${w.id}" type="number" value="${w.year}">
+                </div>
+                <div class="wai-fld">
+                    <label>Origem</label>
+                    <input id="wo-${w.id}" value="${w.origin}">
+                </div>
+                <div class="wai-fld">
+                    <label>Preço (R$)</label>
+                    <input id="wp-${w.id}" type="number" step="0.01" value="${w.price}">
+                </div>
+                <div class="wai-fld">
+                    <label>Estoque (unid.)</label>
+                    <input id="ws-${w.id}" type="number" value="${w.stock}">
+                </div>
+                <div class="wai-fld" style="grid-column:span 2">
+                    <label>Imagem (URL ou caminho local ex: images/vinho.jpg)</label>
+                    <input id="wi-${w.id}" value="${w.image}" oninput="previewThumb(${w.id})">
+                </div>
+                <div class="wai-fld" style="grid-column:span 3">
+                    <label>Descrição</label>
+                    <textarea id="wd-${w.id}">${w.description}</textarea>
+                </div>
+            </div>
+            <div style="text-align:right;margin-top:.5rem">
+                <button class="btn-admin btn-del-wine" onclick="deleteWineAdmin(${w.id})">🗑️ Remover</button>
+            </div>`;
+        list.appendChild(el);
+    });
+}
+
+function previewThumb(id) {
+    const val = document.getElementById(`wi-${id}`).value;
+    document.getElementById(`thumb-${id}`).src = val;
+}
+
+function deleteWineAdmin(id) {
+    if (!confirm('Remover este vinho?')) return;
+    wines = wines.filter(w => w.id !== id);
+    renderAdminList();
+}
+
+function addWineAdmin() {
+    wines.push({
+        id: nextId++,
+        name: 'Novo Vinho',
+        type: 'tinto',
+        origin: '',
+        year: new Date().getFullYear(),
+        description: '',
+        price: 0,
+        stock: 0,
+        image: 'images/novo.jpg'
+    });
+    renderAdminList();
+    // scroll até o último
+    document.getElementById('adminList').lastElementChild?.scrollIntoView({behavior:'smooth'});
+}
+
+function applyAdmin() {
+    wines = wines.map(w => ({
+        ...w,
+        name:        document.getElementById(`wn-${w.id}`)?.value || w.name,
+        type:        document.getElementById(`wt-${w.id}`)?.value || w.type,
+        year:    +   document.getElementById(`wy-${w.id}`)?.value || w.year,
+        origin:      document.getElementById(`wo-${w.id}`)?.value || w.origin,
+        price:   +   document.getElementById(`wp-${w.id}`)?.value || w.price,
+        stock:   +   document.getElementById(`ws-${w.id}`)?.value || w.stock,
+        image:       document.getElementById(`wi-${w.id}`)?.value || w.image,
+        description: document.getElementById(`wd-${w.id}`)?.value || w.description,
+    }));
+    renderWines();
+    toast('Alterações aplicadas! ✅');
+}
+
+function exportConfig() {
+    applyAdmin();
+    const winesStr = JSON.stringify(wines, null, 4)
+        .replace(/"(\w+)":/g, '$1:');           // remove aspas das keys
+    const content = `// ============================================================
+//  ✏️  ARQUIVO DE CONFIGURAÇÃO — EDITE AQUI!
+//  Não é necessário alterar o index.html para atualizar dados.
+// ============================================================
+
+// 📱 SEU NÚMERO DE WHATSAPP (formato: 55 + DDD + número, sem espaços)
+const WHATSAPP_NUMBER = "${WHATSAPP_NUMBER}";
+
+// 🏪 NOME DA SUA LOJA
+const STORE_NAME = "${STORE_NAME}";
+
+// 🔑 SENHA DO PAINEL ADMIN
+const ADMIN_PASSWORD = "${ADMIN_PASSWORD}";
+
+// 🍷 LISTA DE VINHOS
+let wines = ${winesStr};
+`;
+    const blob = new Blob([content], {type:'text/javascript'});
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = 'config.js';
+    a.click();
+    toast('config.js baixado! Envie ao GitHub 🚀');
+}
+
+// ── UTILS ──
+function overlayClick(e, id) {
+    if (e.target.id === id) {
+        id === 'cartOverlay' ? closeCart() : closeAdmin();
+    }
+}
+
+function toast(msg, type = 'ok') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className   = `toast show ${type}`;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// Início
+renderWines();
+</script>
+</body>
+</html>
