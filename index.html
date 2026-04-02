@@ -12,23 +12,33 @@
        ║  ✏️  CONFIGURAÇÕES — EDITE AQUI, NÃO MEXA NO RESTO!        ║
        ╚══════════════════════════════════════════════════════════════╝ */
 
-    // 📱 SEU WHATSAPP (55 + DDD + número, sem espaços ou traços)
-    const WHATSAPP_NUMBER = "5511965866812";
+    // 📱 WHATSAPP DA EMPRESA (55 + DDD + número, sem espaços)
+    const WHATSAPP_NUMBER = "5511999999999";
 
     // 🏪 NOME DA LOJA
-    const STORE_NAME = "Vinoteca BR";
+    const STORE_NAME = "Vinheria Premium";
 
     // 🔑 SENHA DO PAINEL ADMIN
     const ADMIN_PASSWORD = "vinho123";
 
+    // 👤 LISTA DE VENDEDORES
+    // Adicione ou remova vendedores aqui
+    const VENDEDORES = [
+        "Selecione o vendedor...",
+        "Ana Silva",
+        "Carlos Souza",
+        "Mariana Lima",
+        "Roberto Costa"
+    ];
+
     // 🍷 LISTA DE VINHOS
-    // image: use "images/nome.jpg" para foto local (coloque na pasta images/)
-    //        ou cole uma URL completa https://...
+    // image: "images/nome.jpg" para foto local  |  ou URL completa https://...
+    // TAMANHO RECOMENDADO PARA AS FOTOS: 600 x 800 pixels (proporção 3:4, retrato)
     let wines = [
         {
             id: 1,
-            name: "DV Catena Malbec Malbec",
-            type: "tinto",        // tinto | branco | rose | espumante
+            name: "Cabernet Sauvignon Reserva",
+            type: "tinto",          // tinto | branco | rose | espumante
             origin: "Vale do Napa, EUA",
             year: 2019,
             description: "Vinho encorpado com notas de cassis, amora e leve toque de carvalho francês.",
@@ -120,428 +130,317 @@
        ╚══════════════════════════════════════════════════════════════╝ */
     </script>
 
+    <!-- ═══════════════════ ESTILOS TELA ═══════════════════ -->
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
         :root {
-            --vinho:     #7A2832;
-            --vinho-dk:  #4A1820;
-            --ouro:      #C9A84C;
-            --ouro-lt:   #E8D5A3;
-            --creme:     #FDF6EC;
-            --dark:      #1A1010;
-            --cinza:     #6B5B5B;
-            --ok:        #2E7D32;
-            --alerta:    #E65100;
+            --vinho:    #7A2832;
+            --vinho-dk: #4A1820;
+            --ouro:     #C9A84C;
+            --ouro-lt:  #E8D5A3;
+            --creme:    #FDF6EC;
+            --dark:     #1A1010;
+            --ok:       #2E7D32;
         }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--dark);
-            color: var(--creme);
-            min-height: 100vh;
-        }
+        body { font-family:'DM Sans',sans-serif; background:var(--dark); color:var(--creme); min-height:100vh; }
 
+        /* ── HEADER ── */
         header {
             background: linear-gradient(160deg, var(--vinho-dk) 0%, var(--vinho) 60%, #8B3040 100%);
-            padding: 3rem 2rem 2.5rem;
-            text-align: center;
-            border-bottom: 2px solid var(--ouro);
-            position: relative;
-            overflow: hidden;
+            padding: 3rem 2rem 2.5rem; text-align:center;
+            border-bottom: 2px solid var(--ouro); position:relative; overflow:hidden;
         }
         header::before {
-            content: '';
-            position: absolute; inset: 0;
+            content:''; position:absolute; inset:0;
             background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='%23C9A84C' opacity='.15'/%3E%3C/svg%3E") repeat;
         }
-        h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 600;
-            color: var(--ouro-lt);
-            letter-spacing: 2px;
-            position: relative;
-        }
-        .subtitle {
-            font-family: 'Cormorant Garamond', serif;
-            font-style: italic;
-            color: rgba(232,213,163,.7);
-            font-size: 1.1rem;
-            margin-top: .4rem;
-            position: relative;
-        }
+        h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3.5rem); font-weight:600; color:var(--ouro-lt); letter-spacing:2px; position:relative; }
+        .subtitle { font-family:'Cormorant Garamond',serif; font-style:italic; color:rgba(232,213,163,.7); font-size:1.1rem; margin-top:.4rem; position:relative; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        /* ── LAYOUT ── */
+        .container { max-width:1400px; margin:0 auto; padding:2rem; }
+        .controls { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:2.5rem; }
 
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .search-wrap { position: relative; flex: 1; min-width: 220px; }
+        /* ── BUSCA ── */
+        .search-wrap { position:relative; flex:1; min-width:220px; }
         .search-wrap input {
-            width: 100%;
-            padding: .85rem 1rem .85rem 2.8rem;
-            border: 1.5px solid rgba(201,168,76,.3);
-            border-radius: 40px;
-            background: rgba(255,255,255,.06);
-            color: var(--creme);
-            font-family: 'DM Sans', sans-serif;
-            font-size: .95rem;
-            transition: .3s;
+            width:100%; padding:.85rem 1rem .85rem 2.8rem;
+            border:1.5px solid rgba(201,168,76,.3); border-radius:40px;
+            background:rgba(255,255,255,.06); color:var(--creme);
+            font-family:'DM Sans',sans-serif; font-size:.95rem; transition:.3s;
         }
-        .search-wrap input:focus { outline: none; border-color: var(--ouro); background: rgba(255,255,255,.1); }
-        .search-wrap::before { content: '🔍'; position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); font-size: 1rem; }
+        .search-wrap input:focus { outline:none; border-color:var(--ouro); background:rgba(255,255,255,.1); }
+        .search-wrap::before { content:'🔍'; position:absolute; left:.9rem; top:50%; transform:translateY(-50%); font-size:1rem; }
 
-        .filters { display: flex; gap: .5rem; flex-wrap: wrap; }
+        /* ── FILTROS / BOTÕES TOPO ── */
+        .top-right { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
         .btn-filter {
-            padding: .5rem 1.1rem;
-            border: 1.5px solid rgba(201,168,76,.35);
-            background: transparent;
-            color: var(--ouro-lt);
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            font-size: .85rem;
-            font-weight: 500;
-            transition: .25s;
+            padding:.5rem 1.1rem; border:1.5px solid rgba(201,168,76,.35);
+            background:transparent; color:var(--ouro-lt); border-radius:20px;
+            cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:500; transition:.25s;
         }
-        .btn-filter:hover, .btn-filter.active {
-            background: var(--vinho);
-            border-color: var(--ouro);
-            color: var(--ouro-lt);
-        }
+        .btn-filter:hover, .btn-filter.active { background:var(--vinho); border-color:var(--ouro); }
 
+        .btn-catalog {
+            padding:.5rem 1.1rem; border:1.5px solid var(--ouro);
+            background:rgba(201,168,76,.12); color:var(--ouro); border-radius:20px;
+            cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:600; transition:.25s;
+            display:flex; align-items:center; gap:.4rem;
+        }
+        .btn-catalog:hover { background:rgba(201,168,76,.25); }
+
+        /* ── CARRINHO FAB ── */
         .cart-fab {
-            position: fixed;
-            top: 1.5rem; right: 1.5rem;
-            width: 58px; height: 58px;
-            background: var(--vinho);
-            border: 2px solid var(--ouro);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem;
-            cursor: pointer;
-            z-index: 900;
-            box-shadow: 0 4px 24px rgba(0,0,0,.45);
-            transition: .3s;
+            position:fixed; top:1.5rem; right:1.5rem;
+            width:58px; height:58px; background:var(--vinho); border:2px solid var(--ouro);
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            font-size:1.4rem; cursor:pointer; z-index:900;
+            box-shadow:0 4px 24px rgba(0,0,0,.45); transition:.3s;
         }
-        .cart-fab:hover { transform: scale(1.1); background: var(--vinho-dk); }
+        .cart-fab:hover { transform:scale(1.1); background:var(--vinho-dk); }
         .cart-badge {
-            position: absolute; top: -4px; right: -4px;
-            background: var(--ouro); color: var(--vinho-dk);
-            width: 22px; height: 22px;
-            border-radius: 50%;
-            font-size: .75rem; font-weight: 700;
-            display: flex; align-items: center; justify-content: center;
+            position:absolute; top:-4px; right:-4px;
+            background:var(--ouro); color:var(--vinho-dk);
+            width:22px; height:22px; border-radius:50%;
+            font-size:.75rem; font-weight:700;
+            display:flex; align-items:center; justify-content:center;
         }
 
-        .wine-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-            gap: 2rem;
-        }
-
+        /* ── GRID VINHOS ── */
+        .wine-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:2rem; }
         .wine-card {
-            background: linear-gradient(145deg, rgba(255,255,255,.07) 0%, rgba(255,255,255,.03) 100%);
-            border: 1px solid rgba(201,168,76,.15);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: .35s;
-            position: relative;
+            background:linear-gradient(145deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.03) 100%);
+            border:1px solid rgba(201,168,76,.15); border-radius:16px; overflow:hidden; transition:.35s;
         }
-        .wine-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(201,168,76,.5);
-            box-shadow: 0 18px 40px rgba(0,0,0,.5);
-        }
+        .wine-card:hover { transform:translateY(-8px); border-color:rgba(201,168,76,.5); box-shadow:0 18px 40px rgba(0,0,0,.5); }
 
-        .wine-img-wrap { position: relative; height: 320px; overflow: hidden; background: #2a1a1a; }
-        .wine-img-wrap img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            transition: transform .4s;
-        }
-        .wine-img-wrap .no-img {
-            width: 100%; height: 100%;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            color: rgba(201,168,76,.3);
-            font-size: .85rem; gap: .5rem;
-        }
-        .no-img-icon { font-size: 3rem; opacity: .4; }
-        .wine-card:hover .wine-img-wrap img { transform: scale(1.05); }
+        .wine-img-wrap { position:relative; height:320px; overflow:hidden; background:#2a1a1a; }
+        .wine-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform .4s; }
+        .wine-card:hover .wine-img-wrap img { transform:scale(1.05); }
+        .no-img { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:rgba(201,168,76,.3); font-size:.85rem; gap:.5rem; }
+        .no-img-icon { font-size:3rem; opacity:.4; }
 
-        .type-badge {
-            position: absolute; top: 1rem; left: 1rem;
-            padding: .3rem .8rem;
-            border-radius: 12px;
-            font-size: .75rem; font-weight: 600;
-            text-transform: uppercase; letter-spacing: .8px;
-        }
-        .type-tinto    { background: #6B0000; color: #ffcccc; }
-        .type-branco   { background: #F5F5DC; color: #444; }
-        .type-rose     { background: #E8A4B8; color: #6B0030; }
-        .type-espumante{ background: #C9A84C; color: #2a1a00; }
+        .type-badge { position:absolute; top:1rem; left:1rem; padding:.3rem .8rem; border-radius:12px; font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.8px; }
+        .type-tinto     { background:#6B0000; color:#ffcccc; }
+        .type-branco    { background:#F5F5DC; color:#444; }
+        .type-rose      { background:#E8A4B8; color:#6B0030; }
+        .type-espumante { background:#C9A84C; color:#2a1a00; }
 
-        .wine-body { padding: 1.4rem; }
-        .wine-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.25rem; font-weight: 600;
-            color: var(--ouro-lt);
-            margin-bottom: .3rem; line-height: 1.3;
-        }
-        .wine-meta { font-size: .82rem; color: #9e8e8e; margin-bottom: .7rem; }
-        .wine-desc { font-size: .9rem; color: #c5b5b5; line-height: 1.55; }
+        .wine-body { padding:1.4rem; }
+        .wine-name { font-family:'Cormorant Garamond',serif; font-size:1.25rem; font-weight:600; color:var(--ouro-lt); margin-bottom:.3rem; line-height:1.3; }
+        .wine-meta { font-size:.82rem; color:#9e8e8e; margin-bottom:.7rem; }
+        .wine-desc { font-size:.9rem; color:#c5b5b5; line-height:1.55; }
+        .wine-footer { display:flex; justify-content:space-between; align-items:center; margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(201,168,76,.2); }
+        .price { font-family:'Cormorant Garamond',serif; font-size:1.7rem; font-weight:600; color:var(--ouro); }
+        .stock-info { text-align:right; }
+        .stock-label { font-size:.75rem; color:#888; }
+        .stock-val { font-weight:600; font-size:1rem; }
+        .s-ok  { color:#66BB6A; }
+        .s-med { color:#FFA726; }
+        .s-low { color:#EF5350; }
 
-        .wine-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem; padding-top: 1rem;
-            border-top: 1px solid rgba(201,168,76,.2);
-        }
-        .price {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.7rem; font-weight: 600;
-            color: var(--ouro);
-        }
-        .stock-info { text-align: right; }
-        .stock-label { font-size: .75rem; color: #888; }
-        .stock-val { font-weight: 600; font-size: 1rem; }
-        .s-ok  { color: #66BB6A; }
-        .s-med { color: #FFA726; }
-        .s-low { color: #EF5350; }
-
-        .qty-row {
-            display: flex; align-items: center;
-            justify-content: center; gap: 1rem;
-            margin-top: 1rem;
-        }
-        .qty-btn {
-            width: 32px; height: 32px; border-radius: 50%;
-            border: 1.5px solid var(--ouro);
-            background: transparent; color: var(--ouro);
-            font-size: 1.1rem; cursor: pointer;
-            transition: .2s;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .qty-btn:hover { background: var(--ouro); color: var(--vinho-dk); }
-        .qty-val { font-size: 1.2rem; font-weight: 600; min-width: 32px; text-align: center; }
-
-        .btn-add {
-            width: 100%; margin-top: .9rem; padding: .9rem;
-            background: linear-gradient(135deg, var(--vinho) 0%, var(--vinho-dk) 100%);
-            color: var(--ouro-lt); border: none; border-radius: 10px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 1rem; font-weight: 600; cursor: pointer; transition: .3s;
-        }
-        .btn-add:hover:not(:disabled) { opacity: .85; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(122,40,50,.5); }
-        .btn-add:disabled { background: #3a3030; color: #666; cursor: not-allowed; }
+        .qty-row { display:flex; align-items:center; justify-content:center; gap:1rem; margin-top:1rem; }
+        .qty-btn { width:32px; height:32px; border-radius:50%; border:1.5px solid var(--ouro); background:transparent; color:var(--ouro); font-size:1.1rem; cursor:pointer; transition:.2s; display:flex; align-items:center; justify-content:center; }
+        .qty-btn:hover { background:var(--ouro); color:var(--vinho-dk); }
+        .qty-val { font-size:1.2rem; font-weight:600; min-width:32px; text-align:center; }
+        .btn-add { width:100%; margin-top:.9rem; padding:.9rem; background:linear-gradient(135deg,var(--vinho) 0%,var(--vinho-dk) 100%); color:var(--ouro-lt); border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; transition:.3s; }
+        .btn-add:hover:not(:disabled) { opacity:.85; transform:translateY(-2px); box-shadow:0 6px 18px rgba(122,40,50,.5); }
+        .btn-add:disabled { background:#3a3030; color:#666; cursor:not-allowed; }
 
         /* ── OVERLAY / MODAL ── */
-        .overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,.75);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center; justify-content: center;
-            padding: 1rem;
-        }
-        .overlay.open { display: flex; animation: fadeIn .25s; }
+        .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; padding:1rem; }
+        .overlay.open { display:flex; animation:fadeIn .25s; }
         @keyframes fadeIn { from{opacity:0}to{opacity:1} }
-
-        .modal {
-            background: #1e1212; border: 1.5px solid var(--ouro);
-            border-radius: 18px;
-            width: 100%; max-width: 560px; max-height: 90vh;
-            display: flex; flex-direction: column;
-            animation: slideUp .3s;
-        }
+        .modal { background:#1e1212; border:1.5px solid var(--ouro); border-radius:18px; width:100%; max-width:580px; max-height:92vh; display:flex; flex-direction:column; animation:slideUp .3s; }
         @keyframes slideUp { from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1} }
 
-        .modal-hd {
-            background: linear-gradient(135deg, var(--vinho) 0%, var(--vinho-dk) 100%);
-            padding: 1.3rem 1.5rem;
-            display: flex; justify-content: space-between; align-items: center;
-            border-radius: 16px 16px 0 0;
-        }
-        .modal-hd h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--ouro-lt); }
-        .btn-close {
-            background: none; border: none; color: var(--creme);
-            font-size: 1.3rem; cursor: pointer;
-            width: 36px; height: 36px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            transition: .2s;
-        }
-        .btn-close:hover { background: rgba(255,255,255,.12); transform: rotate(90deg); }
+        .modal-hd { background:linear-gradient(135deg,var(--vinho) 0%,var(--vinho-dk) 100%); padding:1.3rem 1.5rem; display:flex; justify-content:space-between; align-items:center; border-radius:16px 16px 0 0; }
+        .modal-hd h2 { font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--ouro-lt); }
+        .btn-close { background:none; border:none; color:var(--creme); font-size:1.3rem; cursor:pointer; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:.2s; }
+        .btn-close:hover { background:rgba(255,255,255,.12); transform:rotate(90deg); }
 
-        .cart-list { flex: 1; overflow-y: auto; padding: 1.2rem; }
-        .empty-msg { text-align: center; padding: 3rem; color: #6b5b5b; }
-        .empty-msg div { font-size: 3rem; margin-bottom: 1rem; }
+        .cart-list { flex:1; overflow-y:auto; padding:1.2rem; }
+        .empty-msg { text-align:center; padding:3rem; color:#6b5b5b; }
+        .empty-msg div { font-size:3rem; margin-bottom:1rem; }
 
-        .cart-item {
-            display: flex; gap: .9rem; padding: 1rem;
-            background: rgba(255,255,255,.04);
-            border-radius: 10px; margin-bottom: .8rem;
-            border: 1px solid rgba(201,168,76,.12);
-        }
-        .ci-img { width: 72px; height: 72px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(201,168,76,.25); flex-shrink: 0; background: #2a1a1a; }
-        .ci-info { flex: 1; }
-        .ci-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--ouro-lt); }
-        .ci-price { font-size: .9rem; color: #998888; margin: .2rem 0; }
-        .ci-row { display: flex; align-items: center; gap: .5rem; margin-top: .4rem; }
-        .ci-qbtn {
-            width: 22px; height: 22px; border-radius: 50%;
-            border: 1px solid var(--ouro); background: transparent;
-            color: var(--ouro); cursor: pointer; font-size: .9rem;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .ci-subtotal { margin-left: auto; color: var(--ouro); font-weight: 600; font-size: .95rem; }
-        .ci-del { color: #c0504d; cursor: pointer; font-size: 1.1rem; transition: .2s; flex-shrink: 0; }
-        .ci-del:hover { transform: scale(1.2); }
+        .cart-item { display:flex; gap:.9rem; padding:1rem; background:rgba(255,255,255,.04); border-radius:10px; margin-bottom:.8rem; border:1px solid rgba(201,168,76,.12); }
+        .ci-img { width:72px; height:72px; object-fit:cover; border-radius:6px; border:1px solid rgba(201,168,76,.25); flex-shrink:0; background:#2a1a1a; }
+        .ci-info { flex:1; }
+        .ci-name { font-family:'Cormorant Garamond',serif; font-size:1.05rem; color:var(--ouro-lt); }
+        .ci-price { font-size:.9rem; color:#998888; margin:.2rem 0; }
+        .ci-row { display:flex; align-items:center; gap:.5rem; margin-top:.4rem; }
+        .ci-qbtn { width:22px; height:22px; border-radius:50%; border:1px solid var(--ouro); background:transparent; color:var(--ouro); cursor:pointer; font-size:.9rem; display:flex; align-items:center; justify-content:center; }
+        .ci-subtotal { margin-left:auto; color:var(--ouro); font-weight:600; font-size:.95rem; }
+        .ci-del { color:#c0504d; cursor:pointer; font-size:1.1rem; transition:.2s; flex-shrink:0; }
+        .ci-del:hover { transform:scale(1.2); }
 
-        .modal-ft { padding: 1.3rem; border-top: 1px solid rgba(122,40,50,.4); }
-        .total-row {
-            display: flex; justify-content: space-between;
-            font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;
-            margin-bottom: 1.1rem; color: var(--ouro-lt);
-        }
-        .total-row span:last-child { color: var(--ouro); }
+        .modal-ft { padding:1.3rem; border-top:1px solid rgba(122,40,50,.4); }
+        .total-row { display:flex; justify-content:space-between; font-family:'Cormorant Garamond',serif; font-size:1.5rem; margin-bottom:1.1rem; color:var(--ouro-lt); }
+        .total-row span:last-child { color:var(--ouro); font-weight:700; }
 
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-bottom: 1rem; }
-        @media (max-width:480px) { .form-row { grid-template-columns: 1fr; } }
-        .fld label { display: block; font-size: .8rem; color: #9e8e8e; margin-bottom: .3rem; }
-        .fld input {
-            width: 100%; padding: .7rem .9rem;
-            border: 1.5px solid rgba(122,40,50,.5);
-            border-radius: 8px; background: rgba(255,255,255,.05);
-            color: var(--creme);
-            font-family: 'DM Sans', sans-serif; font-size: .9rem;
+        /* ── CAMPOS DO PEDIDO ── */
+        .order-fields { display:flex; flex-direction:column; gap:.7rem; margin-bottom:1rem; }
+        .fld label { display:block; font-size:.78rem; color:#9e8e8e; margin-bottom:.3rem; letter-spacing:.5px; text-transform:uppercase; }
+        .fld input, .fld select {
+            width:100%; padding:.7rem .9rem;
+            border:1.5px solid rgba(122,40,50,.5); border-radius:8px;
+            background:rgba(255,255,255,.05); color:var(--creme);
+            font-family:'DM Sans',sans-serif; font-size:.95rem;
         }
-        .fld input:focus { outline: none; border-color: var(--ouro); }
+        .fld input:focus, .fld select:focus { outline:none; border-color:var(--ouro); }
+        .fld select option { background:#1e1010; }
+        .fld-row { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
+        @media(max-width:480px){ .fld-row { grid-template-columns:1fr; } }
 
-        .btn-wpp {
-            width: 100%; padding: 1rem;
-            background: linear-gradient(135deg, #25D366 0%, #1a9e50 100%);
-            color: white; border: none; border-radius: 10px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: .3s;
-            display: flex; align-items: center; justify-content: center; gap: .6rem;
+        /* ── VENDEDOR BADGE ── */
+        .vendedor-badge {
+            background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.3);
+            border-radius:8px; padding:.5rem .9rem;
+            font-size:.85rem; color:var(--ouro-lt);
+            display:flex; align-items:center; gap:.5rem; margin-bottom:.7rem;
         }
-        .btn-wpp:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,.35); }
+
+        .btn-wpp { width:100%; padding:1rem; background:linear-gradient(135deg,#25D366 0%,#1a9e50 100%); color:white; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:1.05rem; font-weight:700; cursor:pointer; transition:.3s; display:flex; align-items:center; justify-content:center; gap:.6rem; }
+        .btn-wpp:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(37,211,102,.35); }
 
         /* ── TOAST ── */
-        .toast {
-            position: fixed; bottom: 2rem; left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            padding: .9rem 1.8rem; border-radius: 40px;
-            font-size: .95rem; font-weight: 500;
-            z-index: 2000; opacity: 0; transition: .35s; white-space: nowrap;
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast.ok  { background: var(--ok); color: #fff; }
-        .toast.err { background: #c62828; color: #fff; }
+        .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(80px); padding:.9rem 1.8rem; border-radius:40px; font-size:.95rem; font-weight:500; z-index:2000; opacity:0; transition:.35s; white-space:nowrap; }
+        .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+        .toast.ok  { background:var(--ok); color:#fff; }
+        .toast.err { background:#c62828; color:#fff; }
 
         /* ── ADMIN ── */
-        .admin-trigger {
-            position: fixed; bottom: 1.5rem; left: 1.5rem;
-            background: rgba(0,0,0,.6);
-            border: 1px solid rgba(201,168,76,.2);
-            color: rgba(201,168,76,.4);
-            padding: .5rem .9rem; border-radius: 8px;
-            font-size: .75rem; cursor: pointer; z-index: 100; transition: .2s;
-        }
-        .admin-trigger:hover { color: var(--ouro); border-color: var(--ouro); }
+        .admin-trigger { position:fixed; bottom:1.5rem; left:1.5rem; background:rgba(0,0,0,.6); border:1px solid rgba(201,168,76,.2); color:rgba(201,168,76,.4); padding:.5rem .9rem; border-radius:8px; font-size:.75rem; cursor:pointer; z-index:100; transition:.2s; }
+        .admin-trigger:hover { color:var(--ouro); border-color:var(--ouro); }
 
-        .admin-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,.85);
-            backdrop-filter: blur(6px);
-            z-index: 1100;
-            align-items: flex-start; justify-content: center;
-            padding: 1rem; overflow-y: auto;
-        }
-        .admin-overlay.open { display: flex; }
+        .admin-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(6px); z-index:1100; align-items:flex-start; justify-content:center; padding:1rem; overflow-y:auto; }
+        .admin-overlay.open { display:flex; }
+        .admin-panel { background:#1a1010; border:1.5px solid var(--ouro); border-radius:16px; width:100%; max-width:940px; margin:auto; overflow:hidden; }
+        .admin-hd { background:var(--vinho-dk); padding:1.2rem 1.5rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(201,168,76,.3); }
+        .admin-hd h2 { font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--ouro); }
+        .admin-body { padding:1.5rem; }
+        .admin-note { background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.2); border-radius:8px; padding:1rem; font-size:.85rem; color:#c5b5b5; margin-bottom:1.5rem; line-height:1.7; }
+        .admin-note strong { color:var(--ouro-lt); }
+        .admin-note code { background:rgba(0,0,0,.3); padding:1px 5px; border-radius:3px; font-size:.8rem; }
 
-        .admin-panel {
-            background: #1a1010; border: 1.5px solid var(--ouro);
-            border-radius: 16px; width: 100%; max-width: 920px;
-            margin: auto; overflow: hidden;
-        }
-        .admin-hd {
-            background: var(--vinho-dk); padding: 1.2rem 1.5rem;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(201,168,76,.3);
-        }
-        .admin-hd h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--ouro); }
-        .admin-body { padding: 1.5rem; }
+        .wine-admin-list { display:flex; flex-direction:column; gap:1rem; }
+        .wine-admin-item { background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.15); border-radius:10px; padding:1rem; }
+        .wai-top { display:flex; gap:.8rem; align-items:center; margin-bottom:.8rem; }
+        .wai-thumb { width:60px; height:60px; object-fit:cover; border-radius:6px; border:1px solid rgba(201,168,76,.3); background:#2a1a1a; flex-shrink:0; }
+        .wai-name { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--ouro-lt); }
+        .wai-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.6rem; }
+        .wai-fld label { display:block; font-size:.75rem; color:#888; margin-bottom:.25rem; }
+        .wai-fld input, .wai-fld select, .wai-fld textarea { width:100%; padding:.55rem .7rem; border:1px solid rgba(122,40,50,.4); border-radius:6px; background:rgba(255,255,255,.05); color:var(--creme); font-family:'DM Sans',sans-serif; font-size:.85rem; }
+        .wai-fld textarea { resize:vertical; height:60px; }
+        .wai-fld input:focus, .wai-fld select:focus, .wai-fld textarea:focus { outline:none; border-color:var(--ouro); }
+        .wai-fld select option { background:#1a1010; }
+        .wai-img-preview { margin-top:.5rem; width:100%; height:80px; object-fit:cover; border-radius:6px; background:#2a1a1a; display:block; }
 
-        .admin-note {
-            background: rgba(201,168,76,.08);
-            border: 1px solid rgba(201,168,76,.2);
-            border-radius: 8px; padding: 1rem;
-            font-size: .85rem; color: #c5b5b5; margin-bottom: 1.5rem; line-height: 1.6;
-        }
-        .admin-note strong { color: var(--ouro-lt); }
-        .admin-note code { background: rgba(0,0,0,.3); padding: 1px 6px; border-radius: 3px; font-size: .8rem; }
+        .admin-actions { display:flex; gap:.8rem; margin-top:1.5rem; flex-wrap:wrap; }
+        .btn-admin { padding:.75rem 1.4rem; border-radius:8px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.9rem; cursor:pointer; transition:.2s; border:none; }
+        .btn-save     { background:var(--ok); color:#fff; }
+        .btn-add-wine { background:var(--vinho); color:var(--ouro-lt); }
+        .btn-export   { background:var(--ouro); color:var(--vinho-dk); }
+        .btn-del-wine { background:#c62828; color:#fff; margin-left:auto; }
 
-        .wine-admin-list { display: flex; flex-direction: column; gap: 1rem; }
-        .wine-admin-item {
-            background: rgba(255,255,255,.04);
-            border: 1px solid rgba(201,168,76,.15);
-            border-radius: 10px; padding: 1rem;
-        }
-        .wai-top { display: flex; gap: .8rem; align-items: center; margin-bottom: .8rem; }
-        .wai-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(201,168,76,.3); background: #2a1a1a; flex-shrink: 0; }
-        .wai-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--ouro-lt); }
-        .wai-fields {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: .6rem;
-        }
-        .wai-fld label { display: block; font-size: .75rem; color: #888; margin-bottom: .25rem; }
-        .wai-fld input, .wai-fld select, .wai-fld textarea {
-            width: 100%; padding: .55rem .7rem;
-            border: 1px solid rgba(122,40,50,.4); border-radius: 6px;
-            background: rgba(255,255,255,.05); color: var(--creme);
-            font-family: 'DM Sans', sans-serif; font-size: .85rem;
-        }
-        .wai-fld textarea { resize: vertical; height: 60px; }
-        .wai-fld input:focus, .wai-fld select:focus, .wai-fld textarea:focus { outline: none; border-color: var(--ouro); }
-        .wai-fld select option { background: #1a1010; }
-        .wai-img-preview { margin-top: .5rem; width: 100%; height: 80px; object-fit: cover; border-radius: 6px; background: #2a1a1a; display: block; }
+        .login-box { padding:2.5rem; text-align:center; }
+        .login-box h3 { font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--ouro); margin-bottom:1.2rem; }
+        .login-box input { width:100%; max-width:280px; padding:.8rem 1rem; border-radius:8px; border:1.5px solid rgba(201,168,76,.3); background:rgba(255,255,255,.05); color:var(--creme); font-size:1rem; display:block; margin:0 auto 1rem; text-align:center; letter-spacing:4px; }
+        .login-box input:focus { outline:none; border-color:var(--ouro); }
+        .btn-login { padding:.7rem 2rem; background:var(--vinho); color:var(--ouro-lt); border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer; }
 
-        .admin-actions { display: flex; gap: .8rem; margin-top: 1.5rem; flex-wrap: wrap; }
-        .btn-admin {
-            padding: .75rem 1.4rem; border-radius: 8px;
-            font-family: 'DM Sans', sans-serif; font-weight: 600;
-            font-size: .9rem; cursor: pointer; transition: .2s; border: none;
-        }
-        .btn-save     { background: var(--ok); color: #fff; }
-        .btn-add-wine { background: var(--vinho); color: var(--ouro-lt); }
-        .btn-export   { background: var(--ouro); color: var(--vinho-dk); }
-        .btn-del-wine { background: #c62828; color: #fff; margin-left: auto; }
+        @media(max-width:640px){ .cart-fab { top:auto; bottom:5rem; right:1.5rem; } }
+    </style>
 
-        .login-box { padding: 2.5rem; text-align: center; }
-        .login-box h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--ouro); margin-bottom: 1.2rem; }
-        .login-box input {
-            width: 100%; max-width: 280px; padding: .8rem 1rem;
-            border-radius: 8px; border: 1.5px solid rgba(201,168,76,.3);
-            background: rgba(255,255,255,.05); color: var(--creme);
-            font-size: 1rem; display: block; margin: 0 auto 1rem;
-            text-align: center; letter-spacing: 4px;
+    <!-- ═══════════════════ ESTILOS CATÁLOGO (impressão/PDF) ═══════════════════ -->
+    <style id="catalog-style">
+        .catalog-overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,.9); z-index:1200;
+            overflow-y:auto; padding:2rem 1rem;
         }
-        .login-box input:focus { outline: none; border-color: var(--ouro); }
-        .btn-login { padding: .7rem 2rem; background: var(--vinho); color: var(--ouro-lt); border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .catalog-overlay.open { display:block; }
 
-        @media (max-width: 640px) {
-            .cart-fab { top: auto; bottom: 5rem; right: 1.5rem; }
+        .catalog-wrap {
+            max-width:900px; margin:0 auto;
+            background:#fff; border-radius:12px;
+            overflow:hidden;
+        }
+
+        .catalog-toolbar {
+            background:#4A1820; padding:1rem 1.5rem;
+            display:flex; justify-content:space-between; align-items:center;
+            position:sticky; top:0; z-index:10;
+        }
+        .catalog-toolbar span { color:#E8D5A3; font-family:'Cormorant Garamond',serif; font-size:1.3rem; }
+        .catalog-toolbar-btns { display:flex; gap:.6rem; }
+        .btn-print { padding:.5rem 1.2rem; background:#C9A84C; color:#2a1a00; border:none; border-radius:8px; font-weight:700; font-size:.9rem; cursor:pointer; }
+        .btn-close-cat { padding:.5rem 1rem; background:transparent; color:#E8D5A3; border:1px solid rgba(232,213,163,.4); border-radius:8px; font-size:.9rem; cursor:pointer; }
+
+        /* PÁGINA DO CATÁLOGO */
+        .catalog-page { padding:2.5rem; background:#fff; color:#222; }
+        .catalog-header { text-align:center; border-bottom:3px double #7A2832; padding-bottom:1.5rem; margin-bottom:2rem; }
+        .catalog-header h1 { font-family:'Cormorant Garamond',serif; font-size:2.5rem; color:#4A1820; letter-spacing:2px; }
+        .catalog-header p { color:#888; font-style:italic; font-size:1rem; margin-top:.3rem; }
+
+        /* GRID DE RÓTULOS */
+        .catalog-grid {
+            display:grid;
+            grid-template-columns:repeat(2, 1fr);
+            gap:1.5rem;
+        }
+
+        /* RÓTULO INDIVIDUAL */
+        .label-card {
+            border:1.5px solid #C9A84C;
+            border-radius:10px;
+            overflow:hidden;
+            page-break-inside:avoid;
+            break-inside:avoid;
+        }
+        .label-img {
+            width:100%; height:200px;
+            object-fit:cover;
+            background:#f5f0e8;
+            display:block;
+        }
+        .label-img-placeholder {
+            width:100%; height:200px;
+            background:linear-gradient(135deg,#f5f0e8,#ede0cc);
+            display:flex; align-items:center; justify-content:center;
+            font-size:3rem; color:#C9A84C; opacity:.4;
+        }
+        .label-body { padding:1rem 1.2rem; }
+        .label-type-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem; }
+        .label-badge { padding:.2rem .7rem; border-radius:10px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; }
+        .lb-tinto     { background:#f0d0d0; color:#6B0000; }
+        .lb-branco    { background:#f5f5dc; color:#555; border:1px solid #ccc; }
+        .lb-rose      { background:#fce4ec; color:#880e4f; }
+        .lb-espumante { background:#fff8dc; color:#5d4037; border:1px solid #e6c46a; }
+        .label-year { font-size:.8rem; color:#999; }
+        .label-name { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:#4A1820; line-height:1.2; margin-bottom:.2rem; }
+        .label-origin { font-size:.8rem; color:#888; margin-bottom:.5rem; }
+        .label-desc { font-size:.82rem; color:#555; line-height:1.5; margin-bottom:.7rem; border-top:1px solid #f0e8d8; padding-top:.7rem; }
+        .label-price-row { display:flex; justify-content:space-between; align-items:center; }
+        .label-price { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:700; color:#C9A84C; }
+        .label-stock-badge { font-size:.75rem; padding:.2rem .6rem; border-radius:10px; font-weight:600; }
+        .lsb-ok  { background:#e8f5e9; color:#2E7D32; }
+        .lsb-med { background:#fff3e0; color:#E65100; }
+        .lsb-low { background:#ffebee; color:#c62828; }
+
+        .catalog-footer { text-align:center; margin-top:2rem; padding-top:1rem; border-top:1px solid #e0d0c0; font-size:.8rem; color:#bbb; }
+
+        /* ── PRINT ── */
+        @media print {
+            body > *:not(.catalog-overlay) { display:none !important; }
+            .catalog-overlay { position:static !important; background:none !important; padding:0 !important; display:block !important; }
+            .catalog-wrap { border-radius:0 !important; box-shadow:none !important; }
+            .catalog-toolbar { display:none !important; }
+            .catalog-page { padding:1.5rem !important; }
+            .catalog-grid { grid-template-columns:repeat(2,1fr) !important; }
+            .label-card { border:1px solid #C9A84C !important; }
         }
     </style>
 </head>
@@ -562,67 +461,109 @@
         <div class="search-wrap">
             <input type="text" id="searchInput" placeholder="Buscar vinhos..." oninput="renderWines()">
         </div>
-        <div class="filters">
+        <div class="top-right">
             <button class="btn-filter active" data-f="todos"     onclick="setFilter(this)">Todos</button>
             <button class="btn-filter"        data-f="tinto"     onclick="setFilter(this)">Tintos</button>
             <button class="btn-filter"        data-f="branco"    onclick="setFilter(this)">Brancos</button>
             <button class="btn-filter"        data-f="rose"      onclick="setFilter(this)">Rosés</button>
             <button class="btn-filter"        data-f="espumante" onclick="setFilter(this)">Espumantes</button>
+            <button class="btn-catalog" onclick="openCatalog()">📋 Catálogo</button>
         </div>
     </div>
     <div class="wine-grid" id="wineGrid"></div>
 </div>
 
-<!-- Modal: Carrinho -->
+<!-- ═══ MODAL: CARRINHO ═══ -->
 <div class="overlay" id="cartOverlay" onclick="if(event.target===this)closeCart()">
     <div class="modal">
         <div class="modal-hd">
-            <h2>🛒 Seu Pedido</h2>
+            <h2>🛒 Novo Pedido</h2>
             <button class="btn-close" onclick="closeCart()">✕</button>
         </div>
+
         <div class="cart-list" id="cartList"></div>
+
         <div class="modal-ft">
             <div class="total-row">
-                <span>Total:</span>
+                <span>Total do Pedido:</span>
                 <span id="cartTotal">R$ 0,00</span>
             </div>
-            <div class="form-row">
+
+            <div class="order-fields">
+                <!-- VENDEDOR -->
                 <div class="fld">
-                    <label>Seu Nome *</label>
-                    <input type="text" id="custName" placeholder="Nome completo">
+                    <label>👤 Vendedor *</label>
+                    <select id="selVendedor">
+                        <!-- preenchido via JS -->
+                    </select>
                 </div>
+
+                <!-- CLIENTE -->
+                <div class="fld-row">
+                    <div class="fld">
+                        <label>Cliente *</label>
+                        <input type="text" id="custName" placeholder="Nome completo">
+                    </div>
+                    <div class="fld">
+                        <label>Telefone *</label>
+                        <input type="tel" id="custPhone" placeholder="(11) 99999-9999">
+                    </div>
+                </div>
+
+                <!-- ENDEREÇO (opcional) -->
                 <div class="fld">
-                    <label>Telefone *</label>
-                    <input type="tel" id="custPhone" placeholder="(11) 99999-9999">
+                    <label>Endereço / Observação</label>
+                    <input type="text" id="custAddr" placeholder="Endereço de entrega ou observação (opcional)">
                 </div>
             </div>
+
             <button class="btn-wpp" onclick="sendWhatsApp()">
-                📱 Enviar Pedido via WhatsApp
+                📲 Enviar Pedido pelo WhatsApp
             </button>
         </div>
     </div>
 </div>
 
-<!-- Modal: Admin -->
+<!-- ═══ CATÁLOGO (impressão) ═══ -->
+<div class="catalog-overlay" id="catalogOverlay">
+    <div class="catalog-wrap">
+        <div class="catalog-toolbar">
+            <span>📋 Catálogo — <span id="catTitle"></span></span>
+            <div class="catalog-toolbar-btns">
+                <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+                <button class="btn-close-cat" onclick="closeCatalog()">✕ Fechar</button>
+            </div>
+        </div>
+        <div class="catalog-page">
+            <div class="catalog-header">
+                <h1 id="catHeaderTitle"></h1>
+                <p id="catHeaderDate"></p>
+            </div>
+            <div class="catalog-grid" id="catalogGrid"></div>
+            <div class="catalog-footer" id="catFooter"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: ADMIN ═══ -->
 <div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
     <div class="admin-panel">
         <div class="admin-hd">
-            <h2>⚙️ Painel Admin — <span id="storeNameAdmin"></span></h2>
+            <h2>⚙️ Painel Admin</h2>
             <button class="btn-close" onclick="closeAdmin()">✕</button>
         </div>
-
         <div id="loginBox" class="login-box">
             <h3>🔒 Área Restrita</h3>
             <input type="password" id="adminPwd" placeholder="••••••••" onkeyup="if(event.key==='Enter')doLogin()">
             <br>
             <button class="btn-login" onclick="doLogin()">Entrar</button>
         </div>
-
         <div id="adminContent" style="display:none">
             <div class="admin-body">
                 <div class="admin-note">
-                    <strong>🖼️ Fotos do seu computador:</strong> coloque os arquivos na pasta <code>images/</code> (na mesma pasta que o index.html) e use <code>images/nome.jpg</code> no campo Imagem.<br><br>
-                    <strong>💾 Para salvar permanentemente:</strong> clique em "Exportar HTML" e substitua o arquivo <code>index.html</code> — todas as alterações ficam embutidas no arquivo.
+                    <strong>🖼️ Tamanho recomendado para fotos: 600 × 800 pixels</strong> (proporção 3:4, retrato).<br>
+                    Formatos aceitos: JPG, PNG, WebP. Coloque os arquivos na pasta <code>images/</code> e use <code>images/nome.jpg</code> no campo Imagem.<br><br>
+                    <strong>💾 Para salvar:</strong> clique em "Exportar HTML" e substitua o arquivo no GitHub.
                 </div>
                 <div class="wine-admin-list" id="adminList"></div>
                 <div class="admin-actions">
@@ -638,6 +579,7 @@
 <button class="admin-trigger" onclick="openAdmin()">⚙ admin</button>
 <div class="toast" id="toast"></div>
 
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
 <script>
 // ── ESTADO ──
 let cart      = [];
@@ -645,8 +587,20 @@ let filter    = 'todos';
 let adminAuth = false;
 let nextId    = wines.length ? Math.max(...wines.map(w=>w.id)) + 1 : 1;
 
-document.getElementById('storeTitle').textContent    = STORE_NAME;
-document.getElementById('storeNameAdmin').textContent = STORE_NAME;
+// ── INIT ──
+document.getElementById('storeTitle').textContent = STORE_NAME;
+document.getElementById('catTitle').textContent   = STORE_NAME;
+
+// Preenche select de vendedores
+const selVend = document.getElementById('selVendedor');
+VENDEDORES.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v === VENDEDORES[0] ? '' : v;
+    opt.textContent = v;
+    if (v === VENDEDORES[0]) opt.disabled = true;
+    selVend.appendChild(opt);
+});
+selVend.selectedIndex = 0;
 
 // ── RENDER VINHOS ──
 function renderWines() {
@@ -666,30 +620,24 @@ function renderWines() {
     }
 
     list.forEach(w => {
-        const sc = w.stock > 10 ? 's-ok' : w.stock > 5 ? 's-med' : 's-low';
-        const st = w.stock === 0 ? 'Esgotado' : `${w.stock} unid.`;
-        const imgHTML = w.image
+        const sc   = w.stock > 10 ? 's-ok' : w.stock > 5 ? 's-med' : 's-low';
+        const st   = w.stock === 0 ? 'Esgotado' : `${w.stock} unid.`;
+        const imgH = w.image
             ? `<img src="${w.image}" alt="${w.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
             : '';
-        const noImgHTML = `<div class="no-img" style="${w.image?'display:none':''}"><span class="no-img-icon">🍷</span><span>Sem imagem</span></div>`;
+        const noH  = `<div class="no-img" style="${w.image?'display:none':''}"><span class="no-img-icon">🍷</span><span>Sem imagem</span></div>`;
 
         const card = document.createElement('div');
         card.className = 'wine-card';
         card.innerHTML = `
-            <div class="wine-img-wrap">
-                ${imgHTML}${noImgHTML}
-                <span class="type-badge type-${w.type}">${w.type}</span>
-            </div>
+            <div class="wine-img-wrap">${imgH}${noH}<span class="type-badge type-${w.type}">${w.type}</span></div>
             <div class="wine-body">
                 <div class="wine-name">${w.name}</div>
                 <div class="wine-meta">📍 ${w.origin}&nbsp;&nbsp;|&nbsp;&nbsp;🗓️ ${w.year}</div>
                 <div class="wine-desc">${w.description}</div>
                 <div class="wine-footer">
-                    <div class="price">R$ ${w.price.toFixed(2).replace('.',',')}</div>
-                    <div class="stock-info">
-                        <div class="stock-label">Estoque</div>
-                        <div class="stock-val ${sc}">${st}</div>
-                    </div>
+                    <div class="price">R$ ${fmt(w.price)}</div>
+                    <div class="stock-info"><div class="stock-label">Estoque</div><div class="stock-val ${sc}">${st}</div></div>
                 </div>
                 ${w.stock > 0 ? `
                     <div class="qty-row">
@@ -705,7 +653,7 @@ function renderWines() {
 }
 
 function setFilter(btn) {
-    document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.btn-filter').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     filter = btn.dataset.f;
     renderWines();
@@ -713,101 +661,156 @@ function setFilter(btn) {
 
 function changeQty(id, d) {
     const el  = document.getElementById(`qty-${id}`);
-    const max = wines.find(w => w.id === id).stock;
-    el.textContent = Math.min(max, Math.max(1, +el.textContent + d));
+    const max = wines.find(w=>w.id===id).stock;
+    el.textContent = Math.min(max, Math.max(1, +el.textContent+d));
 }
 
 // ── CARRINHO ──
 function addCart(id) {
-    const wine = wines.find(w => w.id === id);
+    const wine = wines.find(w=>w.id===id);
     const qty  = +document.getElementById(`qty-${id}`).textContent;
-    const ex   = cart.find(c => c.id === id);
+    const ex   = cart.find(c=>c.id===id);
     if (ex) {
-        if (ex.qty + qty > wine.stock) { toast('Quantidade máxima atingida!', 'err'); return; }
+        if (ex.qty+qty > wine.stock){ toast('Quantidade máxima atingida!','err'); return; }
         ex.qty += qty;
     } else {
-        cart.push({ id, name: wine.name, price: wine.price, qty, image: wine.image });
+        cart.push({ id, name:wine.name, price:wine.price, qty, image:wine.image });
     }
     document.getElementById(`qty-${id}`).textContent = '1';
     updateBadge();
     toast('Adicionado! 🍷');
 }
 
-function updateBadge() {
-    document.getElementById('cartBadge').textContent = cart.reduce((s,c) => s+c.qty, 0);
-}
+function updateBadge(){ document.getElementById('cartBadge').textContent = cart.reduce((s,c)=>s+c.qty,0); }
 
-function openCart()  { renderCart(); document.getElementById('cartOverlay').classList.add('open'); }
-function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); }
+function openCart(){  renderCart(); document.getElementById('cartOverlay').classList.add('open'); }
+function closeCart(){ document.getElementById('cartOverlay').classList.remove('open'); }
 
 function renderCart() {
     const list = document.getElementById('cartList');
     if (!cart.length) {
-        list.innerHTML = '<div class="empty-msg"><div>🍷</div><p>Seu carrinho está vazio</p></div>';
-        document.getElementById('cartTotal').textContent = 'R$ 0,00';
+        list.innerHTML='<div class="empty-msg"><div>🍷</div><p>Carrinho vazio</p></div>';
+        document.getElementById('cartTotal').textContent='R$ 0,00';
         return;
     }
-    let total = 0;
-    list.innerHTML = '';
-    cart.forEach((item, i) => {
-        const sub = item.price * item.qty;
-        total += sub;
-        const el = document.createElement('div');
+    let total=0; list.innerHTML='';
+    cart.forEach((item,i) => {
+        const sub = item.price*item.qty; total+=sub;
+        const el  = document.createElement('div');
         el.className = 'cart-item';
         el.innerHTML = `
             <img class="ci-img" src="${item.image||''}" alt="${item.name}" onerror="this.style.background='#2a1a1a';this.removeAttribute('src')">
             <div class="ci-info">
                 <div class="ci-name">${item.name}</div>
-                <div class="ci-price">R$ ${item.price.toFixed(2).replace('.',',')}</div>
+                <div class="ci-price">R$ ${fmt(item.price)} / unid.</div>
                 <div class="ci-row">
                     <button class="ci-qbtn" onclick="adjCart(${i},-1)">−</button>
                     <span>${item.qty}</span>
                     <button class="ci-qbtn" onclick="adjCart(${i},1)">+</button>
-                    <span class="ci-subtotal">R$ ${sub.toFixed(2).replace('.',',')}</span>
+                    <span class="ci-subtotal">R$ ${fmt(sub)}</span>
                 </div>
             </div>
             <span class="ci-del" onclick="delCart(${i})">🗑️</span>`;
         list.appendChild(el);
     });
-    document.getElementById('cartTotal').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
+    document.getElementById('cartTotal').textContent = `R$ ${fmt(total)}`;
 }
 
-function adjCart(i, d) {
-    const nq = cart[i].qty + d;
-    if (nq < 1) { delCart(i); return; }
-    const wine = wines.find(w => w.id === cart[i].id);
-    if (nq > wine.stock) { toast('Limite de estoque!','err'); return; }
-    cart[i].qty = nq;
-    renderCart(); updateBadge();
+function adjCart(i,d) {
+    const nq   = cart[i].qty+d;
+    const wine = wines.find(w=>w.id===cart[i].id);
+    if (nq<1){ delCart(i); return; }
+    if (nq>wine.stock){ toast('Limite de estoque!','err'); return; }
+    cart[i].qty=nq; renderCart(); updateBadge();
 }
+function delCart(i){ cart.splice(i,1); renderCart(); updateBadge(); }
 
-function delCart(i) { cart.splice(i,1); renderCart(); updateBadge(); }
-
-// ── WHATSAPP ──
+// ── WHATSAPP — mensagem limpa, só texto ──
 function sendWhatsApp() {
-    const name  = document.getElementById('custName').value.trim();
-    const phone = document.getElementById('custPhone').value.trim();
-    if (!name || !phone) { toast('Preencha nome e telefone!','err'); return; }
+    const vendedor = document.getElementById('selVendedor').value;
+    const name     = document.getElementById('custName').value.trim();
+    const phone    = document.getElementById('custPhone').value.trim();
+    const addr     = document.getElementById('custAddr').value.trim();
+
+    if (!vendedor)       { toast('Selecione o vendedor!','err'); return; }
+    if (!name || !phone) { toast('Preencha nome e telefone do cliente!','err'); return; }
     if (!cart.length)    { toast('Carrinho vazio!','err'); return; }
 
-    let msg = `🍷 *PEDIDO — ${STORE_NAME}*%0A%0A`;
-    msg    += `👤 *Cliente:* ${name}%0A`;
-    msg    += `📱 *Contato:* ${phone}%0A%0A`;
-    msg    += `*ITENS:*%0A━━━━━━━━━━━━━━━━%0A`;
+    // Data e hora no formato BR
+    const now  = new Date();
+    const data = now.toLocaleDateString('pt-BR');
+    const hora = now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+    let msg = '';
+    msg += `*PEDIDO - ${STORE_NAME}*\n`;
+    msg += `Data: ${data} as ${hora}\n`;
+    msg += `─────────────────────\n`;
+    msg += `VENDEDOR: ${vendedor}\n`;
+    msg += `CLIENTE: ${name}\n`;
+    msg += `CONTATO: ${phone}\n`;
+    if (addr) msg += `LOCAL: ${addr}\n`;
+    msg += `─────────────────────\n`;
+    msg += `ITENS:\n\n`;
 
     let total = 0;
     cart.forEach((c,i) => {
         const sub = c.price * c.qty;
         total += sub;
-        msg += `%0A${i+1}. ${c.name}%0A`;
-        msg += `   ${c.qty}x R$${c.price.toFixed(2)} = R$${sub.toFixed(2)}%0A`;
+        msg += `${i+1}. ${c.name}\n`;
+        msg += `   ${c.qty} un x R$${fmt(c.price)} = R$${fmt(sub)}\n`;
     });
-    msg += `%0A━━━━━━━━━━━━━━━━%0A`;
-    msg += `*TOTAL: R$ ${total.toFixed(2)}* 🍷`;
 
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+    msg += `\n─────────────────────\n`;
+    msg += `TOTAL: R$ ${fmt(total)}\n`;
+    msg += `─────────────────────\n`;
+    msg += `Aguardo confirmacao. Obrigado!`;
+
+    const encoded = encodeURIComponent(msg);
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
     toast('Abrindo WhatsApp... 📱');
 }
+
+// ── CATÁLOGO ──
+function openCatalog() {
+    const grid = document.getElementById('catalogGrid');
+    const now  = new Date().toLocaleDateString('pt-BR',{year:'numeric',month:'long',day:'numeric'});
+
+    document.getElementById('catHeaderTitle').textContent = STORE_NAME;
+    document.getElementById('catHeaderDate').textContent  = `Catálogo gerado em ${now}`;
+    document.getElementById('catFooter').textContent      = `${STORE_NAME} • ${wines.filter(w=>w.stock>0).length} produtos disponíveis`;
+
+    grid.innerHTML = '';
+    wines.forEach(w => {
+        const sc  = w.stock > 10 ? 'lsb-ok' : w.stock > 5 ? 'lsb-med' : 'lsb-low';
+        const st  = w.stock === 0 ? 'Esgotado' : `${w.stock} em estoque`;
+        const imgH = w.image
+            ? `<img class="label-img" src="${w.image}" alt="${w.name}" onerror="this.outerHTML='<div class=\\'label-img-placeholder\\'>🍷</div>'">`
+            : `<div class="label-img-placeholder">🍷</div>`;
+
+        const card = document.createElement('div');
+        card.className = 'label-card';
+        card.innerHTML = `
+            ${imgH}
+            <div class="label-body">
+                <div class="label-type-row">
+                    <span class="label-badge lb-${w.type}">${w.type}</span>
+                    <span class="label-year">${w.year}</span>
+                </div>
+                <div class="label-name">${w.name}</div>
+                <div class="label-origin">📍 ${w.origin}</div>
+                <div class="label-desc">${w.description}</div>
+                <div class="label-price-row">
+                    <span class="label-price">R$ ${fmt(w.price)}</span>
+                    <span class="label-stock-badge ${sc}">${st}</span>
+                </div>
+            </div>`;
+        grid.appendChild(card);
+    });
+
+    document.getElementById('catalogOverlay').classList.add('open');
+}
+
+function closeCatalog(){ document.getElementById('catalogOverlay').classList.remove('open'); }
 
 // ── ADMIN ──
 function openAdmin() { document.getElementById('adminOverlay').classList.add('open'); }
@@ -819,9 +822,7 @@ function doLogin() {
         document.getElementById('loginBox').style.display    = 'none';
         document.getElementById('adminContent').style.display = '';
         renderAdminList();
-    } else {
-        toast('Senha incorreta!','err');
-    }
+    } else { toast('Senha incorreta!','err'); }
 }
 
 function renderAdminList() {
@@ -829,49 +830,29 @@ function renderAdminList() {
     list.innerHTML = '';
     wines.forEach(w => {
         const el = document.createElement('div');
-        el.className = 'wine-admin-item';
-        el.id = `wai-${w.id}`;
+        el.className='wine-admin-item'; el.id=`wai-${w.id}`;
         el.innerHTML = `
             <div class="wai-top">
                 <img class="wai-thumb" id="thumb-${w.id}" src="${w.image||''}" alt="" onerror="this.style.background='#3a2020';this.removeAttribute('src')">
                 <div class="wai-name">${w.name}</div>
             </div>
             <div class="wai-fields">
-                <div class="wai-fld" style="grid-column:span 2">
-                    <label>Nome do Vinho</label>
-                    <input id="wn-${w.id}" value="${w.name}">
-                </div>
-                <div class="wai-fld">
-                    <label>Tipo</label>
+                <div class="wai-fld" style="grid-column:span 2"><label>Nome do Vinho</label><input id="wn-${w.id}" value="${w.name}"></div>
+                <div class="wai-fld"><label>Tipo</label>
                     <select id="wt-${w.id}">
                         ${['tinto','branco','rose','espumante'].map(t=>`<option ${w.type===t?'selected':''}>${t}</option>`).join('')}
                     </select>
                 </div>
-                <div class="wai-fld">
-                    <label>Ano</label>
-                    <input id="wy-${w.id}" type="number" value="${w.year}">
-                </div>
-                <div class="wai-fld">
-                    <label>Origem</label>
-                    <input id="wo-${w.id}" value="${w.origin}">
-                </div>
-                <div class="wai-fld">
-                    <label>Preço R$</label>
-                    <input id="wp-${w.id}" type="number" step="0.01" value="${w.price}">
-                </div>
-                <div class="wai-fld">
-                    <label>Estoque</label>
-                    <input id="ws-${w.id}" type="number" value="${w.stock}">
-                </div>
+                <div class="wai-fld"><label>Ano</label><input id="wy-${w.id}" type="number" value="${w.year}"></div>
+                <div class="wai-fld"><label>Origem</label><input id="wo-${w.id}" value="${w.origin}"></div>
+                <div class="wai-fld"><label>Preço R$</label><input id="wp-${w.id}" type="number" step="0.01" value="${w.price}"></div>
+                <div class="wai-fld"><label>Estoque</label><input id="ws-${w.id}" type="number" value="${w.stock}"></div>
                 <div class="wai-fld" style="grid-column:span 2">
-                    <label>Imagem — URL ou caminho local (ex: images/vinho.jpg)</label>
+                    <label>Imagem — URL ou images/nome.jpg (600×800px recomendado)</label>
                     <input id="wi-${w.id}" value="${w.image||''}" oninput="prevThumb(${w.id})">
                     <img class="wai-img-preview" id="prev-${w.id}" src="${w.image||''}" onerror="this.style.display='none'" style="${w.image?'':'display:none'}">
                 </div>
-                <div class="wai-fld" style="grid-column:span 3">
-                    <label>Descrição</label>
-                    <textarea id="wd-${w.id}">${w.description}</textarea>
-                </div>
+                <div class="wai-fld" style="grid-column:span 3"><label>Descrição</label><textarea id="wd-${w.id}">${w.description}</textarea></div>
             </div>
             <div style="text-align:right;margin-top:.5rem">
                 <button class="btn-admin btn-del-wine" onclick="delWineAdmin(${w.id})">🗑️ Remover</button>
@@ -883,19 +864,18 @@ function renderAdminList() {
 function prevThumb(id) {
     const val = document.getElementById(`wi-${id}`).value;
     const prev = document.getElementById(`prev-${id}`);
-    prev.src = val;
-    prev.style.display = val ? '' : 'none';
+    prev.src = val; prev.style.display = val ? '' : 'none';
     document.getElementById(`thumb-${id}`).src = val;
 }
 
 function delWineAdmin(id) {
     if (!confirm('Remover este vinho?')) return;
-    wines = wines.filter(w => w.id !== id);
+    wines = wines.filter(w=>w.id!==id);
     renderAdminList();
 }
 
 function addWineAdmin() {
-    wines.push({ id: nextId++, name:'Novo Vinho', type:'tinto', origin:'', year: new Date().getFullYear(), description:'', price:0, stock:0, image:'' });
+    wines.push({ id:nextId++, name:'Novo Vinho', type:'tinto', origin:'', year:new Date().getFullYear(), description:'', price:0, stock:0, image:'' });
     renderAdminList();
     document.getElementById('adminList').lastElementChild?.scrollIntoView({behavior:'smooth'});
 }
@@ -916,28 +896,25 @@ function applyAdmin() {
     toast('Alterações aplicadas! ✅');
 }
 
-// Exporta o próprio HTML com os dados atualizados embutidos
 function exportHTML() {
     applyAdmin();
     const winesJSON = JSON.stringify(wines, null, 8);
     const html = document.documentElement.outerHTML;
-    // Substitui o bloco let wines = [...]; pelo atualizado
-    const updated = html.replace(
-        /let wines = \[[\s\S]*?\];/,
-        `let wines = ${winesJSON};`
-    );
-    const blob = new Blob([updated], {type:'text/html'});
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
+    const updated = html.replace(/let wines = \[[\s\S]*?\];/, `let wines = ${winesJSON};`);
+    const blob = new Blob([updated],{type:'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
     a.download = 'index.html';
     a.click();
     toast('index.html exportado! Substitua no GitHub 🚀');
 }
 
+// ── UTILS ──
+function fmt(n){ return n.toFixed(2).replace('.',','); }
+
 function toast(msg, type='ok') {
     const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className   = `toast show ${type}`;
+    el.textContent = msg; el.className=`toast show ${type}`;
     clearTimeout(el._t);
     el._t = setTimeout(()=>el.classList.remove('show'), 3000);
 }
