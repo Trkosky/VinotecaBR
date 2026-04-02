@@ -25,7 +25,7 @@ let wines = [
         // description: "Vinho encorpado com notas de cassis, amora e leve toque de carvalho francês.",
         price: 107.90,
         stock: 12,
-        image: "images/dv mbc mbc.png"   // ← coloque sua foto aqui
+        image: "images/dv_mbc_mbc.png"   // ← coloque sua foto aqui
     },
     {
         id: 2,
