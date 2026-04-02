@@ -4,7 +4,7 @@
 // ============================================================
 
 // 📱 SEU NÚMERO DE WHATSAPP (formato: 55 + DDD + número, sem espaços)
-const WHATSAPP_NUMBER = "5511999999999";
+const WHATSAPP_NUMBER = "5511965866812";
 
 // 🏪 NOME DA SUA LOJA
 const STORE_NAME = "Vinoteca BR";
@@ -29,14 +29,14 @@ let wines = [
     },
     {
         id: 2,
-        name: "Sauvignon Blanc Premium",
-        type: "branco",
+        name: "Luca Old Malbec",
+        type: "Tinto",
         origin: "Loire, França",
-        year: 2021,
-        description: "Fresco e mineral, com aromas cítricos e florais. Final elegante.",
-        price: 145.00,
-        stock: 8,
-        image: "images/sauvignon.jpg"
+        year: ,
+        // description: "Fresco e mineral, com aromas cítricos e florais. Final elegante.",
+        price: 147.90,
+        stock: 6,
+        image: "images/luca.png"
     },
     {
         id: 3,
