@@ -20,7 +20,7 @@ let wines = [
         id: 1,
         name: "DV Catena Malbec Malbec",
         type: "tinto",          // tinto | branco | rose | espumante
-        origin: "Vale do Napa, EUA",
+        origin: "Argentina",
         year: Sob Consulta,
         // description: "Vinho encorpado com notas de cassis, amora e leve toque de carvalho francês.",
         price: 107.90,
@@ -31,7 +31,7 @@ let wines = [
         id: 2,
         name: "Luca Old Malbec",
         type: "Tinto",
-        origin: "Loire, França",
+        origin: "Argentina",
         year: ,
         // description: "Fresco e mineral, com aromas cítricos e florais. Final elegante.",
         price: 147.90,
@@ -40,14 +40,14 @@ let wines = [
     },
     {
         id: 3,
-        name: "Whispering Angel Rosé",
-        type: "rose",
-        origin: "Provence, França",
-        year: 2022,
-        description: "Rosé icônico, seco e refinado. Notas de pêssego e flores brancas.",
+        name: "Luigi Bosca Malbec",
+        type: "Tinto",
+        origin: "Argentina",
+        year: ,
+        // description: "Rosé icônico, seco e refinado. Notas de pêssego e flores brancas.",
         price: 220.00,
         stock: 15,
-        image: "images/rose.jpg"
+        image: "images/luigi_bosca_mbc.png"
     },
     {
         id: 4,
