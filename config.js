@@ -7,7 +7,7 @@
 const WHATSAPP_NUMBER = "5511999999999";
 
 // 🏪 NOME DA SUA LOJA
-const STORE_NAME = "Vinheria Premium";
+const STORE_NAME = "Vinoteca BR";
 
 // 🔑 SENHA DO PAINEL ADMIN (para editar vinhos pelo navegador)
 const ADMIN_PASSWORD = "vinho123";
@@ -18,14 +18,14 @@ const ADMIN_PASSWORD = "vinho123";
 let wines = [
     {
         id: 1,
-        name: "Cabernet Sauvignon Reserva",
+        name: "DV Catena Malbec Malbec",
         type: "tinto",          // tinto | branco | rose | espumante
         origin: "Vale do Napa, EUA",
-        year: 2019,
-        description: "Vinho encorpado com notas de cassis, amora e leve toque de carvalho francês.",
-        price: 189.90,
+        year: Sob Consulta,
+        // description: "Vinho encorpado com notas de cassis, amora e leve toque de carvalho francês.",
+        price: 107.90,
         stock: 12,
-        image: "images/cabernet.jpg"   // ← coloque sua foto aqui
+        image: "images/dv mbc mbc.png"   // ← coloque sua foto aqui
     },
     {
         id: 2,
