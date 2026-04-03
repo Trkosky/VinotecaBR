@@ -6,201 +6,280 @@
     <title>🍷 VinotecaBR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-    /* ╔══════════════════════════════════════════════════════════════╗
-       ║  ✏️  CONFIGURAÇÕES — EDITE AQUI, NÃO MEXA NO RESTO!        ║
-       ╚══════════════════════════════════════════════════════════════╝ */
+    /* ╔══════════════════════════════════════════════════════════════════╗
+       ║  PASSO 1 — Cole aqui as credenciais do seu projeto Firebase     ║
+       ║  Veja o arquivo FIREBASE_SETUP.md para instruções completas     ║
+       ╚══════════════════════════════════════════════════════════════════╝ */
+    const firebaseConfig = {
+  apiKey: "AIzaSyBy7irmpOni2O3tCzfLwwqr2gRAt44EBIQ",
+  authDomain: "vinotecabr-bfffd.firebaseapp.com",
+  projectId: "vinotecabr-bfffd",
+  storageBucket: "vinotecabr-bfffd.firebasestorage.app",
+  messagingSenderId: "852209724042",
+  appId: "1:852209724042:web:b03dc7ee9776f452fe9b73",
+  measurementId: "G-CMSZ826SDZ"
+};
 
+    /* ╔══════════════════════════════════════════════════════════════════╗
+       ║  PASSO 2 — Dados da loja                                        ║
+       ╚══════════════════════════════════════════════════════════════════╝ */
     const WHATSAPP_NUMBER = "5511965866812";
     const STORE_NAME      = "VinotecaBR";
     const ADMIN_PASSWORD  = "vinho123";
+    const VENDEDORES = ["Selecione o vendedor...","Eric","Monique"];
 
-    const VENDEDORES = [
-        "Selecione o vendedor...",
-        "Eric",
-        "Monique",
+    /* ╔══════════════════════════════════════════════════════════════════╗
+       ║  PASSO 3 — Catálogo inicial (só usado na PRIMEIRA abertura)     ║
+       ║  Depois disso o estoque vive no Firebase.                       ║
+       ╚══════════════════════════════════════════════════════════════════╝ */
+    const WINES_INICIAL = [
+        {id:1,name:"DV CATENA CABERNET MALBEC",               type:"tinto", origin:"ARGENTINA",year:0,description:"Produtor Catena Zapata.",      price:89.90, stock:12,image:"images/DV_CB_M_GIT.jpeg"},
+        {id:2,name:"DV CATENA MALBEC MALBEC",                 type:"tinto", origin:"ARGENTINA",year:0,description:"Produtor Catena Zapata.",      price:104.90,stock:8, image:"images/DV_MB_MB_GIT.jpeg"},
+        {id:3,name:"DV CATENA HISTORICO MALBEC PETIT VERDOT", type:"tinto", origin:"ARGENTINA",year:0,description:"Produtor Catena Zapata.",      price:164.90,stock:15,image:"images/DV_PETIT_VERDOT_GIT.jpeg"},
+        {id:4,name:"EL ENEMIGO MALBEC",                       type:"tinto", origin:"ARGENTINA",year:0,description:"Produtor El Enemigo.",         price:124.90,stock:6, image:"images/EL_MB_GIT.jpeg"},
+        {id:5,name:"LUCA OLD VINE MALBEC",                    type:"tinto", origin:"ARGENTINA",year:0,description:"Produtor Luca (Laura Catena).",price:169.00,stock:6, image:"images/LUCA_MB_GIT.jpeg"},
+        {id:6,name:"LUIGI BOSCA MALBEC",                      type:"tinto", origin:"ARGENTINA",year:0,description:"Produtor Bodega Luigi Bosca.", price:89.90, stock:18,image:"images/LUIGI_MB_GIT.jpeg"},
+        {id:7,name:"NICASSIA VINEYARDS MALBEC",               type:"tinto", origin:"ARGENTINA",year:0,description:"Produtor Catena Zapata.",      price:69.90, stock:12,image:"images/NICASSIA_MB_GIT.jpeg"},
+        {id:8,name:"SUSANA BALBO SIGNATURA TORRONTES",        type:"branco",origin:"ARGENTINA",year:0,description:"Produtor Susana Balbo.",       price:137.90,stock:6, image:"images/prosecco.jpg"}
     ];
-
-    // TAMANHO IDEAL DA FOTO: 600 x 900 pixels (proporção 2:3, retrato)
-    let wines = [
-        { id:1, name:"DV CATENA CABERNET MALBEC",                   type:"tinto",   origin:"ARGENTINA", year:0, description:"Produtor Catena Zapata.",       price:89.90,  stock:12, image:"images/DV_CB_M_GIT.jpeg"        },
-        { id:2, name:"DV CATENA MALBEC MALBEC",                      type:"tinto",   origin:"ARGENTINA", year:0, description:"Produtor Catena Zapata.",       price:104.90, stock:8,  image:"images/DV_MB_MB_GIT.jpeg"       },
-        { id:3, name:"DV CATENA HISTORICO MALBEC PETIT VERDOT",      type:"tinto",   origin:"ARGENTINA", year:0, description:"Produtor Catena Zapata.",       price:164.90, stock:15, image:"images/DV_PETIT_VERDOT_GIT.jpeg"},
-        { id:4, name:"EL ENEMIGO MALBEC",                            type:"tinto",   origin:"ARGENTINA", year:0, description:"Produtor El Enemigo.",          price:124.90, stock:6,  image:"images/EL_MB_GIT.jpeg"          },
-        { id:5, name:"LUCA OLD VINE MALBEC",                         type:"tinto",   origin:"ARGENTINA", year:0, description:"Produtor Luca (Laura Catena).", price:169.00, stock:6,  image:"images/LUCA_MB_GIT.jpeg"        },
-        { id:6, name:"LUIGI BOSCA MALBEC",                           type:"tinto",   origin:"ARGENTINA", year:0, description:"Produtor Bodega Luigi Bosca.",  price:89.90,  stock:18, image:"images/LUIGI_MB_GIT.jpeg"       },
-        { id:7, name:"NICASSIA VINEYARDS MALBEC",                    type:"tinto",   origin:"ARGENTINA", year:0, description:"Produtor Catena Zapata.",       price:69.90,  stock:12, image:"images/NICASSIA_MB_GIT.jpeg"    },
-        { id:8, name:"SUSANA BALBO SIGNATURA TORRONTES",             type:"branco",  origin:"ARGENTINA", year:0, description:"Produtor Susana Balbo.",        price:137.90, stock:6,  image:"images/prosecco.jpg"            }
-    ];
-
-    /* ╔══════════════════════════════════════════════════════════════╗
-       ║   FIM DAS CONFIGURAÇÕES — não altere o código abaixo        ║
-       ╚══════════════════════════════════════════════════════════════╝ */
     </script>
 
     <style>
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-        :root { --vinho:#7A2832; --vinho-dk:#4A1820; --ouro:#C9A84C; --ouro-lt:#E8D5A3; --creme:#FDF6EC; --dark:#1A1010; --ok:#2E7D32; }
-        body { font-family:'DM Sans',sans-serif; background:var(--dark); color:var(--creme); min-height:100vh; }
-        header { background:linear-gradient(160deg,var(--vinho-dk) 0%,var(--vinho) 60%,#8B3040 100%); padding:3rem 2rem 2.5rem; text-align:center; border-bottom:2px solid var(--ouro); position:relative; overflow:hidden; }
-        header::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='%23C9A84C' opacity='.15'/%3E%3C/svg%3E") repeat; }
-        h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3.5rem); font-weight:600; color:var(--ouro-lt); letter-spacing:2px; position:relative; }
-        .subtitle { font-family:'Cormorant Garamond',serif; font-style:italic; color:rgba(232,213,163,.7); font-size:1.1rem; margin-top:.4rem; position:relative; }
-        .container { max-width:1400px; margin:0 auto; padding:2rem; }
-        .controls { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:2.5rem; }
-        .search-wrap { position:relative; flex:1; min-width:220px; }
-        .search-wrap input { width:100%; padding:.85rem 1rem .85rem 2.8rem; border:1.5px solid rgba(201,168,76,.3); border-radius:40px; background:rgba(255,255,255,.06); color:var(--creme); font-family:'DM Sans',sans-serif; font-size:.95rem; transition:.3s; }
-        .search-wrap input:focus { outline:none; border-color:var(--ouro); background:rgba(255,255,255,.1); }
-        .search-wrap::before { content:'🔍'; position:absolute; left:.9rem; top:50%; transform:translateY(-50%); font-size:1rem; }
-        .top-right { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
-        .btn-filter { padding:.5rem 1.1rem; border:1.5px solid rgba(201,168,76,.35); background:transparent; color:var(--ouro-lt); border-radius:20px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:500; transition:.25s; }
-        .btn-filter:hover,.btn-filter.active { background:var(--vinho); border-color:var(--ouro); }
-        .btn-catalog { padding:.5rem 1.1rem; border:1.5px solid var(--ouro); background:rgba(201,168,76,.12); color:var(--ouro); border-radius:20px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:600; transition:.25s; }
-        .btn-catalog:hover { background:rgba(201,168,76,.25); }
-        .cart-fab { position:fixed; top:1.5rem; right:1.5rem; width:58px; height:58px; background:var(--vinho); border:2px solid var(--ouro); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; cursor:pointer; z-index:900; box-shadow:0 4px 24px rgba(0,0,0,.45); transition:.3s; }
-        .cart-fab:hover { transform:scale(1.1); }
-        .cart-badge { position:absolute; top:-4px; right:-4px; background:var(--ouro); color:var(--vinho-dk); width:22px; height:22px; border-radius:50%; font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
-        .wine-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:2rem; }
-        .wine-card { background:linear-gradient(145deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.03) 100%); border:1px solid rgba(201,168,76,.15); border-radius:16px; overflow:hidden; transition:.35s; }
-        .wine-card:hover { transform:translateY(-8px); border-color:rgba(201,168,76,.5); box-shadow:0 18px 40px rgba(0,0,0,.5); }
-        .wine-img-wrap { position:relative; height:400px; overflow:hidden; background:#2a1a1a; }
-        .wine-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform .4s; }
-        .wine-card:hover .wine-img-wrap img { transform:scale(1.05); }
-        .no-img { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:rgba(201,168,76,.3); font-size:.85rem; gap:.5rem; }
-        .no-img-icon { font-size:3rem; opacity:.4; }
-        .type-badge { position:absolute; top:1rem; left:1rem; padding:.3rem .8rem; border-radius:12px; font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.8px; }
-        .type-tinto { background:#6B0000; color:#ffcccc; } .type-branco { background:#F5F5DC; color:#444; } .type-rose { background:#E8A4B8; color:#6B0030; } .type-espumante { background:#C9A84C; color:#2a1a00; }
-        .btn-share-label { position:absolute; top:1rem; right:1rem; width:38px; height:38px; background:rgba(26,16,16,.75); border:1.5px solid var(--ouro); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; cursor:pointer; transition:.25s; backdrop-filter:blur(4px); }
-        .btn-share-label:hover { background:var(--ouro); transform:scale(1.1); }
-        .wine-body { padding:1.4rem; }
-        .wine-name { font-family:'Cormorant Garamond',serif; font-size:1.25rem; font-weight:600; color:var(--ouro-lt); margin-bottom:.3rem; line-height:1.3; }
-        .wine-meta { font-size:.82rem; color:#9e8e8e; margin-bottom:.7rem; }
-        .wine-desc { font-size:.9rem; color:#c5b5b5; line-height:1.55; }
-        .wine-footer { display:flex; justify-content:space-between; align-items:center; margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(201,168,76,.2); }
-        .price { font-family:'Cormorant Garamond',serif; font-size:1.7rem; font-weight:600; color:var(--ouro); }
-        .stock-info { text-align:right; } .stock-label { font-size:.75rem; color:#888; } .stock-val { font-weight:600; font-size:1rem; }
-        .s-ok { color:#66BB6A; } .s-med { color:#FFA726; } .s-low { color:#EF5350; }
-        .qty-row { display:flex; align-items:center; justify-content:center; gap:1rem; margin-top:1rem; }
-        .qty-btn { width:32px; height:32px; border-radius:50%; border:1.5px solid var(--ouro); background:transparent; color:var(--ouro); font-size:1.1rem; cursor:pointer; transition:.2s; display:flex; align-items:center; justify-content:center; }
-        .qty-btn:hover { background:var(--ouro); color:var(--vinho-dk); }
-        .qty-val { font-size:1.2rem; font-weight:600; min-width:32px; text-align:center; }
-        .btn-add { width:100%; margin-top:.9rem; padding:.9rem; background:linear-gradient(135deg,var(--vinho) 0%,var(--vinho-dk) 100%); color:var(--ouro-lt); border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; transition:.3s; }
-        .btn-add:hover:not(:disabled) { opacity:.85; transform:translateY(-2px); }
-        .btn-add:disabled { background:#3a3030; color:#666; cursor:not-allowed; }
-        .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; padding:1rem; }
-        .overlay.open { display:flex; animation:fadeIn .25s; }
-        @keyframes fadeIn { from{opacity:0}to{opacity:1} }
-        .modal { background:#1e1212; border:1.5px solid var(--ouro); border-radius:18px; width:100%; max-width:580px; max-height:92vh; display:flex; flex-direction:column; animation:slideUp .3s; }
-        @keyframes slideUp { from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1} }
-        .modal-hd { background:linear-gradient(135deg,var(--vinho) 0%,var(--vinho-dk) 100%); padding:1.3rem 1.5rem; display:flex; justify-content:space-between; align-items:center; border-radius:16px 16px 0 0; }
-        .modal-hd h2 { font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--ouro-lt); }
-        .btn-close { background:none; border:none; color:var(--creme); font-size:1.3rem; cursor:pointer; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:.2s; }
-        .btn-close:hover { background:rgba(255,255,255,.12); transform:rotate(90deg); }
-        .cart-list { flex:1; overflow-y:auto; padding:1.2rem; }
-        .empty-msg { text-align:center; padding:3rem; color:#6b5b5b; }
-        .empty-msg div { font-size:3rem; margin-bottom:1rem; }
-        .cart-item { display:flex; gap:.9rem; padding:1rem; background:rgba(255,255,255,.04); border-radius:10px; margin-bottom:.8rem; border:1px solid rgba(201,168,76,.12); }
-        .ci-img { width:72px; height:72px; object-fit:cover; border-radius:6px; border:1px solid rgba(201,168,76,.25); flex-shrink:0; background:#2a1a1a; }
-        .ci-info { flex:1; } .ci-name { font-family:'Cormorant Garamond',serif; font-size:1.05rem; color:var(--ouro-lt); } .ci-price { font-size:.9rem; color:#998888; margin:.2rem 0; }
-        .ci-row { display:flex; align-items:center; gap:.5rem; margin-top:.4rem; }
-        .ci-qbtn { width:22px; height:22px; border-radius:50%; border:1px solid var(--ouro); background:transparent; color:var(--ouro); cursor:pointer; font-size:.9rem; display:flex; align-items:center; justify-content:center; }
-        .ci-subtotal { margin-left:auto; color:var(--ouro); font-weight:600; font-size:.95rem; }
-        .ci-del { color:#c0504d; cursor:pointer; font-size:1.1rem; transition:.2s; flex-shrink:0; }
-        .ci-del:hover { transform:scale(1.2); }
-        .modal-ft { padding:1.3rem; border-top:1px solid rgba(122,40,50,.4); }
-        .total-row { display:flex; justify-content:space-between; font-family:'Cormorant Garamond',serif; font-size:1.5rem; margin-bottom:1.1rem; color:var(--ouro-lt); }
-        .total-row span:last-child { color:var(--ouro); font-weight:700; }
-        .order-fields { display:flex; flex-direction:column; gap:.7rem; margin-bottom:1rem; }
-        .fld label { display:block; font-size:.78rem; color:#9e8e8e; margin-bottom:.3rem; letter-spacing:.5px; text-transform:uppercase; }
-        .fld input,.fld select { width:100%; padding:.7rem .9rem; border:1.5px solid rgba(122,40,50,.5); border-radius:8px; background:rgba(255,255,255,.05); color:var(--creme); font-family:'DM Sans',sans-serif; font-size:.95rem; }
-        .fld input:focus,.fld select:focus { outline:none; border-color:var(--ouro); }
-        .fld select option { background:#1e1010; }
-        .fld-row { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
-        @media(max-width:480px){ .fld-row { grid-template-columns:1fr; } }
-        .btn-wpp { width:100%; padding:1rem; background:linear-gradient(135deg,#25D366 0%,#1a9e50 100%); color:white; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:1.05rem; font-weight:700; cursor:pointer; transition:.3s; display:flex; align-items:center; justify-content:center; gap:.6rem; }
-        .btn-wpp:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(37,211,102,.35); }
-        .label-preview-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:1500; align-items:center; justify-content:center; padding:1rem; flex-direction:column; gap:1rem; }
-        .label-preview-overlay.open { display:flex; }
-        .label-preview-img { max-width:380px; width:100%; border-radius:12px; box-shadow:0 8px 40px rgba(0,0,0,.6); }
-        .label-preview-actions { display:flex; gap:.8rem; flex-wrap:wrap; justify-content:center; }
-        .btn-lp { padding:.8rem 1.4rem; border-radius:10px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:1rem; cursor:pointer; border:none; transition:.3s; display:flex; align-items:center; gap:.5rem; }
-        .btn-lp-wpp { background:linear-gradient(135deg,#25D366,#1a9e50); color:#fff; } .btn-lp-dl { background:var(--ouro); color:var(--vinho-dk); } .btn-lp-cl { background:rgba(255,255,255,.1); color:var(--creme); border:1px solid rgba(255,255,255,.2); }
-        .btn-lp:hover { transform:translateY(-2px); opacity:.9; }
-        .generating-msg { color:var(--ouro-lt); font-family:'Cormorant Garamond',serif; font-size:1.3rem; display:none; }
-        .generating-msg.show { display:block; }
-        .catalog-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.9); z-index:1200; overflow-y:auto; padding:2rem 1rem; }
-        .catalog-overlay.open { display:block; }
-        .catalog-wrap { max-width:900px; margin:0 auto; background:#fff; border-radius:12px; overflow:hidden; }
-        .catalog-toolbar { background:#4A1820; padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10; }
-        .catalog-toolbar span { color:#E8D5A3; font-family:'Cormorant Garamond',serif; font-size:1.3rem; }
-        .catalog-toolbar-btns { display:flex; gap:.6rem; }
-        .btn-print { padding:.5rem 1.2rem; background:#C9A84C; color:#2a1a00; border:none; border-radius:8px; font-weight:700; font-size:.9rem; cursor:pointer; }
-        .btn-close-cat { padding:.5rem 1rem; background:transparent; color:#E8D5A3; border:1px solid rgba(232,213,163,.4); border-radius:8px; font-size:.9rem; cursor:pointer; }
-        .catalog-page { padding:2.5rem; background:#fff; color:#222; }
-        .catalog-header { text-align:center; border-bottom:3px double #7A2832; padding-bottom:1.5rem; margin-bottom:2rem; }
-        .catalog-header h1 { font-family:'Cormorant Garamond',serif; font-size:2.5rem; color:#4A1820; letter-spacing:2px; }
-        .catalog-header p { color:#888; font-style:italic; font-size:1rem; margin-top:.3rem; }
-        .catalog-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; }
-        .label-card { border:1.5px solid #C9A84C; border-radius:10px; overflow:hidden; page-break-inside:avoid; break-inside:avoid; }
-        .label-img { width:100%; height:240px; object-fit:cover; background:#f5f0e8; display:block; }
-        .label-img-placeholder { width:100%; height:240px; background:linear-gradient(135deg,#f5f0e8,#ede0cc); display:flex; align-items:center; justify-content:center; font-size:3rem; color:#C9A84C; opacity:.4; }
-        .label-body { padding:1rem 1.2rem; }
-        .label-type-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem; }
-        .label-badge { padding:.2rem .7rem; border-radius:10px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; }
-        .lb-tinto { background:#f0d0d0; color:#6B0000; } .lb-branco { background:#f5f5dc; color:#555; border:1px solid #ccc; } .lb-rose { background:#fce4ec; color:#880e4f; } .lb-espumante { background:#fff8dc; color:#5d4037; border:1px solid #e6c46a; }
-        .label-year { font-size:.8rem; color:#999; }
-        .label-name { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:#4A1820; line-height:1.2; margin-bottom:.2rem; }
-        .label-origin { font-size:.8rem; color:#888; margin-bottom:.5rem; }
-        .label-desc { font-size:.82rem; color:#555; line-height:1.5; margin-bottom:.7rem; border-top:1px solid #f0e8d8; padding-top:.7rem; }
-        .label-price-row { display:flex; justify-content:space-between; align-items:center; }
-        .label-price { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:700; color:#C9A84C; }
-        .label-stock-badge { font-size:.75rem; padding:.2rem .6rem; border-radius:10px; font-weight:600; }
-        .lsb-ok { background:#e8f5e9; color:#2E7D32; } .lsb-med { background:#fff3e0; color:#E65100; } .lsb-low { background:#ffebee; color:#c62828; }
-        .label-card-footer { display:flex; justify-content:flex-end; padding:.6rem 1rem .8rem; background:#fdf6ec; border-top:1px solid rgba(201,168,76,.2); }
-        .btn-share-catalog { padding:.4rem 1rem; background:linear-gradient(135deg,#25D366,#1a9e50); color:#fff; border:none; border-radius:20px; font-size:.8rem; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:.4rem; }
-        .catalog-footer { text-align:center; margin-top:2rem; padding-top:1rem; border-top:1px solid #e0d0c0; font-size:.8rem; color:#bbb; }
-        .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(80px); padding:.9rem 1.8rem; border-radius:40px; font-size:.95rem; font-weight:500; z-index:3000; opacity:0; transition:.35s; white-space:nowrap; }
-        .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
-        .toast.ok { background:var(--ok); color:#fff; } .toast.err { background:#c62828; color:#fff; } .toast.info { background:var(--vinho); color:var(--ouro-lt); }
-        .admin-trigger { position:fixed; bottom:1.5rem; left:1.5rem; background:rgba(0,0,0,.6); border:1px solid rgba(201,168,76,.2); color:rgba(201,168,76,.4); padding:.5rem .9rem; border-radius:8px; font-size:.75rem; cursor:pointer; z-index:100; transition:.2s; }
-        .admin-trigger:hover { color:var(--ouro); border-color:var(--ouro); }
-        .admin-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(6px); z-index:1100; align-items:flex-start; justify-content:center; padding:1rem; overflow-y:auto; }
-        .admin-overlay.open { display:flex; }
-        .admin-panel { background:#1a1010; border:1.5px solid var(--ouro); border-radius:16px; width:100%; max-width:940px; margin:auto; overflow:hidden; }
-        .admin-hd { background:var(--vinho-dk); padding:1.2rem 1.5rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(201,168,76,.3); }
-        .admin-hd h2 { font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--ouro); }
-        .admin-body { padding:1.5rem; }
-        .admin-note { background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.2); border-radius:8px; padding:1rem; font-size:.85rem; color:#c5b5b5; margin-bottom:1.5rem; line-height:1.8; }
-        .admin-note strong { color:var(--ouro-lt); } .admin-note code { background:rgba(0,0,0,.3); padding:1px 5px; border-radius:3px; font-size:.8rem; }
-        .wine-admin-list { display:flex; flex-direction:column; gap:1rem; }
-        .wine-admin-item { background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.15); border-radius:10px; padding:1rem; }
-        .wai-top { display:flex; gap:.8rem; align-items:center; margin-bottom:.8rem; }
-        .wai-thumb { width:60px; height:60px; object-fit:cover; border-radius:6px; border:1px solid rgba(201,168,76,.3); background:#2a1a1a; flex-shrink:0; }
-        .wai-name { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--ouro-lt); }
-        .wai-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.6rem; }
-        .wai-fld label { display:block; font-size:.75rem; color:#888; margin-bottom:.25rem; }
-        .wai-fld input,.wai-fld select,.wai-fld textarea { width:100%; padding:.55rem .7rem; border:1px solid rgba(122,40,50,.4); border-radius:6px; background:rgba(255,255,255,.05); color:var(--creme); font-family:'DM Sans',sans-serif; font-size:.85rem; }
-        .wai-fld textarea { resize:vertical; height:60px; }
-        .wai-fld input:focus,.wai-fld select:focus,.wai-fld textarea:focus { outline:none; border-color:var(--ouro); }
-        .wai-fld select option { background:#1a1010; }
-        .wai-img-preview { margin-top:.5rem; width:100%; height:80px; object-fit:cover; border-radius:6px; background:#2a1a1a; display:block; }
-        .admin-actions { display:flex; gap:.8rem; margin-top:1.5rem; flex-wrap:wrap; }
-        .btn-admin { padding:.75rem 1.4rem; border-radius:8px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.9rem; cursor:pointer; transition:.2s; border:none; }
-        .btn-save { background:var(--ok); color:#fff; } .btn-add-wine { background:var(--vinho); color:var(--ouro-lt); } .btn-export { background:var(--ouro); color:var(--vinho-dk); } .btn-del-wine { background:#c62828; color:#fff; margin-left:auto; }
-        .login-box { padding:2.5rem; text-align:center; }
-        .login-box h3 { font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--ouro); margin-bottom:1.2rem; }
-        .login-box input { width:100%; max-width:280px; padding:.8rem 1rem; border-radius:8px; border:1.5px solid rgba(201,168,76,.3); background:rgba(255,255,255,.05); color:var(--creme); font-size:1rem; display:block; margin:0 auto 1rem; text-align:center; letter-spacing:4px; }
-        .login-box input:focus { outline:none; border-color:var(--ouro); }
-        .btn-login { padding:.7rem 2rem; background:var(--vinho); color:var(--ouro-lt); border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer; }
-        @media print { body > *:not(.catalog-overlay) { display:none !important; } .catalog-overlay { position:static !important; background:none !important; padding:0 !important; display:block !important; } .catalog-toolbar,.label-card-footer { display:none !important; } .catalog-grid { grid-template-columns:repeat(2,1fr) !important; } }
-        @media(max-width:640px){ .cart-fab { top:auto; bottom:5rem; right:1.5rem; } }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--vinho:#7A2832;--vinho-dk:#4A1820;--ouro:#C9A84C;--ouro-lt:#E8D5A3;--creme:#FDF6EC;--dark:#1A1010;--ok:#2E7D32}
+        body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--creme);min-height:100vh}
+
+        #loadingScreen{position:fixed;inset:0;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:1.5rem}
+        .load-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--ouro-lt);letter-spacing:2px}
+        .load-spinner{width:48px;height:48px;border-radius:50%;border:3px solid rgba(201,168,76,.2);border-top-color:var(--ouro);animation:spin .8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .load-status{font-size:.85rem;color:rgba(201,168,76,.5)}
+
+        #configAlert{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9998;align-items:center;justify-content:center;padding:1rem}
+        #configAlert.show{display:flex}
+        .config-box{background:#1a1010;border:2px solid var(--ouro);border-radius:16px;padding:2rem;max-width:580px;width:100%}
+        .config-box h2{font-family:'Cormorant Garamond',serif;color:var(--ouro);font-size:1.6rem;margin-bottom:1rem}
+        .config-box p,.config-box li{color:#c5b5b5;font-size:.9rem;line-height:1.8}
+        .config-box ol{padding-left:1.4rem;margin-bottom:1rem}
+        .config-box code{background:rgba(0,0,0,.4);padding:2px 7px;border-radius:4px;font-size:.82rem;color:var(--ouro-lt)}
+        .config-box a{color:var(--ouro)}
+
+        header{background:linear-gradient(160deg,var(--vinho-dk) 0%,var(--vinho) 60%,#8B3040 100%);padding:3rem 2rem 2.5rem;text-align:center;border-bottom:2px solid var(--ouro);position:relative;overflow:hidden}
+        header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='%23C9A84C' opacity='.15'/%3E%3C/svg%3E") repeat}
+        h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:600;color:var(--ouro-lt);letter-spacing:2px;position:relative}
+        .db-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-family:'DM Sans',sans-serif;padding:.2rem .7rem;border-radius:20px;margin-left:.7rem;vertical-align:middle;font-weight:500}
+        .db-badge.on{background:rgba(46,125,50,.3);color:#66BB6A;border:1px solid rgba(102,187,106,.25)}
+        .db-badge.off{background:rgba(198,40,40,.3);color:#EF5350;border:1px solid rgba(239,83,80,.25)}
+        .db-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+        .subtitle{font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(232,213,163,.7);font-size:1.1rem;margin-top:.4rem;position:relative}
+
+        .container{max-width:1400px;margin:0 auto;padding:2rem}
+        .controls{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:2.5rem}
+        .search-wrap{position:relative;flex:1;min-width:220px}
+        .search-wrap input{width:100%;padding:.85rem 1rem .85rem 2.8rem;border:1.5px solid rgba(201,168,76,.3);border-radius:40px;background:rgba(255,255,255,.06);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.95rem;transition:.3s}
+        .search-wrap input:focus{outline:none;border-color:var(--ouro);background:rgba(255,255,255,.1)}
+        .search-wrap::before{content:'🔍';position:absolute;left:.9rem;top:50%;transform:translateY(-50%);font-size:1rem}
+        .top-right{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+        .btn-filter{padding:.5rem 1.1rem;border:1.5px solid rgba(201,168,76,.35);background:transparent;color:var(--ouro-lt);border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;transition:.25s}
+        .btn-filter:hover,.btn-filter.active{background:var(--vinho);border-color:var(--ouro)}
+        .btn-catalog{padding:.5rem 1.1rem;border:1.5px solid var(--ouro);background:rgba(201,168,76,.12);color:var(--ouro);border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;transition:.25s}
+        .btn-catalog:hover{background:rgba(201,168,76,.25)}
+
+        .cart-fab{position:fixed;top:1.5rem;right:1.5rem;width:58px;height:58px;background:var(--vinho);border:2px solid var(--ouro);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;z-index:900;box-shadow:0 4px 24px rgba(0,0,0,.45);transition:.3s}
+        .cart-fab:hover{transform:scale(1.1)}
+        .cart-badge{position:absolute;top:-4px;right:-4px;background:var(--ouro);color:var(--vinho-dk);width:22px;height:22px;border-radius:50%;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+        .wine-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:2rem}
+        .wine-card{background:linear-gradient(145deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.03) 100%);border:1px solid rgba(201,168,76,.15);border-radius:16px;overflow:hidden;transition:.35s}
+        .wine-card:hover{transform:translateY(-8px);border-color:rgba(201,168,76,.5);box-shadow:0 18px 40px rgba(0,0,0,.5)}
+        .wine-img-wrap{position:relative;height:400px;overflow:hidden;background:#2a1a1a}
+        .wine-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+        .wine-card:hover .wine-img-wrap img{transform:scale(1.05)}
+        .no-img{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(201,168,76,.3);font-size:.85rem;gap:.5rem}
+        .no-img-icon{font-size:3rem;opacity:.4}
+        .type-badge{position:absolute;top:1rem;left:1rem;padding:.3rem .8rem;border-radius:12px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+        .type-tinto{background:#6B0000;color:#ffcccc}.type-branco{background:#F5F5DC;color:#444}.type-rose{background:#E8A4B8;color:#6B0030}.type-espumante{background:#C9A84C;color:#2a1a00}
+        .btn-share-label{position:absolute;top:1rem;right:1rem;width:38px;height:38px;background:rgba(26,16,16,.75);border:1.5px solid var(--ouro);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:.25s;backdrop-filter:blur(4px)}
+        .btn-share-label:hover{background:var(--ouro);transform:scale(1.1)}
+        .wine-body{padding:1.4rem}
+        .wine-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--ouro-lt);margin-bottom:.3rem;line-height:1.3}
+        .wine-meta{font-size:.82rem;color:#9e8e8e;margin-bottom:.7rem}
+        .wine-desc{font-size:.9rem;color:#c5b5b5;line-height:1.55}
+        .wine-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(201,168,76,.2)}
+        .price{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:600;color:var(--ouro)}
+        .stock-info{text-align:right}.stock-label{font-size:.75rem;color:#888}.stock-val{font-weight:600;font-size:1rem}
+        .s-ok{color:#66BB6A}.s-med{color:#FFA726}.s-low{color:#EF5350}
+        .qty-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1rem}
+        .qty-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--ouro);background:transparent;color:var(--ouro);font-size:1.1rem;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center}
+        .qty-btn:hover{background:var(--ouro);color:var(--vinho-dk)}
+        .qty-val{font-size:1.2rem;font-weight:600;min-width:32px;text-align:center}
+        .btn-add{width:100%;margin-top:.9rem;padding:.9rem;background:linear-gradient(135deg,var(--vinho) 0%,var(--vinho-dk) 100%);color:var(--ouro-lt);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:.3s}
+        .btn-add:hover:not(:disabled){opacity:.85;transform:translateY(-2px)}.btn-add:disabled{background:#3a3030;color:#666;cursor:not-allowed}
+
+        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem}
+        .overlay.open{display:flex;animation:fadeIn .25s}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .modal{background:#1e1212;border:1.5px solid var(--ouro);border-radius:18px;width:100%;max-width:580px;max-height:92vh;display:flex;flex-direction:column;animation:slideUp .3s}
+        @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .modal-hd{background:linear-gradient(135deg,var(--vinho) 0%,var(--vinho-dk) 100%);padding:1.3rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:16px 16px 0 0}
+        .modal-hd h2{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--ouro-lt)}
+        .btn-close{background:none;border:none;color:var(--creme);font-size:1.3rem;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.2s}
+        .btn-close:hover{background:rgba(255,255,255,.12);transform:rotate(90deg)}
+        .cart-list{flex:1;overflow-y:auto;padding:1.2rem}
+        .empty-msg{text-align:center;padding:3rem;color:#6b5b5b}
+        .empty-msg div{font-size:3rem;margin-bottom:1rem}
+        .cart-item{display:flex;gap:.9rem;padding:1rem;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:.8rem;border:1px solid rgba(201,168,76,.12)}
+        .ci-img{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid rgba(201,168,76,.25);flex-shrink:0;background:#2a1a1a}
+        .ci-info{flex:1}.ci-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--ouro-lt)}.ci-price{font-size:.9rem;color:#998888;margin:.2rem 0}
+        .ci-row{display:flex;align-items:center;gap:.5rem;margin-top:.4rem}
+        .ci-qbtn{width:22px;height:22px;border-radius:50%;border:1px solid var(--ouro);background:transparent;color:var(--ouro);cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+        .ci-subtotal{margin-left:auto;color:var(--ouro);font-weight:600;font-size:.95rem}
+        .ci-del{color:#c0504d;cursor:pointer;font-size:1.1rem;transition:.2s;flex-shrink:0}
+        .ci-del:hover{transform:scale(1.2)}
+        .modal-ft{padding:1.3rem;border-top:1px solid rgba(122,40,50,.4)}
+        .total-row{display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:1.5rem;margin-bottom:1.1rem;color:var(--ouro-lt)}
+        .total-row span:last-child{color:var(--ouro);font-weight:700}
+        .order-fields{display:flex;flex-direction:column;gap:.7rem;margin-bottom:1rem}
+        .fld label{display:block;font-size:.78rem;color:#9e8e8e;margin-bottom:.3rem;letter-spacing:.5px;text-transform:uppercase}
+        .fld input,.fld select{width:100%;padding:.7rem .9rem;border:1.5px solid rgba(122,40,50,.5);border-radius:8px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.95rem}
+        .fld input:focus,.fld select:focus{outline:none;border-color:var(--ouro)}
+        .fld select option{background:#1e1010}
+        .fld-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+        @media(max-width:480px){.fld-row{grid-template-columns:1fr}}
+        .btn-wpp{width:100%;padding:1rem;background:linear-gradient(135deg,#25D366 0%,#1a9e50 100%);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:.3s;display:flex;align-items:center;justify-content:center;gap:.6rem}
+        .btn-wpp:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,211,102,.35)}
+        .btn-wpp:disabled{background:#3a3030;color:#666;cursor:not-allowed;transform:none;box-shadow:none}
+
+        .label-preview-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1500;align-items:center;justify-content:center;padding:1rem;flex-direction:column;gap:1rem}
+        .label-preview-overlay.open{display:flex}
+        .label-preview-img{max-width:380px;width:100%;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+        .label-preview-actions{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+        .btn-lp{padding:.8rem 1.4rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;border:none;transition:.3s;display:flex;align-items:center;gap:.5rem}
+        .btn-lp-wpp{background:linear-gradient(135deg,#25D366,#1a9e50);color:#fff}.btn-lp-dl{background:var(--ouro);color:var(--vinho-dk)}.btn-lp-cl{background:rgba(255,255,255,.1);color:var(--creme);border:1px solid rgba(255,255,255,.2)}
+        .btn-lp:hover{transform:translateY(-2px);opacity:.9}
+        .generating-msg{color:var(--ouro-lt);font-family:'Cormorant Garamond',serif;font-size:1.3rem;display:none}
+        .generating-msg.show{display:block}
+
+        .catalog-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1200;overflow-y:auto;padding:2rem 1rem}
+        .catalog-overlay.open{display:block}
+        .catalog-wrap{max-width:900px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden}
+        .catalog-toolbar{background:#4A1820;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+        .catalog-toolbar span{color:#E8D5A3;font-family:'Cormorant Garamond',serif;font-size:1.3rem}
+        .catalog-toolbar-btns{display:flex;gap:.6rem}
+        .btn-print{padding:.5rem 1.2rem;background:#C9A84C;color:#2a1a00;border:none;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer}
+        .btn-close-cat{padding:.5rem 1rem;background:transparent;color:#E8D5A3;border:1px solid rgba(232,213,163,.4);border-radius:8px;font-size:.9rem;cursor:pointer}
+        .catalog-page{padding:2.5rem;background:#fff;color:#222}
+        .catalog-header{text-align:center;border-bottom:3px double #7A2832;padding-bottom:1.5rem;margin-bottom:2rem}
+        .catalog-header h1{font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:#4A1820;letter-spacing:2px}
+        .catalog-header p{color:#888;font-style:italic;font-size:1rem;margin-top:.3rem}
+        .catalog-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+        .label-card{border:1.5px solid #C9A84C;border-radius:10px;overflow:hidden;page-break-inside:avoid;break-inside:avoid}
+        .label-img{width:100%;height:240px;object-fit:cover;background:#f5f0e8;display:block}
+        .label-img-placeholder{width:100%;height:240px;background:linear-gradient(135deg,#f5f0e8,#ede0cc);display:flex;align-items:center;justify-content:center;font-size:3rem;color:#C9A84C;opacity:.4}
+        .label-body{padding:1rem 1.2rem}
+        .label-type-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+        .label-badge{padding:.2rem .7rem;border-radius:10px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+        .lb-tinto{background:#f0d0d0;color:#6B0000}.lb-branco{background:#f5f5dc;color:#555;border:1px solid #ccc}.lb-rose{background:#fce4ec;color:#880e4f}.lb-espumante{background:#fff8dc;color:#5d4037;border:1px solid #e6c46a}
+        .label-year{font-size:.8rem;color:#999}
+        .label-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:#4A1820;line-height:1.2;margin-bottom:.2rem}
+        .label-origin{font-size:.8rem;color:#888;margin-bottom:.5rem}
+        .label-desc{font-size:.82rem;color:#555;line-height:1.5;margin-bottom:.7rem;border-top:1px solid #f0e8d8;padding-top:.7rem}
+        .label-price-row{display:flex;justify-content:space-between;align-items:center}
+        .label-price{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#C9A84C}
+        .label-stock-badge{font-size:.75rem;padding:.2rem .6rem;border-radius:10px;font-weight:600}
+        .lsb-ok{background:#e8f5e9;color:#2E7D32}.lsb-med{background:#fff3e0;color:#E65100}.lsb-low{background:#ffebee;color:#c62828}
+        .label-card-footer{display:flex;justify-content:flex-end;padding:.6rem 1rem .8rem;background:#fdf6ec;border-top:1px solid rgba(201,168,76,.2)}
+        .btn-share-catalog{padding:.4rem 1rem;background:linear-gradient(135deg,#25D366,#1a9e50);color:#fff;border:none;border-radius:20px;font-size:.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:.4rem}
+        .catalog-footer{text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #e0d0c0;font-size:.8rem;color:#bbb}
+
+        /* ── HISTÓRICO ── */
+        .orders-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:1100;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+        .orders-overlay.open{display:flex}
+        .orders-panel{background:#1a1010;border:1.5px solid var(--ouro);border-radius:16px;width:100%;max-width:860px;margin:auto;overflow:hidden}
+        .orders-hd{background:var(--vinho-dk);padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,168,76,.3)}
+        .orders-hd h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--ouro)}
+        .orders-body{padding:1.5rem;max-height:75vh;overflow-y:auto}
+        .order-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:1rem;margin-bottom:.8rem}
+        .order-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem}
+        .order-meta{font-size:.8rem;color:#9e8e8e;margin-top:.2rem}
+        .order-total-badge{background:rgba(201,168,76,.15);color:var(--ouro);padding:.2rem .7rem;border-radius:20px;font-size:.85rem;font-weight:600;white-space:nowrap}
+        .order-items{font-size:.85rem;color:#c5b5b5;line-height:1.7}
+        .order-vendedor{display:inline-block;background:rgba(122,40,50,.4);color:var(--ouro-lt);padding:.15rem .6rem;border-radius:10px;font-size:.75rem;margin-bottom:.3rem}
+        .empty-orders{text-align:center;padding:3rem;color:#6b5b5b}
+
+        .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);padding:.9rem 1.8rem;border-radius:40px;font-size:.95rem;font-weight:500;z-index:3000;opacity:0;transition:.35s;white-space:nowrap}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+        .toast.ok{background:var(--ok);color:#fff}.toast.err{background:#c62828;color:#fff}.toast.info{background:var(--vinho);color:var(--ouro-lt)}
+
+        .admin-trigger{position:fixed;bottom:1.5rem;left:1.5rem;background:rgba(0,0,0,.6);border:1px solid rgba(201,168,76,.2);color:rgba(201,168,76,.4);padding:.5rem .9rem;border-radius:8px;font-size:.75rem;cursor:pointer;z-index:100;transition:.2s}
+        .admin-trigger:hover{color:var(--ouro);border-color:var(--ouro)}
+        .admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:1100;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+        .admin-overlay.open{display:flex}
+        .admin-panel{background:#1a1010;border:1.5px solid var(--ouro);border-radius:16px;width:100%;max-width:940px;margin:auto;overflow:hidden}
+        .admin-hd{background:var(--vinho-dk);padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,168,76,.3)}
+        .admin-hd h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--ouro)}
+        .admin-body{padding:1.5rem}
+        .admin-note{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:1rem;font-size:.85rem;color:#c5b5b5;margin-bottom:1.5rem;line-height:1.8}
+        .admin-note strong{color:var(--ouro-lt)}.admin-note code{background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px;font-size:.8rem}
+        .wine-admin-list{display:flex;flex-direction:column;gap:1rem}
+        .wine-admin-item{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:1rem}
+        .wai-top{display:flex;gap:.8rem;align-items:center;margin-bottom:.8rem}
+        .wai-thumb{width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid rgba(201,168,76,.3);background:#2a1a1a;flex-shrink:0}
+        .wai-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--ouro-lt)}
+        .wai-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.6rem}
+        .wai-fld label{display:block;font-size:.75rem;color:#888;margin-bottom:.25rem}
+        .wai-fld input,.wai-fld select,.wai-fld textarea{width:100%;padding:.55rem .7rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem}
+        .wai-fld textarea{resize:vertical;height:60px}
+        .wai-fld input:focus,.wai-fld select:focus,.wai-fld textarea:focus{outline:none;border-color:var(--ouro)}
+        .wai-fld select option{background:#1a1010}
+        .wai-img-preview{margin-top:.5rem;width:100%;height:80px;object-fit:cover;border-radius:6px;background:#2a1a1a;display:block}
+        .admin-actions{display:flex;gap:.8rem;margin-top:1.5rem;flex-wrap:wrap}
+        .btn-admin{padding:.75rem 1.4rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;transition:.2s;border:none}
+        .btn-save{background:var(--ok);color:#fff}.btn-add-wine{background:var(--vinho);color:var(--ouro-lt)}.btn-del-wine{background:#c62828;color:#fff;margin-left:auto}
+        .login-box{padding:2.5rem;text-align:center}
+        .login-box h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--ouro);margin-bottom:1.2rem}
+        .login-box input{width:100%;max-width:280px;padding:.8rem 1rem;border-radius:8px;border:1.5px solid rgba(201,168,76,.3);background:rgba(255,255,255,.05);color:var(--creme);font-size:1rem;display:block;margin:0 auto 1rem;text-align:center;letter-spacing:4px}
+        .login-box input:focus{outline:none;border-color:var(--ouro)}
+        .btn-login{padding:.7rem 2rem;background:var(--vinho);color:var(--ouro-lt);border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer}
+
+        @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(2,1fr) !important}}
+        @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
 </head>
 <body>
 
+<div id="loadingScreen">
+    <div class="load-title">🍷 VinotecaBR</div>
+    <div class="load-spinner"></div>
+    <div class="load-status" id="loadStatus">Conectando ao banco de dados...</div>
+</div>
+
+<div id="configAlert">
+    <div class="config-box">
+        <h2>⚙️ Configure o Firebase primeiro</h2>
+        <p>As credenciais ainda não foram preenchidas no arquivo. Siga os passos:</p>
+        <ol>
+            <li>Acesse <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
+            <li>Clique em <strong>Adicionar projeto</strong> → dê um nome → crie</li>
+            <li>Na tela do projeto, clique em <strong>Web (&lt;/&gt;)</strong> → registre o app</li>
+            <li>Copie o bloco <code>firebaseConfig</code> que aparecer</li>
+            <li>Cole os valores em <code>FIREBASE_CONFIG</code> no topo do <code>index.html</code></li>
+            <li>No menu lateral: <strong>Build → Realtime Database → Criar banco</strong></li>
+            <li>Na aba <strong>Regras</strong>, cole: <code>{"rules":{".read":true,".write":true}}</code></li>
+            <li>Salve e reabra o site</li>
+        </ol>
+        <p style="font-size:.8rem;color:#888;margin-top:.5rem">Guia completo no arquivo <strong>FIREBASE_SETUP.md</strong></p>
+    </div>
+</div>
+
 <header>
-    <h1>🍷 <span id="storeTitle"></span></h1>
+    <h1>🍷 <span id="storeTitle"></span>
+        <span class="db-badge off" id="dbBadge"><span class="db-dot"></span>offline</span>
+    </h1>
     <p class="subtitle">Seleção exclusiva dos melhores vinhos</p>
 </header>
 
@@ -208,9 +287,7 @@
 
 <div class="container">
     <div class="controls">
-        <div class="search-wrap">
-            <input type="text" id="searchInput" placeholder="Buscar vinhos..." oninput="renderWines()">
-        </div>
+        <div class="search-wrap"><input type="text" id="searchInput" placeholder="Buscar vinhos..." oninput="renderWines()"></div>
         <div class="top-right">
             <button class="btn-filter active" data-f="todos"     onclick="setFilter(this)">Todos</button>
             <button class="btn-filter"        data-f="tinto"     onclick="setFilter(this)">Tintos</button>
@@ -223,7 +300,7 @@
     <div class="wine-grid" id="wineGrid"></div>
 </div>
 
-<!-- MODAL: CARRINHO -->
+<!-- CARRINHO -->
 <div class="overlay" id="cartOverlay" onclick="if(event.target===this)closeCart()">
     <div class="modal">
         <div class="modal-hd"><h2>🛒 Novo Pedido</h2><button class="btn-close" onclick="closeCart()">✕</button></div>
@@ -238,12 +315,12 @@
                 </div>
                 <div class="fld"><label>Endereço / Observação</label><input type="text" id="custAddr" placeholder="Opcional"></div>
             </div>
-            <button class="btn-wpp" onclick="sendWhatsApp()">📲 Enviar Pedido pelo WhatsApp</button>
+            <button class="btn-wpp" id="btnEnviar" onclick="sendWhatsApp()">📲 Enviar Pedido pelo WhatsApp</button>
         </div>
     </div>
 </div>
 
-<!-- MODAL: PREVIEW DO RÓTULO -->
+<!-- RÓTULO -->
 <div class="label-preview-overlay" id="labelPreviewOverlay">
     <p class="generating-msg" id="generatingMsg">⏳ Gerando rótulo...</p>
     <img class="label-preview-img" id="labelPreviewImg" src="" alt="Rótulo">
@@ -254,7 +331,7 @@
     </div>
 </div>
 
-<!-- MODAL: CATÁLOGO -->
+<!-- CATÁLOGO -->
 <div class="catalog-overlay" id="catalogOverlay">
     <div class="catalog-wrap">
         <div class="catalog-toolbar">
@@ -265,17 +342,22 @@
             </div>
         </div>
         <div class="catalog-page">
-            <div class="catalog-header">
-                <h1 id="catHeaderTitle"></h1>
-                <p id="catHeaderDate"></p>
-            </div>
+            <div class="catalog-header"><h1 id="catHeaderTitle"></h1><p id="catHeaderDate"></p></div>
             <div class="catalog-grid" id="catalogGrid"></div>
             <div class="catalog-footer" id="catFooter"></div>
         </div>
     </div>
 </div>
 
-<!-- MODAL: ADMIN -->
+<!-- HISTÓRICO -->
+<div class="orders-overlay" id="ordersOverlay" onclick="if(event.target===this)closeOrders()">
+    <div class="orders-panel">
+        <div class="orders-hd"><h2>📋 Histórico de Pedidos</h2><button class="btn-close" onclick="closeOrders()">✕</button></div>
+        <div class="orders-body" id="ordersBody"></div>
+    </div>
+</div>
+
+<!-- ADMIN -->
 <div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
     <div class="admin-panel">
         <div class="admin-hd"><h2>⚙️ Painel Admin</h2><button class="btn-close" onclick="closeAdmin()">✕</button></div>
@@ -287,16 +369,15 @@
         <div id="adminContent" style="display:none">
             <div class="admin-body">
                 <div class="admin-note">
-                    <strong>🖼️ Tamanho ideal das fotos: 600 × 900 pixels (proporção 2:3, retrato)</strong><br>
-                    Isso mostra a garrafa inteira sem cortar. Formato JPG. Coloque em <code>images/nome.jpg</code>.<br><br>
-                    <strong>❌ Evitar:</strong> fotos quadradas ou paisagem — a garrafa ficará cortada.<br>
-                    <strong>✅ Ideal:</strong> fundo branco/neutro, garrafa centralizada, proporção 2:3.
+                    <strong>☁️ Firebase ativo</strong> — tudo salvo direto no banco. Sem exportar HTML.<br>
+                    Todos os vendedores veem o estoque atualizado em tempo real.<br><br>
+                    <strong>🖼️ Fotos: 600 × 900 px (2:3)</strong>. Coloque em <code>images/nome.jpg</code>.
                 </div>
                 <div class="wine-admin-list" id="adminList"></div>
                 <div class="admin-actions">
                     <button class="btn-admin btn-add-wine" onclick="addWineAdmin()">➕ Novo Vinho</button>
-                    <button class="btn-admin btn-save"     onclick="applyAdmin()">✅ Aplicar na Tela</button>
-                    <button class="btn-admin btn-export"   onclick="exportHTML()">💾 Exportar HTML</button>
+                    <button class="btn-admin btn-save"     onclick="applyAdmin()">☁️ Salvar no Firebase</button>
+                    <button class="btn-admin" style="background:#185FA5;color:#E6F1FB" onclick="openOrders()">📋 Histórico de Pedidos</button>
                 </div>
             </div>
         </div>
@@ -307,24 +388,71 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── ESTADO ──
-let cart=[], filter='todos', adminAuth=false;
-let nextId=wines.length?Math.max(...wines.map(w=>w.id))+1:1;
+let db=null, wines=[], cart=[], filter='todos', adminAuth=false, nextId=1;
 let labelDataUrl='', labelWineName='';
 
-// ── INIT ──
-document.getElementById('storeTitle').textContent=STORE_NAME;
-document.getElementById('catTitle').textContent=STORE_NAME;
+document.getElementById('storeTitle').textContent = STORE_NAME;
+document.getElementById('catTitle').textContent   = STORE_NAME;
 
-const selVend=document.getElementById('selVendedor');
+const selVend = document.getElementById('selVendedor');
 VENDEDORES.forEach(v=>{
-    const opt=document.createElement('option');
-    opt.value=v===VENDEDORES[0]?'':v; opt.textContent=v;
-    if(v===VENDEDORES[0]){opt.disabled=true;opt.selected=true;}
-    selVend.appendChild(opt);
+    const o=document.createElement('option');
+    o.value=v===VENDEDORES[0]?'':v; o.textContent=v;
+    if(v===VENDEDORES[0]){o.disabled=true;o.selected=true;}
+    selVend.appendChild(o);
 });
 
-// ── RENDER VINHOS ──
+// ══ FIREBASE INIT ══
+function configOk(){ return FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey!=='COLE_AQUI'; }
+
+async function initFirebase(){
+    setLS('Verificando configuração...');
+    if(!configOk()){
+        document.getElementById('loadingScreen').style.display='none';
+        document.getElementById('configAlert').classList.add('show');
+        return;
+    }
+    try{
+        setLS('Conectando ao Firebase...');
+        firebase.initializeApp(FIREBASE_CONFIG);
+        db=firebase.database();
+
+        // Escuta vinhos em tempo real
+        db.ref('wines').on('value', snap=>{
+            const data=snap.val();
+            if(data){
+                wines=Object.values(data).sort((a,b)=>a.id-b.id);
+                nextId=Math.max(...wines.map(w=>w.id))+1;
+                renderWines();
+            } else {
+                setLS('Populando catálogo inicial...');
+                const u={};
+                WINES_INICIAL.forEach(w=>{ u[`wines/${w.id}`]=w; });
+                db.ref().update(u).then(()=>toast('Catálogo carregado! ✅'));
+            }
+        });
+
+        // Status de conexão
+        db.ref('.info/connected').on('value', snap=>{
+            const on=snap.val()===true;
+            const el=document.getElementById('dbBadge');
+            el.className=`db-badge ${on?'on':'off'}`;
+            el.innerHTML=`<span class="db-dot"></span>${on?'online':'offline'}`;
+        });
+
+        setLS('Pronto!');
+        setTimeout(()=>document.getElementById('loadingScreen').style.display='none', 500);
+    }catch(e){
+        setLS('Erro: '+e.message);
+        setTimeout(()=>{
+            document.getElementById('loadingScreen').style.display='none';
+            toast('Erro ao conectar. Verifique FIREBASE_CONFIG.','err');
+        },2500);
+    }
+}
+function setLS(m){ document.getElementById('loadStatus').textContent=m; }
+
+// ══ RENDER ══
 function renderWines(){
     const grid=document.getElementById('wineGrid');
     const q=document.getElementById('searchInput').value.toLowerCase();
@@ -342,10 +470,9 @@ function renderWines(){
         const noH=`<div class="no-img" style="${w.image?'display:none':''}"><span class="no-img-icon">🍷</span><span>Sem imagem</span></div>`;
         const card=document.createElement('div'); card.className='wine-card';
         card.innerHTML=`
-            <div class="wine-img-wrap">
-                ${imgH}${noH}
+            <div class="wine-img-wrap">${imgH}${noH}
                 <span class="type-badge type-${w.type}">${w.type}</span>
-                <button class="btn-share-label" onclick="openLabelPreview(${w.id})" title="Enviar rótulo pelo WhatsApp">📲</button>
+                <button class="btn-share-label" onclick="openLabelPreview(${w.id})" title="Enviar rótulo">📲</button>
             </div>
             <div class="wine-body">
                 <div class="wine-name">${w.name}</div>
@@ -367,18 +494,10 @@ function renderWines(){
         grid.appendChild(card);
     });
 }
+function setFilter(btn){ document.querySelectorAll('.btn-filter').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); filter=btn.dataset.f; renderWines(); }
+function changeQty(id,d){ const el=document.getElementById(`qty-${id}`); const max=wines.find(w=>w.id===id).stock; el.textContent=Math.min(max,Math.max(1,+el.textContent+d)); }
 
-function setFilter(btn){
-    document.querySelectorAll('.btn-filter').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active'); filter=btn.dataset.f; renderWines();
-}
-function changeQty(id,d){
-    const el=document.getElementById(`qty-${id}`);
-    const max=wines.find(w=>w.id===id).stock;
-    el.textContent=Math.min(max,Math.max(1,+el.textContent+d));
-}
-
-// ── CARRINHO ──
+// ══ CARRINHO ══
 function addCart(id){
     const wine=wines.find(w=>w.id===id); const qty=+document.getElementById(`qty-${id}`).textContent;
     const ex=cart.find(c=>c.id===id);
@@ -387,15 +506,15 @@ function addCart(id){
     document.getElementById(`qty-${id}`).textContent='1';
     updateBadge(); toast('Adicionado! 🍷');
 }
-function updateBadge(){document.getElementById('cartBadge').textContent=cart.reduce((s,c)=>s+c.qty,0);}
-function openCart(){renderCart();document.getElementById('cartOverlay').classList.add('open');}
-function closeCart(){document.getElementById('cartOverlay').classList.remove('open');}
+function updateBadge(){ document.getElementById('cartBadge').textContent=cart.reduce((s,c)=>s+c.qty,0); }
+function openCart(){ renderCart(); document.getElementById('cartOverlay').classList.add('open'); }
+function closeCart(){ document.getElementById('cartOverlay').classList.remove('open'); }
 function renderCart(){
     const list=document.getElementById('cartList');
     if(!cart.length){list.innerHTML='<div class="empty-msg"><div>🍷</div><p>Carrinho vazio</p></div>';document.getElementById('cartTotal').textContent='R$ 0,00';return;}
     let total=0; list.innerHTML='';
     cart.forEach((item,i)=>{const sub=item.price*item.qty;total+=sub;
-        const el=document.createElement('div'); el.className='cart-item';
+        const el=document.createElement('div');el.className='cart-item';
         el.innerHTML=`<img class="ci-img" src="${item.image||''}" alt="${item.name}" onerror="this.style.background='#2a1a1a';this.removeAttribute('src')">
             <div class="ci-info"><div class="ci-name">${item.name}</div><div class="ci-price">R$ ${fmt(item.price)} / un</div>
             <div class="ci-row"><button class="ci-qbtn" onclick="adjCart(${i},-1)">−</button><span>${item.qty}</span><button class="ci-qbtn" onclick="adjCart(${i},1)">+</button><span class="ci-subtotal">R$ ${fmt(sub)}</span></div></div>
@@ -407,8 +526,8 @@ function renderCart(){
 function adjCart(i,d){const nq=cart[i].qty+d;const wine=wines.find(w=>w.id===cart[i].id);if(nq<1){delCart(i);return;}if(nq>wine.stock){toast('Limite!','err');return;}cart[i].qty=nq;renderCart();updateBadge();}
 function delCart(i){cart.splice(i,1);renderCart();updateBadge();}
 
-// ── WHATSAPP — pedido com baixa de estoque automática ──
-function sendWhatsApp(){
+// ══ ENVIAR PEDIDO + BAIXA NO FIREBASE ══
+async function sendWhatsApp(){
     const vendedor=document.getElementById('selVendedor').value;
     const name=document.getElementById('custName').value.trim();
     const phone=document.getElementById('custPhone').value.trim();
@@ -417,66 +536,57 @@ function sendWhatsApp(){
     if(!name||!phone){toast('Preencha nome e telefone!','err');return;}
     if(!cart.length){toast('Carrinho vazio!','err');return;}
 
+    const btn=document.getElementById('btnEnviar');
+    btn.disabled=true; btn.textContent='⏳ Salvando no banco...';
+
     const now=new Date();
     const data=now.toLocaleDateString('pt-BR');
     const hora=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
     let msg=`*PEDIDO - ${STORE_NAME}*\n`;
-    msg+=`Data: ${data} as ${hora}\n`;
-    msg+=`─────────────────────\n`;
-    msg+=`VENDEDOR: ${vendedor}\n`;
-    msg+=`CLIENTE: ${name}\n`;
-    msg+=`CONTATO: ${phone}\n`;
+    msg+=`Data: ${data} as ${hora}\n─────────────────────\n`;
+    msg+=`VENDEDOR: ${vendedor}\nCLIENTE: ${name}\nCONTATO: ${phone}\n`;
     if(addr) msg+=`LOCAL: ${addr}\n`;
-    msg+=`─────────────────────\n`;
-    msg+=`ITENS:\n\n`;
+    msg+=`─────────────────────\nITENS:\n\n`;
     let total=0;
     cart.forEach((c,i)=>{const sub=c.price*c.qty;total+=sub;
-        msg+=`${i+1}. ${c.name}\n`;
-        msg+=`   ${c.qty} un x R$${fmt(c.price)} = R$${fmt(sub)}\n`;
+        msg+=`${i+1}. ${c.name}\n   ${c.qty} un x R$${fmt(c.price)} = R$${fmt(sub)}\n`;
     });
-    msg+=`\n─────────────────────\n`;
-    msg+=`TOTAL: R$ ${fmt(total)}\n─────────────────────\nAguardo confirmacao!`;
+    msg+=`\n─────────────────────\nTOTAL: R$ ${fmt(total)}\n─────────────────────\nAguardo confirmacao!`;
 
-    // ── 1. Dá baixa no estoque ──
-    cart.forEach(c=>{
-        const wine=wines.find(w=>w.id===c.id);
-        if(wine) wine.stock=Math.max(0,wine.stock-c.qty);
-    });
+    try{
+        const updates={};
+        // Baixa estoque no Firebase
+        cart.forEach(c=>{
+            const wine=wines.find(w=>w.id===c.id);
+            if(wine) updates[`wines/${c.id}/stock`]=Math.max(0,wine.stock-c.qty);
+        });
+        // Salva pedido no histórico
+        const key=`${Date.now()}_${Math.random().toString(36).substr(2,4)}`;
+        updates[`orders/${key}`]={
+            vendedor, cliente:name, telefone:phone,
+            endereco:addr||'', data, hora, total, timestamp:Date.now(),
+            itens:cart.map(c=>({nome:c.name,qty:c.qty,preco:c.price}))
+        };
+        await db.ref().update(updates);
 
-    // ── 2. Exporta HTML atualizado automaticamente (sem abrir admin) ──
-    autoExportHTML(vendedor,data,hora);
-
-    // ── 3. Abre WhatsApp ──
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
-
-    // ── 4. Limpa carrinho e atualiza tela ──
-    cart=[];
-    updateBadge();
-    closeCart();
-    renderWines();
-
-    toast('Pedido enviado! Estoque atualizado e HTML salvo 📦');
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
+        cart=[];
+        updateBadge();
+        closeCart();
+        toast('✅ Pedido enviado! Estoque atualizado em tempo real.');
+    }catch(e){
+        toast('Erro: '+e.message,'err');
+    }finally{
+        btn.disabled=false;
+        btn.innerHTML='📲 Enviar Pedido pelo WhatsApp';
+    }
 }
 
-// Gera e baixa o HTML com estoque atualizado — nome inclui vendedor e horário
-function autoExportHTML(vendedor,data,hora){
-    const winesJSON=JSON.stringify(wines,null,8);
-    const html=document.documentElement.outerHTML;
-    const updated=html.replace(/let wines = \[[\s\S]*?\];/,`let wines = ${winesJSON};`);
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([updated],{type:'text/html'}));
-    const safeName=vendedor.replace(/\s+/g,'_');
-    const safeData=data.replace(/\//g,'-');
-    a.download=`index_${safeName}_${safeData}_${hora.replace(':','h')}.html`;
-    a.click();
-}
-
-// ── GERADOR DE RÓTULO (Canvas 800×1080) ──
+// ══ GERADOR DE RÓTULO ══
 function loadImg(src){return new Promise((res,rej)=>{if(!src){rej();return;}const img=new Image();img.crossOrigin='anonymous';img.onload=()=>res(img);img.onerror=rej;img.src=src;});}
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
 function wrapText(ctx,text,x,y,maxW,lh){const words=text.split(' ');let line='';let cy=y;for(let n=0;n<words.length;n++){const test=line+words[n]+' ';if(ctx.measureText(test).width>maxW&&n>0){ctx.fillText(line.trim(),x,cy);line=words[n]+' ';cy+=lh;}else line=test;}ctx.fillText(line.trim(),x,cy);return cy;}
-
 async function generateLabelCanvas(wine){
     const W=800,H=1080;const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');
     ctx.fillStyle='#FDF6EC';ctx.fillRect(0,0,W,H);
@@ -484,46 +594,43 @@ async function generateLabelCanvas(wine){
     ctx.fillStyle='#4A1820';ctx.fillRect(3,3,W-6,120);
     ctx.fillStyle='#E8D5A3';ctx.font='bold 40px Georgia, serif';ctx.textAlign='center';ctx.fillText(STORE_NAME,W/2,78);
     const imgX=20,imgY=135,imgW=W-40,imgH=490;ctx.fillStyle='#f0e8d8';ctx.fillRect(imgX,imgY,imgW,imgH);
-    try{const img=await loadImg(wine.image);const scale=Math.min(imgW/img.width,imgH/img.height);const sw=img.width*scale,sh=img.height*scale;const sx=imgX+(imgW-sw)/2,sy=imgY+(imgH-sh)/2;ctx.drawImage(img,sx,sy,sw,sh);}
-    catch(e){ctx.fillStyle='rgba(201,168,76,.25)';ctx.fillRect(imgX,imgY,imgW,imgH);ctx.fillStyle='#C9A84C';ctx.font='100px serif';ctx.textAlign='center';ctx.fillText('🍷',W/2,imgY+imgH/2+35);ctx.font='22px DM Sans, sans-serif';ctx.fillStyle='rgba(201,168,76,.5)';ctx.fillText('Sem imagem',W/2,imgY+imgH/2+80);}
+    try{const img=await loadImg(wine.image);const scale=Math.min(imgW/img.width,imgH/img.height);const sw=img.width*scale,sh=img.height*scale;ctx.drawImage(img,imgX+(imgW-sw)/2,imgY+(imgH-sh)/2,sw,sh);}
+    catch(e){ctx.fillStyle='rgba(201,168,76,.25)';ctx.fillRect(imgX,imgY,imgW,imgH);ctx.fillStyle='#C9A84C';ctx.font='100px serif';ctx.textAlign='center';ctx.fillText('🍷',W/2,imgY+imgH/2+35);}
     ctx.strokeStyle='#C9A84C';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(30,640);ctx.lineTo(W-30,640);ctx.stroke();
-    const typeColors={tinto:{bg:'#6B0000',fg:'#ffcccc'},branco:{bg:'#e8e8c8',fg:'#444'},rose:{bg:'#e8a4b8',fg:'#6B0030'},espumante:{bg:'#C9A84C',fg:'#2a1a00'}};
-    const tc=typeColors[wine.type]||{bg:'#888',fg:'#fff'};
-    ctx.font='bold 20px DM Sans, sans-serif';ctx.textAlign='left';
-    const tw=ctx.measureText(wine.type.toUpperCase()).width+28;roundRect(ctx,30,654,tw,34,8);ctx.fillStyle=tc.bg;ctx.fill();ctx.fillStyle=tc.fg;ctx.fillText(wine.type.toUpperCase(),44,677);
+    const tc={tinto:{bg:'#6B0000',fg:'#ffcccc'},branco:{bg:'#e8e8c8',fg:'#444'},rose:{bg:'#e8a4b8',fg:'#6B0030'},espumante:{bg:'#C9A84C',fg:'#2a1a00'}}[wine.type]||{bg:'#888',fg:'#fff'};
+    ctx.font='bold 20px DM Sans, sans-serif';ctx.textAlign='left';const tw=ctx.measureText(wine.type.toUpperCase()).width+28;
+    roundRect(ctx,30,654,tw,34,8);ctx.fillStyle=tc.bg;ctx.fill();ctx.fillStyle=tc.fg;ctx.fillText(wine.type.toUpperCase(),44,677);
     ctx.font='20px DM Sans, sans-serif';ctx.fillStyle='#999';ctx.textAlign='right';ctx.fillText(wine.year||'',W-30,677);
     ctx.fillStyle='#4A1820';ctx.font='bold 44px Georgia, serif';ctx.textAlign='center';
     const nameY=wrapText(ctx,wine.name,W/2,730,W-80,52);
-    ctx.fillStyle='#888';ctx.font='22px DM Sans, sans-serif';ctx.textAlign='center';ctx.fillText(`📍 ${wine.origin}`,W/2,nameY+46);
-    ctx.fillStyle='#666';ctx.font='19px DM Sans, sans-serif';ctx.textAlign='center';wrapText(ctx,wine.description,W/2,nameY+88,W-100,28);
+    ctx.fillStyle='#888';ctx.font='22px DM Sans, sans-serif';ctx.fillText(`📍 ${wine.origin}`,W/2,nameY+46);
+    ctx.fillStyle='#666';ctx.font='19px DM Sans, sans-serif';wrapText(ctx,wine.description,W/2,nameY+88,W-100,28);
     ctx.setLineDash([6,5]);ctx.strokeStyle='rgba(201,168,76,.5)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(30,940);ctx.lineTo(W-30,940);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle='#C9A84C';ctx.font='bold 64px Georgia, serif';ctx.textAlign='center';ctx.fillText(`R$ ${fmt(wine.price)}`,W/2,1010);
     ctx.fillStyle='#4A1820';ctx.fillRect(3,H-70,W-6,67);ctx.fillStyle='#E8D5A3';ctx.font='18px DM Sans, sans-serif';ctx.textAlign='center';ctx.fillText('Entre em contato para fazer seu pedido',W/2,H-38);
     ctx.fillStyle='rgba(201,168,76,.6)';ctx.font='16px DM Sans, sans-serif';ctx.fillText(`WhatsApp: ${WHATSAPP_NUMBER}`,W/2,H-16);
     return canvas.toDataURL('image/jpeg',0.92);
 }
-
-async function openLabelPreview(wineId){
-    const wine=wines.find(w=>w.id===wineId);labelWineName=wine.name;
-    const overlay=document.getElementById('labelPreviewOverlay');const img=document.getElementById('labelPreviewImg');const genMsg=document.getElementById('generatingMsg');
+async function openLabelPreview(id){
+    const wine=wines.find(w=>w.id===id);labelWineName=wine.name;
+    const ov=document.getElementById('labelPreviewOverlay'),img=document.getElementById('labelPreviewImg'),gm=document.getElementById('generatingMsg');
     img.style.display='none';document.getElementById('btnShareWpp').style.display='none';document.getElementById('btnDownload').style.display='none';
-    genMsg.classList.add('show');overlay.classList.add('open');
+    gm.classList.add('show');ov.classList.add('open');
     try{labelDataUrl=await generateLabelCanvas(wine);img.src=labelDataUrl;img.style.display='block';document.getElementById('btnShareWpp').style.display='flex';document.getElementById('btnDownload').style.display='flex';}
-    catch(e){toast('Erro ao gerar rótulo','err');overlay.classList.remove('open');}
-    finally{genMsg.classList.remove('show');}
+    catch(e){toast('Erro ao gerar rótulo','err');ov.classList.remove('open');}
+    finally{gm.classList.remove('show');}
 }
 function closePreview(){document.getElementById('labelPreviewOverlay').classList.remove('open');}
 async function doShareWpp(){
     if(!labelDataUrl)return;const fname=labelWineName.replace(/[^a-zA-Z0-9]/g,'_')+'.jpg';
     try{const res=await fetch(labelDataUrl);const blob=await res.blob();const file=new File([blob],fname,{type:'image/jpeg'});
-        if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:labelWineName});toast('Compartilhado!');return;}}
-    catch(e){}
+        if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:labelWineName});toast('Compartilhado!');return;}}catch(e){}
     doDownload();const msg=`🍷 *${labelWineName}*\n\n_Rótulo em anexo_\n\nInteressado? Entre em contato!`;
     setTimeout(()=>window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank'),600);toast('Imagem salva! Anexe no WhatsApp. 📎','info');
 }
 function doDownload(){if(!labelDataUrl)return;const a=document.createElement('a');a.href=labelDataUrl;a.download=labelWineName.replace(/[^a-zA-Z0-9]/g,'_')+'.jpg';a.click();toast('Imagem baixada! ⬇️');}
 
-// ── CATÁLOGO ──
+// ══ CATÁLOGO ══
 function openCatalog(){
     const now=new Date().toLocaleDateString('pt-BR',{year:'numeric',month:'long',day:'numeric'});
     document.getElementById('catHeaderTitle').textContent=STORE_NAME;
@@ -532,13 +639,13 @@ function openCatalog(){
     const grid=document.getElementById('catalogGrid');grid.innerHTML='';
     wines.forEach(w=>{
         const sc=w.stock>10?'lsb-ok':w.stock>5?'lsb-med':'lsb-low';const st=w.stock===0?'Esgotado':`${w.stock} em estoque`;
-        const imgH=w.image?`<img class="label-img" src="${w.image}" alt="${w.name}" onerror="this.outerHTML='<div class=\\'label-img-placeholder\\'>🍷</div>'">` :`<div class="label-img-placeholder">🍷</div>`;
+        const imgH=w.image?`<img class="label-img" src="${w.image}" alt="${w.name}" onerror="this.outerHTML='<div class=\\'label-img-placeholder\\'>🍷</div>'">`:`<div class="label-img-placeholder">🍷</div>`;
         const card=document.createElement('div');card.className='label-card';
         card.innerHTML=`${imgH}<div class="label-body">
-                <div class="label-type-row"><span class="label-badge lb-${w.type}">${w.type}</span><span class="label-year">${w.year||'-'}</span></div>
-                <div class="label-name">${w.name}</div><div class="label-origin">📍 ${w.origin}</div>
-                <div class="label-desc">${w.description}</div>
-                <div class="label-price-row"><span class="label-price">R$ ${fmt(w.price)}</span><span class="label-stock-badge ${sc}">${st}</span></div>
+            <div class="label-type-row"><span class="label-badge lb-${w.type}">${w.type}</span><span class="label-year">${w.year||'-'}</span></div>
+            <div class="label-name">${w.name}</div><div class="label-origin">📍 ${w.origin}</div>
+            <div class="label-desc">${w.description}</div>
+            <div class="label-price-row"><span class="label-price">R$ ${fmt(w.price)}</span><span class="label-stock-badge ${sc}">${st}</span></div>
             </div><div class="label-card-footer"><button class="btn-share-catalog" onclick="closeCatalog();openLabelPreview(${w.id})">📲 Enviar este rótulo</button></div>`;
         grid.appendChild(card);
     });
@@ -546,7 +653,32 @@ function openCatalog(){
 }
 function closeCatalog(){document.getElementById('catalogOverlay').classList.remove('open');}
 
-// ── ADMIN ──
+// ══ HISTÓRICO DE PEDIDOS ══
+function openOrders(){
+    closeAdmin();
+    const body=document.getElementById('ordersBody');
+    body.innerHTML='<p style="color:#9e8e8e;padding:1rem">Carregando...</p>';
+    document.getElementById('ordersOverlay').classList.add('open');
+    db.ref('orders').orderByChild('timestamp').limitToLast(100).once('value',snap=>{
+        const data=snap.val();
+        if(!data){body.innerHTML='<div class="empty-orders"><p>📋 Nenhum pedido ainda.</p></div>';return;}
+        const orders=Object.values(data).sort((a,b)=>b.timestamp-a.timestamp);
+        body.innerHTML='';
+        orders.forEach(o=>{
+            const card=document.createElement('div');card.className='order-card';
+            const itens=o.itens.map(i=>`• ${i.nome} — ${i.qty}x R$${fmt(i.preco)}`).join('<br>');
+            card.innerHTML=`<div class="order-header">
+                <div><span class="order-vendedor">👤 ${o.vendedor}</span>
+                <div class="order-meta">${o.data} às ${o.hora} &nbsp;|&nbsp; ${o.cliente} &nbsp;|&nbsp; ${o.telefone}${o.endereco?' &nbsp;|&nbsp; '+o.endereco:''}</div></div>
+                <span class="order-total-badge">R$ ${fmt(o.total)}</span>
+            </div><div class="order-items">${itens}</div>`;
+            body.appendChild(card);
+        });
+    });
+}
+function closeOrders(){document.getElementById('ordersOverlay').classList.remove('open');}
+
+// ══ ADMIN ══
 function openAdmin(){document.getElementById('adminOverlay').classList.add('open');}
 function closeAdmin(){document.getElementById('adminOverlay').classList.remove('open');}
 function doLogin(){
@@ -565,7 +697,7 @@ function renderAdminList(){
                 <div class="wai-fld"><label>Origem</label><input id="wo-${w.id}" value="${w.origin}"></div>
                 <div class="wai-fld"><label>Preço R$</label><input id="wp-${w.id}" type="number" step="0.01" value="${w.price}"></div>
                 <div class="wai-fld"><label>Estoque</label><input id="ws-${w.id}" type="number" value="${w.stock}"></div>
-                <div class="wai-fld" style="grid-column:span 2"><label>Imagem — URL ou images/nome.jpg (ideal 600×900px)</label>
+                <div class="wai-fld" style="grid-column:span 2"><label>Imagem — URL ou images/nome.jpg</label>
                     <input id="wi-${w.id}" value="${w.image||''}" oninput="prevThumb(${w.id})">
                     <img class="wai-img-preview" id="prev-${w.id}" src="${w.image||''}" onerror="this.style.display='none'" style="${w.image?'':'display:none'}"></div>
                 <div class="wai-fld" style="grid-column:span 3"><label>Descrição</label><textarea id="wd-${w.id}">${w.description}</textarea></div>
@@ -575,10 +707,12 @@ function renderAdminList(){
     });
 }
 function prevThumb(id){const v=document.getElementById(`wi-${id}`).value;const p=document.getElementById(`prev-${id}`);p.src=v;p.style.display=v?'':'none';document.getElementById(`thumb-${id}`).src=v;}
-function delWineAdmin(id){if(!confirm('Remover?'))return;wines=wines.filter(w=>w.id!==id);renderAdminList();}
+function delWineAdmin(id){if(!confirm('Remover este vinho do Firebase?'))return;db.ref(`wines/${id}`).remove();toast('Vinho removido!');}
 function addWineAdmin(){wines.push({id:nextId++,name:'Novo Vinho',type:'tinto',origin:'',year:new Date().getFullYear(),description:'',price:0,stock:0,image:''});renderAdminList();document.getElementById('adminList').lastElementChild?.scrollIntoView({behavior:'smooth'});}
-function applyAdmin(){
-    wines=wines.map(w=>({...w,
+async function applyAdmin(){
+    const upd={};
+    wines.map(w=>({
+        ...w,
         name:       document.getElementById(`wn-${w.id}`)?.value||w.name,
         type:       document.getElementById(`wt-${w.id}`)?.value||w.type,
         year:    +( document.getElementById(`wy-${w.id}`)?.value)||w.year,
@@ -587,22 +721,15 @@ function applyAdmin(){
         stock:   +( document.getElementById(`ws-${w.id}`)?.value)||w.stock,
         image:      document.getElementById(`wi-${w.id}`)?.value??w.image,
         description:document.getElementById(`wd-${w.id}`)?.value||w.description,
-    }));
-    renderWines(); toast('Aplicado! ✅');
-}
-function exportHTML(){
-    applyAdmin();
-    const winesJSON=JSON.stringify(wines,null,8);
-    const html=document.documentElement.outerHTML;
-    const updated=html.replace(/let wines = \[[\s\S]*?\];/,`let wines = ${winesJSON};`);
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([updated],{type:'text/html'}));a.download='index.html';a.click();
-    toast('Exportado! Substitua no GitHub 🚀');
+    })).forEach(w=>{ upd[`wines/${w.id}`]=w; });
+    try{ await db.ref().update(upd); toast('✅ Salvo no Firebase! Todos já veem as mudanças.'); }
+    catch(e){ toast('Erro: '+e.message,'err'); }
 }
 
 function fmt(n){return n.toFixed(2).replace('.',',');}
 function toast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className=`toast show ${type}`;clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3500);}
 
-renderWines();
+initFirebase();
 </script>
 </body>
 </html>
