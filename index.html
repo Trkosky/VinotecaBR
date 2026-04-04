@@ -247,6 +247,70 @@
         .login-box input:focus{outline:none;border-color:var(--ouro)}
         .btn-login{padding:.7rem 2rem;background:var(--vinho);color:var(--ouro-lt);border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer}
 
+        
+        /* ══════════════════════════════════════
+           PAINEL FINANCEIRO
+        ══════════════════════════════════════ */
+        .fin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);z-index:1150;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+        .fin-overlay.open{display:flex}
+        .fin-panel{background:#1a1010;border:1.5px solid var(--ouro);border-radius:16px;width:100%;max-width:1000px;margin:auto;overflow:hidden}
+        .fin-hd{background:var(--vinho-dk);padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,168,76,.3)}
+        .fin-hd h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--ouro)}
+
+        /* tabs */
+        .fin-tabs{display:flex;border-bottom:1px solid rgba(201,168,76,.2);background:rgba(0,0,0,.2)}
+        .fin-tab{padding:.8rem 1.3rem;background:transparent;border:none;color:#9e8e8e;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:.2s;border-bottom:2px solid transparent}
+        .fin-tab:hover{color:var(--ouro-lt)}
+        .fin-tab.active{color:var(--ouro);border-bottom-color:var(--ouro)}
+        .fin-body{padding:1.5rem;max-height:80vh;overflow-y:auto}
+
+        /* KPI cards */
+        .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem}
+        .kpi-card{background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:1rem 1.2rem}
+        .kpi-label{font-size:.75rem;color:#9e8e8e;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px}
+        .kpi-value{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--ouro)}
+        .kpi-value.pos{color:#66BB6A}.kpi-value.neg{color:#EF5350}
+
+        /* tabela financeira */
+        .fin-table{width:100%;border-collapse:collapse;font-size:.85rem}
+        .fin-table th{text-align:left;padding:.6rem .8rem;font-size:.75rem;color:#9e8e8e;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(201,168,76,.2);font-weight:500}
+        .fin-table td{padding:.7rem .8rem;border-bottom:1px solid rgba(255,255,255,.04);color:#c5b5b5;vertical-align:middle}
+        .fin-table tr:last-child td{border-bottom:none}
+        .fin-table tr:hover td{background:rgba(255,255,255,.03)}
+        .badge-margin{display:inline-block;padding:.15rem .55rem;border-radius:8px;font-size:.75rem;font-weight:600}
+        .bm-ok{background:rgba(46,125,50,.25);color:#66BB6A}
+        .bm-warn{background:rgba(230,81,0,.25);color:#FFA726}
+        .bm-bad{background:rgba(198,40,40,.25);color:#EF5350}
+
+        /* formulário de despesa */
+        .desp-form{display:grid;grid-template-columns:1fr 1fr auto auto;gap:.6rem;align-items:end;margin-bottom:1.2rem;background:rgba(255,255,255,.04);padding:1rem;border-radius:10px;border:1px solid rgba(201,168,76,.12)}
+        @media(max-width:640px){.desp-form{grid-template-columns:1fr}}
+        .desp-form label{display:block;font-size:.75rem;color:#888;margin-bottom:.25rem}
+        .desp-form input,.desp-form select{width:100%;padding:.55rem .7rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem}
+        .desp-form input:focus,.desp-form select:focus{outline:none;border-color:var(--ouro)}
+        .desp-form select option{background:#1a1010}
+        .btn-add-desp{padding:.55rem 1.1rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;white-space:nowrap}
+        .btn-del-desp{background:transparent;border:none;color:#c0504d;cursor:pointer;font-size:1rem;padding:.2rem .4rem}
+
+        /* comissões */
+        .com-filter{display:flex;gap:.7rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1.2rem;background:rgba(255,255,255,.04);padding:1rem;border-radius:10px;border:1px solid rgba(201,168,76,.12)}
+        .com-filter label{display:block;font-size:.75rem;color:#888;margin-bottom:.25rem}
+        .com-filter input,.com-filter select{padding:.55rem .7rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem}
+        .com-filter input:focus{outline:none;border-color:var(--ouro)}
+        .btn-calc-com{padding:.55rem 1.1rem;background:var(--vinho);color:var(--ouro-lt);border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer}
+        .com-pct-row{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+        .com-pct-row label{font-size:.82rem;color:#9e8e8e}
+        .com-pct-row input{width:70px;padding:.4rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem}
+        .com-pct-row button{padding:.4rem .9rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer}
+        .com-vendor-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:1rem 1.2rem;margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem}
+        .com-vendor-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--ouro-lt)}
+        .com-vendor-stats{display:flex;gap:1.5rem;flex-wrap:wrap}
+        .com-stat{text-align:center}
+        .com-stat-lbl{font-size:.72rem;color:#888;text-transform:uppercase;letter-spacing:.4px}
+        .com-stat-val{font-size:1.1rem;font-weight:600;color:var(--creme)}
+        .com-stat-val.gold{color:var(--ouro)}
+        .com-stat-val.green{color:#66BB6A}
+
         @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(2,1fr) !important}}
         @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
@@ -358,6 +422,96 @@
     </div>
 </div>
 
+<!-- FINANCEIRO -->
+<div class="fin-overlay" id="finOverlay" onclick="if(event.target===this)closeFin()">
+    <div class="fin-panel">
+        <div class="fin-hd">
+            <h2>💰 Painel Financeiro</h2>
+            <button class="btn-close" onclick="closeFin()">✕</button>
+        </div>
+        <div class="fin-tabs">
+            <button class="fin-tab active" onclick="finTab(0,this)">📦 Margem por Vinho</button>
+            <button class="fin-tab" onclick="finTab(1,this)">💸 Despesas</button>
+            <button class="fin-tab" onclick="finTab(2,this)">🏆 Comissões</button>
+        </div>
+
+        <!-- TAB 0: MARGEM -->
+        <div class="fin-body" id="finTab0">
+            <div class="kpi-grid" id="margemKpis"></div>
+            <table class="fin-table">
+                <thead><tr>
+                    <th>Vinho</th><th>Custo</th><th>Venda</th><th>Margem R$</th><th>Margem %</th><th>Estoque</th><th>Custo Total</th>
+                </tr></thead>
+                <tbody id="margemTabela"></tbody>
+            </table>
+        </div>
+
+        <!-- TAB 1: DESPESAS -->
+        <div class="fin-body" id="finTab1" style="display:none">
+            <div class="kpi-grid" id="despesasKpis"></div>
+            <div class="desp-form">
+                <div>
+                    <label>Descrição *</label>
+                    <input type="text" id="dDesc" placeholder="Ex: Frete, Aluguel...">
+                </div>
+                <div>
+                    <label>Categoria</label>
+                    <select id="dCat">
+                        <option>Compra de Estoque</option>
+                        <option>Frete / Logística</option>
+                        <option>Aluguel / Estrutura</option>
+                        <option>Marketing</option>
+                        <option>Impostos / Taxas</option>
+                        <option>Outros</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Valor R$ *</label>
+                    <input type="number" id="dVal" step="0.01" placeholder="0,00">
+                </div>
+                <div>
+                    <label>Data *</label>
+                    <input type="date" id="dData">
+                </div>
+                <button class="btn-add-desp" onclick="addDespesa()">➕ Lançar</button>
+            </div>
+            <table class="fin-table">
+                <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th></th></tr></thead>
+                <tbody id="despesasTabela"></tbody>
+            </table>
+        </div>
+
+        <!-- TAB 2: COMISSÕES -->
+        <div class="fin-body" id="finTab2" style="display:none">
+            <div class="com-pct-row">
+                <label>% Comissão (padrão para todos):</label>
+                <input type="number" id="comPctGlobal" min="0" max="100" step="0.1" value="5">
+                <span style="font-size:.82rem;color:#9e8e8e">%</span>
+                <button onclick="saveComPct()">Salvar %</button>
+            </div>
+            <div class="com-filter">
+                <div>
+                    <label>De</label>
+                    <input type="date" id="comDe">
+                </div>
+                <div>
+                    <label>Até</label>
+                    <input type="date" id="comAte">
+                </div>
+                <div>
+                    <label>Vendedor</label>
+                    <select id="comVendedor">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <button class="btn-calc-com" onclick="loadComissoes()">📊 Calcular</button>
+            </div>
+            <div class="kpi-grid" id="comKpis"></div>
+            <div id="comCards"></div>
+        </div>
+    </div>
+</div>
+
 <!-- ADMIN -->
 <div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
     <div class="admin-panel">
@@ -379,6 +533,7 @@
                     <button class="btn-admin btn-add-wine" onclick="addWineAdmin()">➕ Novo Vinho</button>
                     <button class="btn-admin btn-save"     onclick="applyAdmin()">☁️ Salvar no Firebase</button>
                     <button class="btn-admin" style="background:#185FA5;color:#E6F1FB" onclick="openOrders()">📋 Histórico de Pedidos</button>
+                    <button class="btn-admin" style="background:#7A2832;color:var(--ouro-lt)" onclick="openFin()">💰 Financeiro</button>
                 </div>
             </div>
         </div>
@@ -698,6 +853,7 @@ function renderAdminList(){
                 <div class="wai-fld"><label>Origem</label><input id="wo-${w.id}" value="${w.origin}"></div>
                 <div class="wai-fld"><label>Preço R$</label><input id="wp-${w.id}" type="number" step="0.01" value="${w.price}"></div>
                 <div class="wai-fld"><label>Estoque</label><input id="ws-${w.id}" type="number" value="${w.stock}"></div>
+                <div class="wai-fld"><label>Custo R$ (compra)</label><input id="wc-${w.id}" type="number" step="0.01" value="${w.custo||0}" placeholder="0,00"></div>
                 <div class="wai-fld" style="grid-column:span 2"><label>Imagem — URL ou images/nome.jpg</label>
                     <input id="wi-${w.id}" value="${w.image||''}" oninput="prevThumb(${w.id})">
                     <img class="wai-img-preview" id="prev-${w.id}" src="${w.image||''}" onerror="this.style.display='none'" style="${w.image?'':'display:none'}"></div>
@@ -720,11 +876,219 @@ async function applyAdmin(){
         origin:     document.getElementById(`wo-${w.id}`)?.value||w.origin,
         price:   +( document.getElementById(`wp-${w.id}`)?.value)||w.price,
         stock:   +( document.getElementById(`ws-${w.id}`)?.value)||w.stock,
+        custo:   +( document.getElementById(`wc-${w.id}`)?.value)||w.custo||0,
         image:      document.getElementById(`wi-${w.id}`)?.value??w.image,
         description:document.getElementById(`wd-${w.id}`)?.value||w.description,
     })).forEach(w=>{ upd[`wines/${w.id}`]=w; });
     try{ await db.ref().update(upd); toast('✅ Salvo no Firebase! Todos já veem as mudanças.'); }
     catch(e){ toast('Erro: '+e.message,'err'); }
+}
+
+
+// ══════════════════════════════════════════════════════
+//  PAINEL FINANCEIRO
+// ══════════════════════════════════════════════════════
+
+function openFin(){
+    closeAdmin();
+    document.getElementById('finOverlay').classList.add('open');
+    // data padrão dos filtros: mês atual
+    const hoje = new Date();
+    const ini  = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0];
+    const fim  = hoje.toISOString().split('T')[0];
+    document.getElementById('comDe').value  = ini;
+    document.getElementById('comAte').value = fim;
+    document.getElementById('dData').value  = fim;
+    // preenche select vendedor
+    const sv = document.getElementById('comVendedor');
+    sv.innerHTML = '<option value="">Todos</option>';
+    VENDEDORES.slice(1).forEach(v=>{
+        const o=document.createElement('option'); o.value=v; o.textContent=v; sv.appendChild(o);
+    });
+    // carrega % salvo
+    db.ref('config/comissao_pct').once('value', s=>{
+        if(s.val()) document.getElementById('comPctGlobal').value = s.val();
+    });
+    loadMargem();
+}
+function closeFin(){ document.getElementById('finOverlay').classList.remove('open'); }
+
+function finTab(n, btn){
+    [0,1,2].forEach(i=>{
+        document.getElementById('finTab'+i).style.display = i===n ? '' : 'none';
+    });
+    document.querySelectorAll('.fin-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    if(n===0) loadMargem();
+    if(n===1) loadDespesas();
+    if(n===2) loadComissoes();
+}
+
+// ── MARGEM ──
+function loadMargem(){
+    const tbody = document.getElementById('margemTabela');
+    const kpis  = document.getElementById('margemKpis');
+    tbody.innerHTML = '';
+
+    let totalCusto=0, totalVenda=0, totalEstoque=0;
+    wines.forEach(w=>{
+        const custo  = w.custo || 0;
+        const venda  = w.price || 0;
+        const margem = venda - custo;
+        const pct    = custo > 0 ? (margem/custo*100) : 0;
+        const custoTotal = custo * (w.stock||0);
+        totalCusto   += custoTotal;
+        totalVenda   += venda * (w.stock||0);
+        totalEstoque += w.stock||0;
+
+        const cls = pct >= 40 ? 'bm-ok' : pct >= 15 ? 'bm-warn' : 'bm-bad';
+        const tr  = document.createElement('tr');
+        tr.innerHTML = `<td>${w.name}</td>
+            <td>R$ ${fmt(custo)}</td>
+            <td>R$ ${fmt(venda)}</td>
+            <td style="color:${margem>=0?'#66BB6A':'#EF5350'}">R$ ${fmt(margem)}</td>
+            <td><span class="badge-margin ${cls}">${pct.toFixed(1)}%</span></td>
+            <td>${w.stock||0} un</td>
+            <td>R$ ${fmt(custoTotal)}</td>`;
+        tbody.appendChild(tr);
+    });
+
+    const margemTotal = totalVenda - totalCusto;
+    kpis.innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Custo em Estoque</div><div class="kpi-value">R$ ${fmt(totalCusto)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Valor de Venda em Estoque</div><div class="kpi-value">R$ ${fmt(totalVenda)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Margem Bruta Estoque</div><div class="kpi-value ${margemTotal>=0?'pos':'neg'}">R$ ${fmt(margemTotal)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total de Unidades</div><div class="kpi-value">${totalEstoque}</div></div>`;
+}
+
+// ── DESPESAS ──
+function loadDespesas(){
+    const tbody = document.getElementById('despesasTabela');
+    const kpis  = document.getElementById('despesasKpis');
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#9e8e8e;padding:1rem">Carregando...</td></tr>';
+
+    db.ref('despesas').orderByChild('timestamp').once('value', snap=>{
+        const data = snap.val();
+        tbody.innerHTML = '';
+        if(!data){
+            tbody.innerHTML = '<tr><td colspan="5" style="color:#6b5b5b;text-align:center;padding:1.5rem">Nenhuma despesa lançada.</td></tr>';
+            kpis.innerHTML  = '<div class="kpi-card"><div class="kpi-label">Total de Despesas</div><div class="kpi-value">R$ 0,00</div></div>';
+            return;
+        }
+        const list  = Object.entries(data).sort((a,b)=>b[1].timestamp-a[1].timestamp);
+        let   total = 0;
+        const catTotals = {};
+        list.forEach(([key, d])=>{
+            total += d.valor;
+            catTotals[d.categoria] = (catTotals[d.categoria]||0) + d.valor;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${d.data}</td><td>${d.descricao}</td><td style="color:#9e8e8e">${d.categoria}</td>
+                <td style="color:#EF5350">R$ ${fmt(d.valor)}</td>
+                <td><button class="btn-del-desp" onclick="delDespesa('${key}')">🗑️</button></td>`;
+            tbody.appendChild(tr);
+        });
+
+        // maior categoria
+        const topCat = Object.entries(catTotals).sort((a,b)=>b[1]-a[1])[0];
+        kpis.innerHTML = `
+            <div class="kpi-card"><div class="kpi-label">Total de Despesas</div><div class="kpi-value neg">R$ ${fmt(total)}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Nº de Lançamentos</div><div class="kpi-value">${list.length}</div></div>
+            ${topCat?`<div class="kpi-card"><div class="kpi-label">Maior Categoria</div><div class="kpi-value" style="font-size:1rem">${topCat[0]}<br><span style="color:#EF5350;font-size:1.3rem">R$ ${fmt(topCat[1])}</span></div></div>`:''}`;
+    });
+}
+
+async function addDespesa(){
+    const desc = document.getElementById('dDesc').value.trim();
+    const val  = parseFloat(document.getElementById('dVal').value);
+    const cat  = document.getElementById('dCat').value;
+    const data = document.getElementById('dData').value;
+    if(!desc || !val || !data){ toast('Preencha descrição, valor e data!','err'); return; }
+    const key  = Date.now()+'_'+Math.random().toString(36).substr(2,4);
+    await db.ref('despesas/'+key).set({ descricao:desc, valor:val, categoria:cat, data, timestamp:Date.now() });
+    document.getElementById('dDesc').value = '';
+    document.getElementById('dVal').value  = '';
+    toast('Despesa lançada! ✅');
+    loadDespesas();
+}
+
+async function delDespesa(key){
+    if(!confirm('Remover esta despesa?')) return;
+    await db.ref('despesas/'+key).remove();
+    toast('Despesa removida.');
+    loadDespesas();
+}
+
+// ── COMISSÕES ──
+async function saveComPct(){
+    const pct = parseFloat(document.getElementById('comPctGlobal').value)||0;
+    await db.ref('config/comissao_pct').set(pct);
+    toast('% de comissão salvo! ✅');
+    loadComissoes();
+}
+
+function loadComissoes(){
+    const de   = document.getElementById('comDe').value;
+    const ate  = document.getElementById('comAte').value;
+    const vend = document.getElementById('comVendedor').value;
+    const pct  = parseFloat(document.getElementById('comPctGlobal').value)||0;
+    const cards = document.getElementById('comCards');
+    const kpis  = document.getElementById('comKpis');
+    cards.innerHTML = '<p style="color:#9e8e8e;padding:.5rem 0">Carregando...</p>';
+
+    db.ref('orders').orderByChild('timestamp').once('value', snap=>{
+        const data = snap.val();
+        if(!data){ cards.innerHTML='<p style="color:#6b5b5b;text-align:center;padding:2rem">Nenhum pedido encontrado.</p>'; return; }
+
+        // filtra por período
+        const deTs  = de  ? new Date(de+'T00:00:00').getTime()  : 0;
+        const ateTs = ate ? new Date(ate+'T23:59:59').getTime() : Infinity;
+
+        const orders = Object.values(data).filter(o=>{
+            const ts = o.timestamp||0;
+            if(ts < deTs || ts > ateTs) return false;
+            if(vend && o.vendedor !== vend) return false;
+            return true;
+        });
+
+        // agrupa por vendedor
+        const byVend = {};
+        orders.forEach(o=>{
+            if(!byVend[o.vendedor]) byVend[o.vendedor]={ total:0, pedidos:0, itens:0 };
+            byVend[o.vendedor].total   += o.total||0;
+            byVend[o.vendedor].pedidos += 1;
+            byVend[o.vendedor].itens   += (o.itens||[]).reduce((s,i)=>s+i.qty,0);
+        });
+
+        const totalGeral = Object.values(byVend).reduce((s,v)=>s+v.total,0);
+        const comTotal   = totalGeral * pct/100;
+
+        kpis.innerHTML = `
+            <div class="kpi-card"><div class="kpi-label">Total Vendido (período)</div><div class="kpi-value">R$ ${fmt(totalGeral)}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total de Comissões</div><div class="kpi-value green">R$ ${fmt(comTotal)}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total de Pedidos</div><div class="kpi-value">${orders.length}</div></div>
+            <div class="kpi-card"><div class="kpi-label">% Aplicada</div><div class="kpi-value">${pct}%</div></div>`;
+
+        cards.innerHTML = '';
+        if(!Object.keys(byVend).length){
+            cards.innerHTML='<p style="color:#6b5b5b;text-align:center;padding:2rem">Nenhuma venda no período.</p>';
+            return;
+        }
+
+        Object.entries(byVend).sort((a,b)=>b[1].total-a[1].total).forEach(([nome, v])=>{
+            const com = v.total * pct/100;
+            const card = document.createElement('div');
+            card.className = 'com-vendor-card';
+            card.innerHTML = `
+                <div class="com-vendor-name">👤 ${nome}</div>
+                <div class="com-vendor-stats">
+                    <div class="com-stat"><div class="com-stat-lbl">Pedidos</div><div class="com-stat-val">${v.pedidos}</div></div>
+                    <div class="com-stat"><div class="com-stat-lbl">Itens vendidos</div><div class="com-stat-val">${v.itens}</div></div>
+                    <div class="com-stat"><div class="com-stat-lbl">Total vendido</div><div class="com-stat-val gold">R$ ${fmt(v.total)}</div></div>
+                    <div class="com-stat"><div class="com-stat-lbl">Comissão (${pct}%)</div><div class="com-stat-val green">R$ ${fmt(com)}</div></div>
+                </div>`;
+            cards.appendChild(card);
+        });
+    });
 }
 
 function fmt(n){return n.toFixed(2).replace('.',',');}
