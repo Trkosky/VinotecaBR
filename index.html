@@ -311,6 +311,39 @@
         .com-stat-val.gold{color:var(--ouro)}
         .com-stat-val.green{color:#66BB6A}
 
+
+        /* ══ PEDIDOS EM ABERTO ══ */
+        .ped-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);z-index:1150;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+        .ped-overlay.open{display:flex}
+        .ped-panel{background:#1a1010;border:1.5px solid var(--ouro);border-radius:16px;width:100%;max-width:1000px;margin:auto;overflow:hidden}
+        .ped-hd{background:var(--vinho-dk);padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,168,76,.3)}
+        .ped-hd h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--ouro)}
+        .ped-filter{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:1rem 1.5rem;border-bottom:1px solid rgba(201,168,76,.12);background:rgba(0,0,0,.15)}
+        .ped-filter label{font-size:.78rem;color:#9e8e8e}
+        .ped-filter select,.ped-filter input{padding:.45rem .7rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem}
+        .ped-filter select option{background:#1a1010}
+        .btn-ped-refresh{padding:.45rem 1rem;background:rgba(201,168,76,.15);color:var(--ouro);border:1px solid rgba(201,168,76,.3);border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer}
+        .ped-body{padding:1.2rem;max-height:78vh;overflow-y:auto}
+        .ped-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;margin-bottom:1.2rem}
+        .ped-grid{display:flex;flex-direction:column;gap:.7rem}
+        .ped-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.12);border-radius:10px;padding:1rem 1.2rem;display:grid;grid-template-columns:1fr auto;gap:.8rem;align-items:start}
+        .ped-card.pago{border-color:rgba(46,125,50,.3);background:rgba(46,125,50,.05)}
+        .ped-card-left{}
+        .ped-card-top{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.4rem}
+        .ped-status{display:inline-block;padding:.2rem .7rem;border-radius:12px;font-size:.72rem;font-weight:700;letter-spacing:.5px}
+        .ps-aberto{background:rgba(230,81,0,.25);color:#FFA726;border:1px solid rgba(230,81,0,.3)}
+        .ps-pago  {background:rgba(46,125,50,.25);color:#66BB6A;border:1px solid rgba(46,125,50,.3)}
+        .ped-vendedor{font-size:.78rem;background:rgba(122,40,50,.35);color:var(--ouro-lt);padding:.15rem .6rem;border-radius:8px}
+        .ped-meta{font-size:.8rem;color:#9e8e8e;margin-bottom:.35rem}
+        .ped-cliente{font-size:.88rem;color:var(--creme);font-weight:500}
+        .ped-itens{font-size:.8rem;color:#c5b5b5;margin-top:.4rem;line-height:1.6}
+        .ped-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:.6rem}
+        .ped-total{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--ouro)}
+        .btn-pagar{padding:.5rem 1rem;background:linear-gradient(135deg,var(--ok),#1B5E20);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:.25s;white-space:nowrap}
+        .btn-pagar:hover{opacity:.85;transform:translateY(-1px)}
+        .btn-reabrir{padding:.5rem 1rem;background:rgba(230,81,0,.2);color:#FFA726;border:1px solid rgba(230,81,0,.3);border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
+        .ped-empty{text-align:center;padding:3rem;color:#6b5b5b}
+
         @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(2,1fr) !important}}
         @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
@@ -419,6 +452,45 @@
     <div class="orders-panel">
         <div class="orders-hd"><h2>📋 Histórico de Pedidos</h2><button class="btn-close" onclick="closeOrders()">✕</button></div>
         <div class="orders-body" id="ordersBody"></div>
+    </div>
+</div>
+
+<!-- PEDIDOS EM ABERTO -->
+<div class="ped-overlay" id="pedOverlay" onclick="if(event.target===this)closePed()">
+    <div class="ped-panel">
+        <div class="ped-hd">
+            <h2>🧾 Pedidos em Aberto</h2>
+            <button class="btn-close" onclick="closePed()">✕</button>
+        </div>
+        <div class="ped-filter">
+            <div>
+                <label>Status</label><br>
+                <select id="pedStatus">
+                    <option value="">Todos</option>
+                    <option value="aberto" selected>Em aberto</option>
+                    <option value="pago">Pagos</option>
+                </select>
+            </div>
+            <div>
+                <label>Vendedor</label><br>
+                <select id="pedVend">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div>
+                <label>De</label><br>
+                <input type="date" id="pedDe">
+            </div>
+            <div>
+                <label>Até</label><br>
+                <input type="date" id="pedAte">
+            </div>
+            <button class="btn-ped-refresh" onclick="loadPedidos()">🔄 Atualizar</button>
+        </div>
+        <div class="ped-body">
+            <div class="ped-kpi-row" id="pedKpis"></div>
+            <div class="ped-grid" id="pedGrid"></div>
+        </div>
     </div>
 </div>
 
@@ -534,6 +606,7 @@
                     <button class="btn-admin btn-save"     onclick="applyAdmin()">☁️ Salvar no Firebase</button>
                     <button class="btn-admin" style="background:#185FA5;color:#E6F1FB" onclick="openOrders()">📋 Histórico de Pedidos</button>
                     <button class="btn-admin" style="background:#7A2832;color:var(--ouro-lt)" onclick="openFin()">💰 Financeiro</button>
+                    <button class="btn-admin" style="background:#E65100;color:#fff" onclick="openPed()">🧾 Pedidos em Aberto</button>
                 </div>
             </div>
         </div>
@@ -722,6 +795,7 @@ async function sendWhatsApp(){
         updates[`orders/${key}`]={
             vendedor, cliente:name, telefone:phone,
             endereco:addr||'', data, hora, total, timestamp:Date.now(),
+            status:'aberto',
             itens:cart.map(c=>({nome:c.name,qty:c.qty,preco:c.price}))
         };
         await db.ref().update(updates);
@@ -872,15 +946,33 @@ async function applyAdmin(){
         ...w,
         name:       document.getElementById(`wn-${w.id}`)?.value||w.name,
         type:       document.getElementById(`wt-${w.id}`)?.value||w.type,
-        year:    +( document.getElementById(`wy-${w.id}`)?.value)||w.year,
+        year:    parseFloat(document.getElementById(`wy-${w.id}`)?.value) || w.year,
         origin:     document.getElementById(`wo-${w.id}`)?.value||w.origin,
-        price:   +( document.getElementById(`wp-${w.id}`)?.value)||w.price,
-        stock:   +( document.getElementById(`ws-${w.id}`)?.value)||w.stock,
-        custo:   +( document.getElementById(`wc-${w.id}`)?.value)||w.custo||0,
+        price:   parseFloat(document.getElementById(`wp-${w.id}`)?.value) || w.price,
+        stock:   parseFloat(document.getElementById(`ws-${w.id}`)?.value) || 0,
+        custo:   parseFloat(document.getElementById(`wc-${w.id}`)?.value) || 0,
         image:      document.getElementById(`wi-${w.id}`)?.value??w.image,
         description:document.getElementById(`wd-${w.id}`)?.value||w.description,
     })).forEach(w=>{ upd[`wines/${w.id}`]=w; });
-    try{ await db.ref().update(upd); toast('✅ Salvo no Firebase! Todos já veem as mudanças.'); }
+    try{
+        await db.ref().update(upd);
+        // atualiza wines local imediatamente (sem esperar Firebase listener)
+        const updated = wines.map(w=>({
+            ...w,
+            name:        document.getElementById(`wn-${w.id}`)?.value||w.name,
+            type:        document.getElementById(`wt-${w.id}`)?.value||w.type,
+            year:        parseFloat(document.getElementById(`wy-${w.id}`)?.value)||w.year,
+            origin:      document.getElementById(`wo-${w.id}`)?.value||w.origin,
+            price:       parseFloat(document.getElementById(`wp-${w.id}`)?.value)||w.price,
+            stock:       parseFloat(document.getElementById(`ws-${w.id}`)?.value)||0,
+            custo:       parseFloat(document.getElementById(`wc-${w.id}`)?.value)||0,
+            image:       document.getElementById(`wi-${w.id}`)?.value??w.image,
+            description: document.getElementById(`wd-${w.id}`)?.value||w.description,
+        }));
+        wines = updated;
+        renderAdminList();
+        toast('✅ Salvo! Preço de compra atualizado.');
+    }
     catch(e){ toast('Erro: '+e.message,'err'); }
 }
 
@@ -1089,6 +1181,107 @@ function loadComissoes(){
             cards.appendChild(card);
         });
     });
+}
+
+
+// ══════════════════════════════════════════════════════
+//  PEDIDOS EM ABERTO
+// ══════════════════════════════════════════════════════
+function openPed(){
+    closeAdmin();
+    const hoje = new Date().toISOString().split('T')[0];
+    const ini  = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+    if(!document.getElementById('pedDe').value) document.getElementById('pedDe').value = ini;
+    if(!document.getElementById('pedAte').value) document.getElementById('pedAte').value = hoje;
+    // preenche select vendedor
+    const sv = document.getElementById('pedVend');
+    if(sv.options.length <= 1){
+        VENDEDORES.slice(1).forEach(v=>{
+            const o=document.createElement('option'); o.value=v; o.textContent=v; sv.appendChild(o);
+        });
+    }
+    document.getElementById('pedOverlay').classList.add('open');
+    loadPedidos();
+}
+function closePed(){ document.getElementById('pedOverlay').classList.remove('open'); }
+
+function loadPedidos(){
+    const status = document.getElementById('pedStatus').value;
+    const vend   = document.getElementById('pedVend').value;
+    const de     = document.getElementById('pedDe').value;
+    const ate    = document.getElementById('pedAte').value;
+    const grid   = document.getElementById('pedGrid');
+    const kpis   = document.getElementById('pedKpis');
+    grid.innerHTML  = '<div class="ped-empty"><p>Carregando...</p></div>';
+    kpis.innerHTML  = '';
+
+    db.ref('orders').orderByChild('timestamp').once('value', snap=>{
+        const raw = snap.val();
+        if(!raw){ grid.innerHTML='<div class="ped-empty"><p>📋 Nenhum pedido encontrado.</p></div>'; return; }
+
+        const deTs  = de  ? new Date(de +'T00:00:00').getTime() : 0;
+        const ateTs = ate ? new Date(ate+'T23:59:59').getTime() : Infinity;
+
+        // montamos com chave para poder dar baixa
+        let entries = Object.entries(raw)
+            .map(([key,o]) => ({key,...o}))
+            .filter(o => {
+                if(o.timestamp < deTs || o.timestamp > ateTs) return false;
+                if(vend   && o.vendedor !== vend) return false;
+                if(status && (o.status||'aberto') !== status) return false;
+                return true;
+            })
+            .sort((a,b) => b.timestamp - a.timestamp);
+
+        // KPIs
+        const totAberto = entries.filter(o=>(o.status||'aberto')==='aberto').reduce((s,o)=>s+o.total,0);
+        const totPago   = entries.filter(o=> o.status              ==='pago' ).reduce((s,o)=>s+o.total,0);
+        const nAberto   = entries.filter(o=>(o.status||'aberto')==='aberto').length;
+        const nPago     = entries.filter(o=> o.status              ==='pago' ).length;
+        kpis.innerHTML  = `
+            <div class="kpi-card"><div class="kpi-label">Em aberto (R$)</div><div class="kpi-value" style="color:#FFA726">R$ ${fmt(totAberto)}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Em aberto (qtd)</div><div class="kpi-value" style="color:#FFA726">${nAberto}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Pagos (R$)</div><div class="kpi-value pos">R$ ${fmt(totPago)}</div></div>
+            <div class="kpi-card"><div class="kpi-label">Pagos (qtd)</div><div class="kpi-value pos">${nPago}</div></div>`;
+
+        if(!entries.length){
+            grid.innerHTML = '<div class="ped-empty"><p>Nenhum pedido para os filtros selecionados.</p></div>';
+            return;
+        }
+
+        grid.innerHTML = '';
+        entries.forEach(o => {
+            const isPago = o.status === 'pago';
+            const itensHtml = (o.itens||[]).map(i=>`${i.qty}x ${i.nome} — R$ ${fmt(i.preco)}`).join(' &nbsp;·&nbsp; ');
+            const card = document.createElement('div');
+            card.className = 'ped-card' + (isPago ? ' pago' : '');
+            card.innerHTML = `
+                <div class="ped-card-left">
+                    <div class="ped-card-top">
+                        <span class="ped-status ${isPago?'ps-pago':'ps-aberto'}">${isPago?'✓ PAGO':'● ABERTO'}</span>
+                        <span class="ped-vendedor">👤 ${o.vendedor}</span>
+                    </div>
+                    <div class="ped-meta">${o.data} às ${o.hora}</div>
+                    <div class="ped-cliente">👤 ${o.cliente} &nbsp;|&nbsp; 📱 ${o.telefone}${o.endereco?' &nbsp;|&nbsp; 📍 '+o.endereco:''}</div>
+                    <div class="ped-itens">${itensHtml}</div>
+                </div>
+                <div class="ped-card-right">
+                    <div class="ped-total">R$ ${fmt(o.total)}</div>
+                    ${isPago
+                        ? `<button class="btn-reabrir" onclick="setPedStatus('${o.key}','aberto')">↩ Reabrir</button>`
+                        : `<button class="btn-pagar"  onclick="setPedStatus('${o.key}','pago')">✓ Marcar como Pago</button>`
+                    }
+                </div>`;
+            grid.appendChild(card);
+        });
+    });
+}
+
+async function setPedStatus(key, novoStatus){
+    await db.ref(`orders/${key}/status`).set(novoStatus);
+    const msg = novoStatus === 'pago' ? '✅ Pedido marcado como PAGO!' : '↩ Pedido reaberto.';
+    toast(msg, novoStatus==='pago'?'ok':'info');
+    loadPedidos();
 }
 
 function fmt(n){return n.toFixed(2).replace('.',',');}
