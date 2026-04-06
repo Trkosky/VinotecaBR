@@ -363,6 +363,39 @@
         .com-imp-row input{width:70px;padding:.4rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem}
         .com-imp-row button{padding:.4rem .9rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer}
 
+
+        /* ══ MODAL EDITAR PEDIDO ══ */
+        .edit-ped-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);z-index:1300;align-items:center;justify-content:center;padding:1rem}
+        .edit-ped-overlay.open{display:flex;animation:fadeIn .2s}
+        .edit-ped-modal{background:#1a1010;border:1.5px solid var(--ouro);border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
+        .edit-ped-hd{background:var(--vinho-dk);padding:1.1rem 1.4rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,168,76,.3);position:sticky;top:0;z-index:5}
+        .edit-ped-hd h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--ouro)}
+        .edit-ped-body{padding:1.4rem;display:flex;flex-direction:column;gap:.9rem}
+        .ep-fld label{display:block;font-size:.75rem;color:#9e8e8e;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.4px}
+        .ep-fld input,.ep-fld select{width:100%;padding:.65rem .85rem;border:1.5px solid rgba(122,40,50,.5);border-radius:8px;background:rgba(255,255,255,.06);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.9rem}
+        .ep-fld input:focus,.ep-fld select:focus{outline:none;border-color:var(--ouro)}
+        .ep-fld select option{background:#1a1010}
+        .ep-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+        @media(max-width:480px){.ep-row{grid-template-columns:1fr}}
+        /* itens editáveis */
+        .ep-itens-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.5rem}
+        .ep-item-row{display:grid;grid-template-columns:1fr 60px 90px 32px;gap:.4rem;align-items:center}
+        .ep-item-row input{padding:.45rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem}
+        .ep-item-row input:focus{outline:none;border-color:var(--ouro)}
+        .ep-item-row label{font-size:.7rem;color:#888;display:block;margin-bottom:.2rem}
+        .btn-ep-del-item{width:28px;height:28px;background:rgba(198,40,40,.2);border:1px solid rgba(198,40,40,.3);color:#EF5350;border-radius:6px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;align-self:flex-end;margin-bottom:0}
+        .btn-ep-del-item:hover{background:rgba(198,40,40,.4)}
+        .btn-ep-add-item{padding:.45rem .9rem;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:var(--ouro);border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;margin-top:.2rem}
+        .edit-ped-footer{padding:1rem 1.4rem;border-top:1px solid rgba(201,168,76,.15);display:flex;gap:.7rem;justify-content:flex-end}
+        .btn-ep-save{padding:.7rem 1.4rem;background:var(--ok);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer}
+        .btn-ep-cancel{padding:.7rem 1.1rem;background:transparent;border:1px solid rgba(201,168,76,.25);color:var(--ouro-lt);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;cursor:pointer}
+        /* botão excluir nos cards de pedido */
+        .btn-excluir-ped{padding:.5rem .85rem;background:rgba(198,40,40,.15);color:#EF5350;border:1px solid rgba(198,40,40,.3);border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
+        .btn-excluir-ped:hover{background:rgba(198,40,40,.35)}
+        .btn-editar-ped{padding:.5rem .85rem;background:rgba(201,168,76,.12);color:var(--ouro);border:1px solid rgba(201,168,76,.3);border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
+        .btn-editar-ped:hover{background:rgba(201,168,76,.25)}
+        .ped-card-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}
+
         @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(2,1fr) !important}}
         @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
@@ -471,6 +504,65 @@
     <div class="orders-panel">
         <div class="orders-hd"><h2>📋 Histórico de Pedidos</h2><button class="btn-close" onclick="closeOrders()">✕</button></div>
         <div class="orders-body" id="ordersBody"></div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR PEDIDO -->
+<div class="edit-ped-overlay" id="editPedOverlay" onclick="if(event.target===this)closeEditPed()">
+    <div class="edit-ped-modal">
+        <div class="edit-ped-hd">
+            <h3>✏️ Editar Pedido</h3>
+            <button class="btn-close" onclick="closeEditPed()">✕</button>
+        </div>
+        <div class="edit-ped-body">
+            <input type="hidden" id="epKey">
+            <div class="ep-row">
+                <div class="ep-fld">
+                    <label>Vendedor</label>
+                    <select id="epVendedor"></select>
+                </div>
+                <div class="ep-fld">
+                    <label>Status</label>
+                    <select id="epStatus">
+                        <option value="aberto">Em aberto</option>
+                        <option value="pago">Pago</option>
+                    </select>
+                </div>
+            </div>
+            <div class="ep-row">
+                <div class="ep-fld">
+                    <label>Cliente</label>
+                    <input type="text" id="epCliente">
+                </div>
+                <div class="ep-fld">
+                    <label>Telefone</label>
+                    <input type="tel" id="epTelefone">
+                </div>
+            </div>
+            <div class="ep-fld">
+                <label>Endereço / Observação</label>
+                <input type="text" id="epEndereco">
+            </div>
+            <div class="ep-fld">
+                <label>Itens do Pedido</label>
+                <div style="display:grid;grid-template-columns:1fr 60px 90px 32px;gap:.4rem;margin-bottom:.4rem">
+                    <span style="font-size:.72rem;color:#888">Produto</span>
+                    <span style="font-size:.72rem;color:#888">Qtd</span>
+                    <span style="font-size:.72rem;color:#888">Preço un</span>
+                    <span></span>
+                </div>
+                <div class="ep-itens-list" id="epItensList"></div>
+                <button class="btn-ep-add-item" onclick="epAddItem()">➕ Adicionar item</button>
+            </div>
+            <div class="ep-fld" style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:.8rem 1rem">
+                <label>Total calculado</label>
+                <div id="epTotalDisplay" style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--ouro)">R$ 0,00</div>
+            </div>
+        </div>
+        <div class="edit-ped-footer">
+            <button class="btn-ep-cancel" onclick="closeEditPed()">Cancelar</button>
+            <button class="btn-ep-save"   onclick="saveEditPed()">✅ Salvar alterações</button>
+        </div>
     </div>
 </div>
 
@@ -1449,14 +1541,129 @@ function loadPedidos(){
                 </div>
                 <div class="ped-card-right">
                     <div class="ped-total">R$ ${fmt(o.total)}</div>
-                    ${isPago
-                        ? `<button class="btn-reabrir" onclick="setPedStatus('${o.key}','aberto')">↩ Reabrir</button>`
-                        : `<button class="btn-pagar"  onclick="setPedStatus('${o.key}','pago')">✓ Marcar como Pago</button>`
-                    }
+                    <div class="ped-card-actions">
+                        ${isPago
+                            ? `<button class="btn-reabrir" onclick="setPedStatus('${o.key}','aberto')">↩ Reabrir</button>`
+                            : `<button class="btn-pagar"  onclick="setPedStatus('${o.key}','pago')">✓ Pago</button>`
+                        }
+                        <button class="btn-editar-ped"  onclick="openEditPed('${o.key}')">✏️ Editar</button>
+                        <button class="btn-excluir-ped" onclick="confirmDelPed('${o.key}','${o.cliente}')">🗑️</button>
+                    </div>
                 </div>`;
             grid.appendChild(card);
         });
     });
+}
+
+
+// ══ EDITAR / EXCLUIR PEDIDO ══
+
+let _editPedData = null; // guarda o pedido sendo editado
+
+function openEditPed(key){
+    db.ref('orders/'+key).once('value', snap=>{
+        const o = snap.val();
+        if(!o){ toast('Pedido não encontrado','err'); return; }
+        _editPedData = {key, ...o};
+
+        // preenche vendedor select
+        const sv = document.getElementById('epVendedor');
+        sv.innerHTML = '';
+        VENDEDORES.slice(1).forEach(v=>{
+            const opt = document.createElement('option');
+            opt.value = v; opt.textContent = v;
+            if(v === o.vendedor) opt.selected = true;
+            sv.appendChild(opt);
+        });
+
+        document.getElementById('epKey').value       = key;
+        document.getElementById('epCliente').value   = o.cliente  || '';
+        document.getElementById('epTelefone').value  = o.telefone || '';
+        document.getElementById('epEndereco').value  = o.endereco || '';
+        document.getElementById('epStatus').value    = o.status   || 'aberto';
+
+        // itens
+        const list = document.getElementById('epItensList');
+        list.innerHTML = '';
+        (o.itens||[]).forEach(item => epAddItemRow(item.nome, item.qty, item.preco));
+        epCalcTotal();
+
+        document.getElementById('editPedOverlay').classList.add('open');
+    });
+}
+
+function closeEditPed(){
+    document.getElementById('editPedOverlay').classList.remove('open');
+    _editPedData = null;
+}
+
+function epAddItemRow(nome='', qty=1, preco=0){
+    const list = document.getElementById('epItensList');
+    const row  = document.createElement('div');
+    row.className = 'ep-item-row';
+    row.innerHTML = `
+        <input type="text"   class="ep-nome"  value="${nome}"  placeholder="Nome do produto" oninput="epCalcTotal()">
+        <input type="number" class="ep-qty"   value="${qty}"   min="1" step="1"              oninput="epCalcTotal()">
+        <input type="number" class="ep-preco" value="${preco}" min="0" step="0.01"            oninput="epCalcTotal()">
+        <button class="btn-ep-del-item" onclick="this.parentElement.remove();epCalcTotal()" title="Remover">✕</button>`;
+    list.appendChild(row);
+}
+
+function epAddItem(){ epAddItemRow('',1,0); }
+
+function epCalcTotal(){
+    let total = 0;
+    document.querySelectorAll('#epItensList .ep-item-row').forEach(row=>{
+        const qty   = parseFloat(row.querySelector('.ep-qty').value)   || 0;
+        const preco = parseFloat(row.querySelector('.ep-preco').value) || 0;
+        total += qty * preco;
+    });
+    document.getElementById('epTotalDisplay').textContent = 'R$ ' + fmt(total);
+    return total;
+}
+
+async function saveEditPed(){
+    const key      = document.getElementById('epKey').value;
+    const vendedor = document.getElementById('epVendedor').value;
+    const cliente  = document.getElementById('epCliente').value.trim();
+    const telefone = document.getElementById('epTelefone').value.trim();
+    const endereco = document.getElementById('epEndereco').value.trim();
+    const status   = document.getElementById('epStatus').value;
+
+    if(!cliente || !telefone){ toast('Preencha cliente e telefone!','err'); return; }
+
+    // coleta itens
+    const itens = [];
+    document.querySelectorAll('#epItensList .ep-item-row').forEach(row=>{
+        const nome  = row.querySelector('.ep-nome').value.trim();
+        const qty   = parseFloat(row.querySelector('.ep-qty').value)   || 0;
+        const preco = parseFloat(row.querySelector('.ep-preco').value) || 0;
+        if(nome && qty > 0) itens.push({nome, qty, preco});
+    });
+
+    if(!itens.length){ toast('Adicione pelo menos um item!','err'); return; }
+
+    const total = itens.reduce((s,i) => s + i.qty * i.preco, 0);
+
+    try{
+        await db.ref('orders/'+key).update({ vendedor, cliente, telefone, endereco, status, itens, total });
+        toast('✅ Pedido atualizado!');
+        closeEditPed();
+        loadPedidos();
+    } catch(e){
+        toast('Erro: '+e.message, 'err');
+    }
+}
+
+async function confirmDelPed(key, cliente){
+    if(!confirm('Excluir o pedido de "'+cliente+'"?\nEsta ação não pode ser desfeita.')) return;
+    try{
+        await db.ref('orders/'+key).remove();
+        toast('Pedido excluído.', 'info');
+        loadPedidos();
+    } catch(e){
+        toast('Erro: '+e.message, 'err');
+    }
 }
 
 async function setPedStatus(key, novoStatus){
