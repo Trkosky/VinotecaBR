@@ -218,7 +218,7 @@
 
         .admin-trigger{position:fixed;bottom:1.5rem;left:1.5rem;background:rgba(0,0,0,.6);border:1px solid rgba(201,168,76,.2);color:rgba(201,168,76,.4);padding:.5rem .9rem;border-radius:8px;font-size:.75rem;cursor:pointer;z-index:100;transition:.2s}
         .admin-trigger:hover{color:var(--ouro);border-color:var(--ouro)}
-        .admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:1100;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+        .admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(3px);z-index:1100;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
         .admin-overlay.open{display:flex}
         .admin-panel{background:#1a1010;border:1.5px solid var(--ouro);border-radius:16px;width:100%;max-width:940px;margin:auto;overflow:hidden}
         .admin-hd{background:var(--vinho-dk);padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,168,76,.3)}
@@ -782,8 +782,7 @@ function showAdminSection(id){
     if(el) el.style.display='';
 }
 function closePanelAndOpen(fnName){
-    closeAdmin();
-    setTimeout(()=>{ window[fnName] && window[fnName](); }, 150);
+    window[fnName] && window[fnName]();
 }
 function openFinTab0(){ openFin(); setTimeout(()=>{ const b=document.querySelectorAll('.fin-tab')[0]; finTab(0,b); }, 200); }
 function openFinTab1(){ openFin(); setTimeout(()=>{ const b=document.querySelectorAll('.fin-tab')[1]; finTab(1,b); }, 200); }
@@ -1043,7 +1042,6 @@ function closeCatalog(){document.getElementById('catalogOverlay').classList.remo
 
 // ══ HISTÓRICO DE PEDIDOS ══
 function openOrders(){
-    closeAdmin();
     const body=document.getElementById('ordersBody');
     body.innerHTML='<p style="color:#9e8e8e;padding:1rem">Carregando...</p>';
     document.getElementById('ordersOverlay').classList.add('open');
@@ -1140,7 +1138,6 @@ async function applyAdmin(){
 // ══════════════════════════════════════════════════════
 
 function openFin(){
-    closeAdmin();
     document.getElementById('finOverlay').classList.add('open');
     // data padrão dos filtros: mês atual
     const hoje = new Date();
@@ -1462,7 +1459,6 @@ function gerarPdfComissao(vendedor, orders, de, ate, pctCom, pctImp){
 //  PEDIDOS EM ABERTO
 // ══════════════════════════════════════════════════════
 function openPed(){
-    closeAdmin();
     const hoje = new Date().toISOString().split('T')[0];
     const ini  = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
     if(!document.getElementById('pedDe').value) document.getElementById('pedDe').value = ini;
