@@ -218,7 +218,7 @@
 
         .admin-trigger{position:fixed;bottom:1.5rem;left:1.5rem;background:rgba(0,0,0,.6);border:1px solid rgba(201,168,76,.2);color:rgba(201,168,76,.4);padding:.5rem .9rem;border-radius:8px;font-size:.75rem;cursor:pointer;z-index:100;transition:.2s}
         .admin-trigger:hover{color:var(--ouro);border-color:var(--ouro)}
-        .admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(3px);z-index:1100;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+        .admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:1100;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
         .admin-overlay.open{display:flex}
         .admin-panel{background:#1a1010;border:1.5px solid var(--ouro);border-radius:16px;width:100%;max-width:940px;margin:auto;overflow:hidden}
         .admin-hd{background:var(--vinho-dk);padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,168,76,.3)}
@@ -396,6 +396,146 @@
         .btn-editar-ped:hover{background:rgba(201,168,76,.25)}
         .ped-card-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}
 
+
+        /* ══ PAINEL ADMIN UNIFICADO ══ */
+        .admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);z-index:1100;align-items:flex-start;justify-content:center;padding:.8rem;overflow-y:auto}
+        .admin-overlay.open{display:flex;animation:fadeIn .25s}
+        .admin-panel{background:#1a1010;border:1.5px solid var(--ouro);border-radius:16px;width:100%;max-width:1160px;margin:auto;overflow:hidden;display:flex;flex-direction:column;min-height:500px;max-height:92vh}
+        .admin-hd{background:var(--vinho-dk);padding:1rem 1.4rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,168,76,.3);flex-shrink:0}
+        .admin-hd h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--ouro)}
+        .admin-hd-right{display:flex;align-items:center;gap:.8rem}
+        .admin-hd-context{font-size:.82rem;color:rgba(232,213,163,.6);font-family:'Cormorant Garamond',serif;font-style:italic}
+        .login-box{padding:2.5rem;text-align:center}
+        .login-box h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--ouro);margin-bottom:1.2rem}
+        .login-box input{width:100%;max-width:280px;padding:.8rem 1rem;border-radius:8px;border:1.5px solid rgba(201,168,76,.3);background:rgba(255,255,255,.05);color:var(--creme);font-size:1rem;display:block;margin:0 auto 1rem;text-align:center;letter-spacing:4px}
+        .login-box input:focus{outline:none;border-color:var(--ouro)}
+        .btn-login{padding:.7rem 2rem;background:var(--vinho);color:var(--ouro-lt);border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer}
+        /* inner layout */
+        .admin-inner{display:flex;flex:1;overflow:hidden;min-height:0}
+        .admin-sidebar{width:210px;flex-shrink:0;border-right:1px solid rgba(201,168,76,.15);overflow-y:auto;background:rgba(0,0,0,.15)}
+        @media(max-width:640px){.admin-inner{flex-direction:column}.admin-sidebar{width:100%;border-right:none;border-bottom:1px solid rgba(201,168,76,.15)}}
+        .admin-main{flex:1;overflow-y:auto;min-height:0}
+        /* sidebar */
+        .adm-section-lbl{padding:.55rem 1rem .25rem;font-size:.68rem;color:#6b5b5b;text-transform:uppercase;letter-spacing:1px}
+        .adm-nav-btn{display:flex;align-items:center;gap:.6rem;width:100%;padding:.75rem 1rem;background:transparent;border:none;color:#c5b5b5;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;transition:.15s;text-align:left;border-left:3px solid transparent}
+        .adm-nav-btn:hover{background:rgba(201,168,76,.07);color:var(--ouro-lt)}
+        .adm-nav-btn.active{background:rgba(201,168,76,.1);color:var(--ouro);border-left-color:var(--ouro)}
+        .adm-nav-btn .mi{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+        /* sections */
+        .admin-section{display:none;padding:1.3rem;animation:fadeIn .2s}
+        .admin-section.active{display:block}
+        .admin-note{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:.9rem 1rem;font-size:.83rem;color:#c5b5b5;margin-bottom:1.2rem;line-height:1.7}
+        .admin-note strong{color:var(--ouro-lt)}.admin-note code{background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px;font-size:.78rem}
+        /* wine list */
+        .wine-admin-list{display:flex;flex-direction:column;gap:.9rem}
+        .wine-admin-item{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.12);border-radius:10px;padding:.9rem}
+        .wai-top{display:flex;gap:.7rem;align-items:center;margin-bottom:.7rem}
+        .wai-thumb{width:54px;height:54px;object-fit:cover;border-radius:6px;border:1px solid rgba(201,168,76,.25);background:#2a1a1a;flex-shrink:0}
+        .wai-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--ouro-lt)}
+        .wai-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.55rem}
+        .wai-fld label{display:block;font-size:.72rem;color:#888;margin-bottom:.2rem}
+        .wai-fld input,.wai-fld select,.wai-fld textarea{width:100%;padding:.5rem .65rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem}
+        .wai-fld textarea{resize:vertical;height:56px}
+        .wai-fld input:focus,.wai-fld select:focus,.wai-fld textarea:focus{outline:none;border-color:var(--ouro)}
+        .wai-fld select option{background:#1a1010}
+        .wai-img-preview{margin-top:.4rem;width:100%;height:72px;object-fit:cover;border-radius:6px;background:#2a1a1a;display:block}
+        .admin-actions{display:flex;gap:.6rem;margin-top:1.1rem;flex-wrap:wrap}
+        .btn-admin{padding:.65rem 1.2rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;transition:.2s;border:none}
+        .btn-save{background:var(--ok);color:#fff}.btn-add-wine{background:var(--vinho);color:var(--ouro-lt)}.btn-del-wine{background:#c62828;color:#fff;margin-left:auto}
+        /* financeiro dentro do admin */
+        .fin-tabs{display:flex;border-bottom:1px solid rgba(201,168,76,.2);margin-bottom:1rem}
+        .fin-tab{padding:.65rem 1.1rem;background:transparent;border:none;color:#9e8e8e;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;transition:.2s;border-bottom:2px solid transparent}
+        .fin-tab:hover{color:var(--ouro-lt)}
+        .fin-tab.active{color:var(--ouro);border-bottom-color:var(--ouro)}
+        .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;margin-bottom:1.2rem}
+        .kpi-card{background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.12);border-radius:10px;padding:.9rem 1rem}
+        .kpi-label{font-size:.72rem;color:#9e8e8e;margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.4px}
+        .kpi-value{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--ouro)}
+        .kpi-value.pos{color:#66BB6A}.kpi-value.neg{color:#EF5350}.kpi-value.green{color:#66BB6A}
+        .fin-table{width:100%;border-collapse:collapse;font-size:.82rem}
+        .fin-table th{text-align:left;padding:.55rem .7rem;font-size:.72rem;color:#9e8e8e;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid rgba(201,168,76,.2);font-weight:500}
+        .fin-table td{padding:.65rem .7rem;border-bottom:1px solid rgba(255,255,255,.04);color:#c5b5b5}
+        .fin-table tr:hover td{background:rgba(255,255,255,.03)}
+        .badge-margin{display:inline-block;padding:.15rem .5rem;border-radius:8px;font-size:.72rem;font-weight:600}
+        .bm-ok{background:rgba(46,125,50,.25);color:#66BB6A}.bm-warn{background:rgba(230,81,0,.25);color:#FFA726}.bm-bad{background:rgba(198,40,40,.25);color:#EF5350}
+        .desp-form{display:grid;grid-template-columns:1fr 1fr auto auto;gap:.55rem;align-items:end;margin-bottom:1rem;background:rgba(255,255,255,.04);padding:.9rem;border-radius:10px;border:1px solid rgba(201,168,76,.1)}
+        @media(max-width:700px){.desp-form{grid-template-columns:1fr}}
+        .desp-form label{display:block;font-size:.72rem;color:#888;margin-bottom:.2rem}
+        .desp-form input,.desp-form select{width:100%;padding:.5rem .65rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem}
+        .desp-form input:focus,.desp-form select:focus{outline:none;border-color:var(--ouro)}
+        .desp-form select option{background:#1a1010}
+        .btn-add-desp{padding:.5rem 1rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;white-space:nowrap}
+        .btn-del-desp{background:transparent;border:none;color:#c0504d;cursor:pointer;font-size:1rem;padding:.2rem .4rem}
+        .com-config-row{display:flex;gap:1.2rem;flex-wrap:wrap;margin-bottom:1rem;background:rgba(255,255,255,.04);padding:.9rem;border-radius:10px;border:1px solid rgba(201,168,76,.1);align-items:flex-end}
+        .com-config-row label{display:block;font-size:.72rem;color:#888;margin-bottom:.25rem}
+        .com-config-row input{width:80px;padding:.5rem .65rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem}
+        .com-config-row input:focus{outline:none;border-color:var(--ouro)}
+        .com-filter{display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1rem;background:rgba(255,255,255,.04);padding:.9rem;border-radius:10px;border:1px solid rgba(201,168,76,.1)}
+        .com-filter label{display:block;font-size:.72rem;color:#888;margin-bottom:.25rem}
+        .com-filter input,.com-filter select{padding:.5rem .65rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem}
+        .com-filter input:focus{outline:none;border-color:var(--ouro)}
+        .btn-calc-com{padding:.5rem 1rem;background:var(--vinho);color:var(--ouro-lt);border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer}
+        .com-vendor-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.12);border-radius:10px;padding:.9rem 1rem;margin-bottom:.7rem}
+        .com-vendor-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--ouro-lt);margin-bottom:.6rem}
+        .com-vendor-stats{display:flex;gap:1.2rem;flex-wrap:wrap}
+        .com-stat{text-align:center}
+        .com-stat-lbl{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.4px}
+        .com-stat-val{font-size:1rem;font-weight:600;color:var(--creme)}
+        .com-stat-val.gold{color:var(--ouro)}.com-stat-val.green{color:#66BB6A}
+        /* pedidos dentro do admin */
+        .ped-filter{display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1rem;background:rgba(255,255,255,.04);padding:.9rem;border-radius:10px;border:1px solid rgba(201,168,76,.1)}
+        .ped-filter label{display:block;font-size:.72rem;color:#888;margin-bottom:.2rem}
+        .ped-filter select,.ped-filter input{padding:.5rem .65rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem}
+        .ped-filter select option{background:#1a1010}
+        .ped-filter input:focus,.ped-filter select:focus{outline:none;border-color:var(--ouro)}
+        .btn-ped-refresh{padding:.5rem .9rem;background:rgba(201,168,76,.12);color:var(--ouro);border:1px solid rgba(201,168,76,.25);border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer}
+        .ped-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.7rem;margin-bottom:1rem}
+        .ped-grid{display:flex;flex-direction:column;gap:.65rem}
+        .ped-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:.9rem 1rem;display:grid;grid-template-columns:1fr auto;gap:.6rem;align-items:start}
+        .ped-card.pago{border-color:rgba(46,125,50,.25);background:rgba(46,125,50,.04)}
+        .ped-status{display:inline-block;padding:.2rem .65rem;border-radius:12px;font-size:.7rem;font-weight:700;letter-spacing:.4px}
+        .ps-aberto{background:rgba(230,81,0,.2);color:#FFA726;border:1px solid rgba(230,81,0,.25)}
+        .ps-pago{background:rgba(46,125,50,.2);color:#66BB6A;border:1px solid rgba(46,125,50,.25)}
+        .ped-card-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.3rem}
+        .ped-vendedor{font-size:.75rem;background:rgba(122,40,50,.3);color:var(--ouro-lt);padding:.15rem .55rem;border-radius:8px}
+        .ped-meta{font-size:.78rem;color:#9e8e8e;margin-bottom:.3rem}
+        .ped-cliente{font-size:.85rem;color:var(--creme);font-weight:500}
+        .ped-itens{font-size:.78rem;color:#c5b5b5;margin-top:.35rem;line-height:1.55}
+        .ped-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+        .ped-total{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--ouro)}
+        .btn-pagar{padding:.45rem .85rem;background:linear-gradient(135deg,var(--ok),#1B5E20);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap}
+        .btn-reabrir{padding:.45rem .85rem;background:rgba(230,81,0,.15);color:#FFA726;border:1px solid rgba(230,81,0,.25);border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap}
+        .btn-editar-ped{padding:.45rem .75rem;background:rgba(201,168,76,.1);color:var(--ouro);border:1px solid rgba(201,168,76,.25);border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap}
+        .btn-excluir-ped{padding:.45rem .65rem;background:rgba(198,40,40,.12);color:#EF5350;border:1px solid rgba(198,40,40,.25);border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer}
+        .ped-card-actions{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+        .ped-empty{text-align:center;padding:2rem;color:#6b5b5b}
+        /* histórico */
+        .order-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:.9rem;margin-bottom:.7rem}
+        .order-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.55rem;flex-wrap:wrap;gap:.4rem}
+        .order-meta{font-size:.78rem;color:#9e8e8e;margin-top:.15rem}
+        .order-total-badge{background:rgba(201,168,76,.12);color:var(--ouro);padding:.2rem .65rem;border-radius:20px;font-size:.82rem;font-weight:600;white-space:nowrap}
+        .order-items{font-size:.82rem;color:#c5b5b5;line-height:1.65}
+        .order-vendedor{display:inline-block;background:rgba(122,40,50,.35);color:var(--ouro-lt);padding:.15rem .55rem;border-radius:8px;font-size:.72rem;margin-bottom:.3rem}
+        .empty-orders{text-align:center;padding:2.5rem;color:#6b5b5b}
+        /* editar pedido — inline dentro do admin */
+        .edit-ped-inline{background:rgba(255,255,255,.04);border:1.5px solid var(--ouro);border-radius:12px;padding:1.1rem;margin-top:.5rem;display:none}
+        .edit-ped-inline.open{display:block;animation:fadeIn .2s}
+        .ep-fld label{display:block;font-size:.72rem;color:#9e8e8e;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.4px}
+        .ep-fld input,.ep-fld select{width:100%;padding:.6rem .8rem;border:1.5px solid rgba(122,40,50,.45);border-radius:8px;background:rgba(255,255,255,.06);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.88rem}
+        .ep-fld input:focus,.ep-fld select:focus{outline:none;border-color:var(--ouro)}
+        .ep-fld select option{background:#1a1010}
+        .ep-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+        @media(max-width:520px){.ep-row{grid-template-columns:1fr}}
+        .ep-itens-list{display:flex;flex-direction:column;gap:.45rem;margin-bottom:.5rem}
+        .ep-item-row{display:grid;grid-template-columns:1fr 55px 85px 30px;gap:.35rem;align-items:center}
+        .ep-item-row input{padding:.42rem .55rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.8rem}
+        .ep-item-row input:focus{outline:none;border-color:var(--ouro)}
+        .btn-ep-del-item{width:26px;height:26px;background:rgba(198,40,40,.15);border:1px solid rgba(198,40,40,.25);color:#EF5350;border-radius:5px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+        .btn-ep-add-item{padding:.4rem .85rem;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);color:var(--ouro);border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;margin-top:.2rem}
+        .btn-ep-save{padding:.65rem 1.2rem;background:var(--ok);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer}
+        .btn-ep-cancel{padding:.65rem 1rem;background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--ouro-lt);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer}
+        .ep-total-display{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--ouro);margin-top:.25rem}
+
         @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(2,1fr) !important}}
         @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
@@ -499,265 +639,170 @@
     </div>
 </div>
 
-<!-- HISTÓRICO -->
-<div class="orders-overlay" id="ordersOverlay" onclick="if(event.target===this)closeOrders()">
-    <div class="orders-panel">
-        <div class="orders-hd"><h2>📋 Histórico de Pedidos</h2><button class="btn-close" onclick="closeOrders()">✕</button></div>
-        <div class="orders-body" id="ordersBody"></div>
-    </div>
-</div>
 
-<!-- MODAL EDITAR PEDIDO -->
-<div class="edit-ped-overlay" id="editPedOverlay" onclick="if(event.target===this)closeEditPed()">
-    <div class="edit-ped-modal">
-        <div class="edit-ped-hd">
-            <h3>✏️ Editar Pedido</h3>
-            <button class="btn-close" onclick="closeEditPed()">✕</button>
-        </div>
-        <div class="edit-ped-body">
-            <input type="hidden" id="epKey">
-            <div class="ep-row">
-                <div class="ep-fld">
-                    <label>Vendedor</label>
-                    <select id="epVendedor"></select>
-                </div>
-                <div class="ep-fld">
-                    <label>Status</label>
-                    <select id="epStatus">
-                        <option value="aberto">Em aberto</option>
-                        <option value="pago">Pago</option>
-                    </select>
-                </div>
-            </div>
-            <div class="ep-row">
-                <div class="ep-fld">
-                    <label>Cliente</label>
-                    <input type="text" id="epCliente">
-                </div>
-                <div class="ep-fld">
-                    <label>Telefone</label>
-                    <input type="tel" id="epTelefone">
-                </div>
-            </div>
-            <div class="ep-fld">
-                <label>Endereço / Observação</label>
-                <input type="text" id="epEndereco">
-            </div>
-            <div class="ep-fld">
-                <label>Itens do Pedido</label>
-                <div style="display:grid;grid-template-columns:1fr 60px 90px 32px;gap:.4rem;margin-bottom:.4rem">
-                    <span style="font-size:.72rem;color:#888">Produto</span>
-                    <span style="font-size:.72rem;color:#888">Qtd</span>
-                    <span style="font-size:.72rem;color:#888">Preço un</span>
-                    <span></span>
-                </div>
-                <div class="ep-itens-list" id="epItensList"></div>
-                <button class="btn-ep-add-item" onclick="epAddItem()">➕ Adicionar item</button>
-            </div>
-            <div class="ep-fld" style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:.8rem 1rem">
-                <label>Total calculado</label>
-                <div id="epTotalDisplay" style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--ouro)">R$ 0,00</div>
-            </div>
-        </div>
-        <div class="edit-ped-footer">
-            <button class="btn-ep-cancel" onclick="closeEditPed()">Cancelar</button>
-            <button class="btn-ep-save"   onclick="saveEditPed()">✅ Salvar alterações</button>
-        </div>
-    </div>
-</div>
-
-<!-- PEDIDOS EM ABERTO -->
-<div class="ped-overlay" id="pedOverlay" onclick="if(event.target===this)closePed()">
-    <div class="ped-panel">
-        <div class="ped-hd">
-            <h2>🧾 Pedidos em Aberto</h2>
-            <button class="btn-close" onclick="closePed()">✕</button>
-        </div>
-        <div class="ped-filter">
-            <div>
-                <label>Status</label><br>
-                <select id="pedStatus">
-                    <option value="">Todos</option>
-                    <option value="aberto" selected>Em aberto</option>
-                    <option value="pago">Pagos</option>
-                </select>
-            </div>
-            <div>
-                <label>Vendedor</label><br>
-                <select id="pedVend">
-                    <option value="">Todos</option>
-                </select>
-            </div>
-            <div>
-                <label>De</label><br>
-                <input type="date" id="pedDe">
-            </div>
-            <div>
-                <label>Até</label><br>
-                <input type="date" id="pedAte">
-            </div>
-            <button class="btn-ped-refresh" onclick="loadPedidos()">🔄 Atualizar</button>
-        </div>
-        <div class="ped-body">
-            <div class="ped-kpi-row" id="pedKpis"></div>
-            <div class="ped-grid" id="pedGrid"></div>
-        </div>
-    </div>
-</div>
-
-<!-- FINANCEIRO -->
-<div class="fin-overlay" id="finOverlay" onclick="if(event.target===this)closeFin()">
-    <div class="fin-panel">
-        <div class="fin-hd">
-            <h2>💰 Painel Financeiro</h2>
-            <button class="btn-close" onclick="closeFin()">✕</button>
-        </div>
-        <div class="fin-tabs">
-            <button class="fin-tab active" onclick="finTab(0,this)">📦 Margem por Vinho</button>
-            <button class="fin-tab" onclick="finTab(1,this)">💸 Despesas</button>
-            <button class="fin-tab" onclick="finTab(2,this)">🏆 Comissões</button>
-        </div>
-
-        <!-- TAB 0: MARGEM -->
-        <div class="fin-body" id="finTab0">
-            <div class="kpi-grid" id="margemKpis"></div>
-            <table class="fin-table">
-                <thead><tr>
-                    <th>Vinho</th><th>Custo</th><th>Venda</th><th>Margem R$</th><th>Margem %</th><th>Estoque</th><th>Custo Total</th>
-                </tr></thead>
-                <tbody id="margemTabela"></tbody>
-            </table>
-        </div>
-
-        <!-- TAB 1: DESPESAS -->
-        <div class="fin-body" id="finTab1" style="display:none">
-            <div class="kpi-grid" id="despesasKpis"></div>
-            <div class="desp-form">
-                <div>
-                    <label>Descrição *</label>
-                    <input type="text" id="dDesc" placeholder="Ex: Frete, Aluguel...">
-                </div>
-                <div>
-                    <label>Categoria</label>
-                    <select id="dCat">
-                        <option>Compra de Estoque</option>
-                        <option>Frete / Logística</option>
-                        <option>Aluguel / Estrutura</option>
-                        <option>Marketing</option>
-                        <option>Impostos / Taxas</option>
-                        <option>Outros</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Valor R$ *</label>
-                    <input type="number" id="dVal" step="0.01" placeholder="0,00">
-                </div>
-                <div>
-                    <label>Data *</label>
-                    <input type="date" id="dData">
-                </div>
-                <button class="btn-add-desp" onclick="addDespesa()">➕ Lançar</button>
-            </div>
-            <table class="fin-table">
-                <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th></th></tr></thead>
-                <tbody id="despesasTabela"></tbody>
-            </table>
-        </div>
-
-        <!-- TAB 2: COMISSÕES -->
-        <div class="fin-body" id="finTab2" style="display:none">
-            <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;background:rgba(255,255,255,.04);padding:1rem;border-radius:10px;border:1px solid rgba(201,168,76,.12)">
-                <div class="com-pct-row" style="margin:0">
-                    <label>% Comissão:</label>
-                    <input type="number" id="comPctGlobal" min="0" max="100" step="0.1" value="5">
-                    <span style="font-size:.82rem;color:#9e8e8e">%</span>
-                </div>
-                <div class="com-imp-row">
-                    <label>% Imposto:</label>
-                    <input type="number" id="comImpGlobal" min="0" max="100" step="0.1" value="0" placeholder="0">
-                    <span style="font-size:.82rem;color:#9e8e8e">%</span>
-                </div>
-                <button onclick="saveComConfig()" style="padding:.4rem 1rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer;align-self:flex-end">Salvar</button>
-            </div>
-            <div class="com-filter">
-                <div>
-                    <label>De</label>
-                    <input type="date" id="comDe">
-                </div>
-                <div>
-                    <label>Até</label>
-                    <input type="date" id="comAte">
-                </div>
-                <div>
-                    <label>Vendedor</label>
-                    <select id="comVendedor">
-                        <option value="">Todos</option>
-                    </select>
-                </div>
-                <button class="btn-calc-com" onclick="loadComissoes()">📊 Calcular</button>
-            </div>
-            <div class="kpi-grid" id="comKpis"></div>
-            <div id="comCards"></div>
-        </div>
-    </div>
-</div>
-
-<!-- ADMIN -->
-<div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
-    <div class="admin-panel">
-        <div class="admin-hd"><h2>⚙️ Painel Admin</h2><button class="btn-close" onclick="closeAdmin()">✕</button></div>
-        <div id="loginBox" class="login-box">
-            <h3>🔒 Área Restrita</h3>
-            <input type="password" id="adminPwd" placeholder="••••••••" onkeyup="if(event.key==='Enter')doLogin()"><br>
-            <button class="btn-login" onclick="doLogin()">Entrar</button>
-        </div>
-        <div id="adminContent" style="display:none">
-            <div class="admin-inner">
-                <!-- SIDEBAR -->
-                <div class="admin-sidebar">
-                    <div class="admin-menu-section">Catálogo</div>
-                    <button class="admin-menu-btn" onclick="showAdminSection('secVinhos')">
-                        <span class="menu-icon">🍷</span> Gerenciar Vinhos
-                    </button>
-                    <div class="admin-menu-section">Vendas</div>
-                    <button class="admin-menu-btn" onclick="closePanelAndOpen('openPed')">
-                        <span class="menu-icon">🧾</span> Pedidos em Aberto
-                    </button>
-                    <button class="admin-menu-btn" onclick="closePanelAndOpen('openOrders')">
-                        <span class="menu-icon">📋</span> Histórico de Pedidos
-                    </button>
-                    <div class="admin-menu-section">Financeiro</div>
-                    <button class="admin-menu-btn" onclick="closePanelAndOpen('openFinTab0')">
-                        <span class="menu-icon">📦</span> Margem por Vinho
-                    </button>
-                    <button class="admin-menu-btn" onclick="closePanelAndOpen('openFinTab1')">
-                        <span class="menu-icon">💸</span> Despesas
-                    </button>
-                    <button class="admin-menu-btn" onclick="closePanelAndOpen('openFinTab2')">
-                        <span class="menu-icon">🏆</span> Comissões
-                    </button>
-                </div>
-                <!-- CONTEÚDO PRINCIPAL -->
-                <div class="admin-main">
-                    <div id="secVinhos" class="admin-body">
-                        <div class="admin-note">
-                            <strong>☁️ Firebase ativo</strong> — tudo salvo direto no banco. Sem exportar HTML.<br>
-                            <strong>🖼️ Fotos: 600 × 900 px (2:3)</strong>. Coloque em <code>images/nome.jpg</code>.
-                        </div>
-                        <div class="wine-admin-list" id="adminList"></div>
-                        <div class="admin-actions">
-                            <button class="btn-admin btn-add-wine" onclick="addWineAdmin()">➕ Novo Vinho</button>
-                            <button class="btn-admin btn-save"     onclick="applyAdmin()">☁️ Salvar no Firebase</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <button class="admin-trigger" onclick="openAdmin()">⚙ admin</button>
 <div class="toast" id="toast"></div>
+
+<!-- ADMIN UNIFICADO -->
+<div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
+  <div class="admin-panel">
+
+    <!-- Header -->
+    <div class="admin-hd">
+      <h2>⚙️ Admin — <span id="adminSectionTitle" style="color:var(--ouro-lt);font-size:1rem;font-weight:400">VinotecaBR</span></h2>
+      <div class="admin-hd-right">
+        <button class="btn-close" onclick="closeAdmin()">✕</button>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div id="loginBox" class="login-box">
+      <h3>🔒 Área Restrita</h3>
+      <input type="password" id="adminPwd" placeholder="••••••••" onkeyup="if(event.key==='Enter')doLogin()"><br>
+      <button class="btn-login" onclick="doLogin()">Entrar</button>
+    </div>
+
+    <!-- Inner: sidebar + content -->
+    <div id="adminContent" style="display:none" class="admin-inner">
+
+      <!-- SIDEBAR -->
+      <div class="admin-sidebar">
+        <div class="adm-section-lbl">Catálogo</div>
+        <button class="adm-nav-btn active" id="nav-vinhos" onclick="navAdmin('vinhos')"><span class="mi">🍷</span>Gerenciar Vinhos</button>
+
+        <div class="adm-section-lbl">Vendas</div>
+        <button class="adm-nav-btn" id="nav-pedidos" onclick="navAdmin('pedidos')"><span class="mi">🧾</span>Pedidos em Aberto</button>
+        <button class="adm-nav-btn" id="nav-historico" onclick="navAdmin('historico')"><span class="mi">📋</span>Histórico</button>
+
+        <div class="adm-section-lbl">Financeiro</div>
+        <button class="adm-nav-btn" id="nav-margem" onclick="navAdmin('margem')"><span class="mi">📦</span>Margem por Vinho</button>
+        <button class="adm-nav-btn" id="nav-despesas" onclick="navAdmin('despesas')"><span class="mi">💸</span>Despesas</button>
+        <button class="adm-nav-btn" id="nav-comissoes" onclick="navAdmin('comissoes')"><span class="mi">🏆</span>Comissões</button>
+      </div>
+
+      <!-- CONTENT AREA -->
+      <div class="admin-main">
+
+        <!-- ── VINHOS ── -->
+        <div class="admin-section active" id="sec-vinhos">
+          <div class="admin-note">
+            <strong>☁️ Firebase ativo</strong> — tudo salvo direto no banco.<br>
+            <strong>🖼️ Fotos: 600 × 900 px (2:3)</strong>. Coloque em <code>images/nome.jpg</code>.
+          </div>
+          <div class="wine-admin-list" id="adminList"></div>
+          <div class="admin-actions">
+            <button class="btn-admin btn-add-wine" onclick="addWineAdmin()">➕ Novo Vinho</button>
+            <button class="btn-admin btn-save"     onclick="applyAdmin()">☁️ Salvar no Firebase</button>
+          </div>
+        </div>
+
+        <!-- ── PEDIDOS EM ABERTO ── -->
+        <div class="admin-section" id="sec-pedidos">
+          <div class="ped-filter">
+            <div><label>Status</label><select id="pedStatus"><option value="">Todos</option><option value="aberto" selected>Em aberto</option><option value="pago">Pagos</option></select></div>
+            <div><label>Vendedor</label><select id="pedVend"><option value="">Todos</option></select></div>
+            <div><label>De</label><input type="date" id="pedDe"></div>
+            <div><label>Até</label><input type="date" id="pedAte"></div>
+            <button class="btn-ped-refresh" onclick="loadPedidos()">🔄 Atualizar</button>
+          </div>
+          <div class="ped-kpi-row" id="pedKpis"></div>
+          <div id="pedGrid"></div>
+
+          <!-- Formulário de edição inline -->
+          <div class="edit-ped-inline" id="editPedInline">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+              <span style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--ouro)">✏️ Editando pedido</span>
+              <button class="btn-ep-cancel" onclick="closeEditPed()">✕ Cancelar</button>
+            </div>
+            <input type="hidden" id="epKey">
+            <div class="ep-row">
+              <div class="ep-fld"><label>Vendedor</label><select id="epVendedor"></select></div>
+              <div class="ep-fld"><label>Status</label><select id="epStatus"><option value="aberto">Em aberto</option><option value="pago">Pago</option></select></div>
+            </div>
+            <div class="ep-row">
+              <div class="ep-fld"><label>Cliente</label><input type="text" id="epCliente"></div>
+              <div class="ep-fld"><label>Telefone</label><input type="tel" id="epTelefone"></div>
+            </div>
+            <div class="ep-fld" style="margin-bottom:.75rem"><label>Endereço / Observação</label><input type="text" id="epEndereco"></div>
+            <div class="ep-fld" style="margin-bottom:.5rem">
+              <label>Itens</label>
+              <div style="display:grid;grid-template-columns:1fr 55px 85px 30px;gap:.35rem;margin-bottom:.35rem">
+                <span style="font-size:.7rem;color:#888">Produto</span><span style="font-size:.7rem;color:#888">Qtd</span><span style="font-size:.7rem;color:#888">Preço un</span><span></span>
+              </div>
+              <div class="ep-itens-list" id="epItensList"></div>
+              <button class="btn-ep-add-item" onclick="epAddItem()">➕ Item</button>
+            </div>
+            <div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:.7rem 1rem;margin-bottom:.9rem">
+              <span style="font-size:.72rem;color:#888;text-transform:uppercase;letter-spacing:.4px">Total calculado</span>
+              <div class="ep-total-display" id="epTotalDisplay">R$ 0,00</div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:.6rem">
+              <button class="btn-ep-cancel" onclick="closeEditPed()">Cancelar</button>
+              <button class="btn-ep-save"   onclick="saveEditPed()">✅ Salvar alterações</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── HISTÓRICO ── -->
+        <div class="admin-section" id="sec-historico">
+          <div id="ordersBody"><p style="color:#9e8e8e;padding:1rem">Clique em Histórico para carregar.</p></div>
+        </div>
+
+        <!-- ── MARGEM ── -->
+        <div class="admin-section" id="sec-margem">
+          <div class="kpi-grid" id="margemKpis"></div>
+          <table class="fin-table">
+            <thead><tr><th>Vinho</th><th>Custo</th><th>Venda</th><th>Margem R$</th><th>Margem %</th><th>Estoque</th><th>Custo Total</th></tr></thead>
+            <tbody id="margemTabela"></tbody>
+          </table>
+        </div>
+
+        <!-- ── DESPESAS ── -->
+        <div class="admin-section" id="sec-despesas">
+          <div class="kpi-grid" id="despesasKpis"></div>
+          <div class="desp-form">
+            <div><label>Descrição *</label><input type="text" id="dDesc" placeholder="Ex: Frete, Aluguel..."></div>
+            <div><label>Categoria</label>
+              <select id="dCat">
+                <option>Compra de Estoque</option><option>Frete / Logística</option>
+                <option>Aluguel / Estrutura</option><option>Marketing</option>
+                <option>Impostos / Taxas</option><option>Outros</option>
+              </select>
+            </div>
+            <div><label>Valor R$ *</label><input type="number" id="dVal" step="0.01" placeholder="0,00"></div>
+            <div><label>Data *</label><input type="date" id="dData"></div>
+            <button class="btn-add-desp" onclick="addDespesa()">➕ Lançar</button>
+          </div>
+          <table class="fin-table">
+            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th></th></tr></thead>
+            <tbody id="despesasTabela"></tbody>
+          </table>
+        </div>
+
+        <!-- ── COMISSÕES ── -->
+        <div class="admin-section" id="sec-comissoes">
+          <div class="com-config-row">
+            <div><label>% Comissão</label><input type="number" id="comPctGlobal" min="0" max="100" step="0.1" value="5"></div>
+            <div><label>% Imposto</label><input type="number" id="comImpGlobal" min="0" max="100" step="0.1" value="0"></div>
+            <button onclick="saveComConfig()" style="padding:.5rem 1rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer">Salvar</button>
+          </div>
+          <div class="com-filter">
+            <div><label>De</label><input type="date" id="comDe"></div>
+            <div><label>Até</label><input type="date" id="comAte"></div>
+            <div><label>Vendedor</label><select id="comVendedor"><option value="">Todos</option></select></div>
+            <button class="btn-calc-com" onclick="loadComissoes()">📊 Calcular</button>
+          </div>
+          <div class="kpi-grid" id="comKpis"></div>
+          <div id="comCards"></div>
+        </div>
+
+      </div><!-- /admin-main -->
+    </div><!-- /admin-inner -->
+  </div><!-- /admin-panel -->
+</div><!-- /admin-overlay -->
+
+
 
 <script>
 let db=null, wines=[], cart=[], filter='todos', adminAuth=false, nextId=1;
@@ -776,17 +821,11 @@ VENDEDORES.forEach(v=>{
 
 
 // ══ ADMIN MENU HELPERS ══
-function showAdminSection(id){
-    document.querySelectorAll('.admin-main > div').forEach(d=>d.style.display='none');
-    const el = document.getElementById(id);
-    if(el) el.style.display='';
-}
-function closePanelAndOpen(fnName){
-    window[fnName] && window[fnName]();
-}
-function openFinTab0(){ openFin(); setTimeout(()=>{ const b=document.querySelectorAll('.fin-tab')[0]; finTab(0,b); }, 200); }
-function openFinTab1(){ openFin(); setTimeout(()=>{ const b=document.querySelectorAll('.fin-tab')[1]; finTab(1,b); }, 200); }
-function openFinTab2(){ openFin(); setTimeout(()=>{ const b=document.querySelectorAll('.fin-tab')[2]; finTab(2,b); }, 200); }
+
+
+
+
+
 
 // ══ FIREBASE INIT ══
 function configOk(){ return FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey!=='COLE_AQUI'; }
@@ -1041,36 +1080,13 @@ function openCatalog(){
 function closeCatalog(){document.getElementById('catalogOverlay').classList.remove('open');}
 
 // ══ HISTÓRICO DE PEDIDOS ══
-function openOrders(){
-    const body=document.getElementById('ordersBody');
-    body.innerHTML='<p style="color:#9e8e8e;padding:1rem">Carregando...</p>';
-    document.getElementById('ordersOverlay').classList.add('open');
-    db.ref('orders').orderByChild('timestamp').limitToLast(100).once('value',snap=>{
-        const data=snap.val();
-        if(!data){body.innerHTML='<div class="empty-orders"><p>📋 Nenhum pedido ainda.</p></div>';return;}
-        const orders=Object.values(data).sort((a,b)=>b.timestamp-a.timestamp);
-        body.innerHTML='';
-        orders.forEach(o=>{
-            const card=document.createElement('div');card.className='order-card';
-            const itens=o.itens.map(i=>`• ${i.nome} — ${i.qty}x R$${fmt(i.preco)}`).join('<br>');
-            card.innerHTML=`<div class="order-header">
-                <div><span class="order-vendedor">👤 ${o.vendedor}</span>
-                <div class="order-meta">${o.data} às ${o.hora} &nbsp;|&nbsp; ${o.cliente} &nbsp;|&nbsp; ${o.telefone}${o.endereco?' &nbsp;|&nbsp; '+o.endereco:''}</div></div>
-                <span class="order-total-badge">R$ ${fmt(o.total)}</span>
-            </div><div class="order-items">${itens}</div>`;
-            body.appendChild(card);
-        });
-    });
-}
-function closeOrders(){document.getElementById('ordersOverlay').classList.remove('open');}
+
+
 
 // ══ ADMIN ══
-function openAdmin(){document.getElementById('adminOverlay').classList.add('open');}
-function closeAdmin(){document.getElementById('adminOverlay').classList.remove('open');}
-function doLogin(){
-    if(document.getElementById('adminPwd').value===ADMIN_PASSWORD){adminAuth=true;document.getElementById('loginBox').style.display='none';document.getElementById('adminContent').style.display='';renderAdminList();}
-    else toast('Senha incorreta!','err');
-}
+
+
+
 function renderAdminList(){
     const list=document.getElementById('adminList');list.innerHTML='';
     wines.forEach(w=>{
@@ -1137,41 +1153,10 @@ async function applyAdmin(){
 //  PAINEL FINANCEIRO
 // ══════════════════════════════════════════════════════
 
-function openFin(){
-    document.getElementById('finOverlay').classList.add('open');
-    // data padrão dos filtros: mês atual
-    const hoje = new Date();
-    const ini  = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0];
-    const fim  = hoje.toISOString().split('T')[0];
-    document.getElementById('comDe').value  = ini;
-    document.getElementById('comAte').value = fim;
-    document.getElementById('dData').value  = fim;
-    // preenche select vendedor
-    const sv = document.getElementById('comVendedor');
-    sv.innerHTML = '<option value="">Todos</option>';
-    VENDEDORES.slice(1).forEach(v=>{
-        const o=document.createElement('option'); o.value=v; o.textContent=v; sv.appendChild(o);
-    });
-    // carrega config salva
-    db.ref('config').once('value', s=>{
-        const cfg = s.val()||{};
-        if(cfg.comissao_pct) document.getElementById('comPctGlobal').value = cfg.comissao_pct;
-        if(cfg.imposto_pct !== undefined) document.getElementById('comImpGlobal').value = cfg.imposto_pct;
-    });
-    loadMargem();
-}
-function closeFin(){ document.getElementById('finOverlay').classList.remove('open'); }
 
-function finTab(n, btn){
-    [0,1,2].forEach(i=>{
-        document.getElementById('finTab'+i).style.display = i===n ? '' : 'none';
-    });
-    document.querySelectorAll('.fin-tab').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    if(n===0) loadMargem();
-    if(n===1) loadDespesas();
-    if(n===2) loadComissoes();
-}
+
+
+
 
 // ── MARGEM ──
 function loadMargem(){
@@ -1458,22 +1443,8 @@ function gerarPdfComissao(vendedor, orders, de, ate, pctCom, pctImp){
 // ══════════════════════════════════════════════════════
 //  PEDIDOS EM ABERTO
 // ══════════════════════════════════════════════════════
-function openPed(){
-    const hoje = new Date().toISOString().split('T')[0];
-    const ini  = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-    if(!document.getElementById('pedDe').value) document.getElementById('pedDe').value = ini;
-    if(!document.getElementById('pedAte').value) document.getElementById('pedAte').value = hoje;
-    // preenche select vendedor
-    const sv = document.getElementById('pedVend');
-    if(sv.options.length <= 1){
-        VENDEDORES.slice(1).forEach(v=>{
-            const o=document.createElement('option'); o.value=v; o.textContent=v; sv.appendChild(o);
-        });
-    }
-    document.getElementById('pedOverlay').classList.add('open');
-    loadPedidos();
-}
-function closePed(){ document.getElementById('pedOverlay').classList.remove('open'); }
+
+
 
 function loadPedidos(){
     const status = document.getElementById('pedStatus').value;
@@ -1556,111 +1527,19 @@ function loadPedidos(){
 
 let _editPedData = null; // guarda o pedido sendo editado
 
-function openEditPed(key){
-    db.ref('orders/'+key).once('value', snap=>{
-        const o = snap.val();
-        if(!o){ toast('Pedido não encontrado','err'); return; }
-        _editPedData = {key, ...o};
 
-        // preenche vendedor select
-        const sv = document.getElementById('epVendedor');
-        sv.innerHTML = '';
-        VENDEDORES.slice(1).forEach(v=>{
-            const opt = document.createElement('option');
-            opt.value = v; opt.textContent = v;
-            if(v === o.vendedor) opt.selected = true;
-            sv.appendChild(opt);
-        });
 
-        document.getElementById('epKey').value       = key;
-        document.getElementById('epCliente').value   = o.cliente  || '';
-        document.getElementById('epTelefone').value  = o.telefone || '';
-        document.getElementById('epEndereco').value  = o.endereco || '';
-        document.getElementById('epStatus').value    = o.status   || 'aberto';
 
-        // itens
-        const list = document.getElementById('epItensList');
-        list.innerHTML = '';
-        (o.itens||[]).forEach(item => epAddItemRow(item.nome, item.qty, item.preco));
-        epCalcTotal();
 
-        document.getElementById('editPedOverlay').classList.add('open');
-    });
-}
 
-function closeEditPed(){
-    document.getElementById('editPedOverlay').classList.remove('open');
-    _editPedData = null;
-}
 
-function epAddItemRow(nome='', qty=1, preco=0){
-    const list = document.getElementById('epItensList');
-    const row  = document.createElement('div');
-    row.className = 'ep-item-row';
-    row.innerHTML = `
-        <input type="text"   class="ep-nome"  value="${nome}"  placeholder="Nome do produto" oninput="epCalcTotal()">
-        <input type="number" class="ep-qty"   value="${qty}"   min="1" step="1"              oninput="epCalcTotal()">
-        <input type="number" class="ep-preco" value="${preco}" min="0" step="0.01"            oninput="epCalcTotal()">
-        <button class="btn-ep-del-item" onclick="this.parentElement.remove();epCalcTotal()" title="Remover">✕</button>`;
-    list.appendChild(row);
-}
 
-function epAddItem(){ epAddItemRow('',1,0); }
 
-function epCalcTotal(){
-    let total = 0;
-    document.querySelectorAll('#epItensList .ep-item-row').forEach(row=>{
-        const qty   = parseFloat(row.querySelector('.ep-qty').value)   || 0;
-        const preco = parseFloat(row.querySelector('.ep-preco').value) || 0;
-        total += qty * preco;
-    });
-    document.getElementById('epTotalDisplay').textContent = 'R$ ' + fmt(total);
-    return total;
-}
 
-async function saveEditPed(){
-    const key      = document.getElementById('epKey').value;
-    const vendedor = document.getElementById('epVendedor').value;
-    const cliente  = document.getElementById('epCliente').value.trim();
-    const telefone = document.getElementById('epTelefone').value.trim();
-    const endereco = document.getElementById('epEndereco').value.trim();
-    const status   = document.getElementById('epStatus').value;
 
-    if(!cliente || !telefone){ toast('Preencha cliente e telefone!','err'); return; }
 
-    // coleta itens
-    const itens = [];
-    document.querySelectorAll('#epItensList .ep-item-row').forEach(row=>{
-        const nome  = row.querySelector('.ep-nome').value.trim();
-        const qty   = parseFloat(row.querySelector('.ep-qty').value)   || 0;
-        const preco = parseFloat(row.querySelector('.ep-preco').value) || 0;
-        if(nome && qty > 0) itens.push({nome, qty, preco});
-    });
 
-    if(!itens.length){ toast('Adicione pelo menos um item!','err'); return; }
 
-    const total = itens.reduce((s,i) => s + i.qty * i.preco, 0);
-
-    try{
-        await db.ref('orders/'+key).update({ vendedor, cliente, telefone, endereco, status, itens, total });
-        toast('✅ Pedido atualizado!');
-        closeEditPed();
-        loadPedidos();
-    } catch(e){
-        toast('Erro: '+e.message, 'err');
-    }
-}
-
-async function confirmDelPed(key, cliente){
-    if(!confirm('Excluir o pedido de "'+cliente+'"?\nEsta ação não pode ser desfeita.')) return;
-    try{
-        await db.ref('orders/'+key).remove();
-        toast('Pedido excluído.', 'info');
-        loadPedidos();
-    } catch(e){
-        toast('Erro: '+e.message, 'err');
-    }
-}
 
 async function setPedStatus(key, novoStatus){
     await db.ref(`orders/${key}/status`).set(novoStatus);
@@ -1669,10 +1548,192 @@ async function setPedStatus(key, novoStatus){
     loadPedidos();
 }
 
+
+// ══ ADMIN UNIFICADO — NAVEGAÇÃO ══
+const _sectionTitles = {
+    vinhos:    '🍷 Gerenciar Vinhos',
+    pedidos:   '🧾 Pedidos em Aberto',
+    historico: '📋 Histórico de Pedidos',
+    margem:    '📦 Margem por Vinho',
+    despesas:  '💸 Despesas',
+    comissoes: '🏆 Comissões',
+};
+
+function navAdmin(section){
+    // Update nav buttons
+    document.querySelectorAll('.adm-nav-btn').forEach(b=>b.classList.remove('active'));
+    const btn = document.getElementById('nav-'+section);
+    if(btn) btn.classList.add('active');
+
+    // Update title
+    document.getElementById('adminSectionTitle').textContent = _sectionTitles[section]||'';
+
+    // Show section
+    document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
+    const sec = document.getElementById('sec-'+section);
+    if(sec) sec.classList.add('active');
+
+    // Load data for section
+    if(section==='pedidos')   loadPedidos();
+    if(section==='historico') loadOrders();
+    if(section==='margem')    loadMargem();
+    if(section==='despesas')  loadDespesas();
+    if(section==='comissoes') loadComissoesInit();
+}
+
+function openAdmin(){
+    document.getElementById('adminOverlay').classList.add('open');
+}
+function closeAdmin(){
+    document.getElementById('adminOverlay').classList.remove('open');
+}
+function doLogin(){
+    if(document.getElementById('adminPwd').value===ADMIN_PASSWORD){
+        adminAuth=true;
+        document.getElementById('loginBox').style.display='none';
+        document.getElementById('adminContent').style.display='flex';
+        // Init vendors in pedidos filter
+        const sv = document.getElementById('pedVend');
+        if(sv.options.length<=1){
+            VENDEDORES.slice(1).forEach(v=>{
+                const o=document.createElement('option');o.value=v;o.textContent=v;sv.appendChild(o);
+            });
+        }
+        // Init dates
+        const hoje = new Date().toISOString().split('T')[0];
+        const ini  = new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().split('T')[0];
+        document.getElementById('pedDe').value  = ini;
+        document.getElementById('pedAte').value = hoje;
+        document.getElementById('dData').value  = hoje;
+        // Load config
+        db.ref('config').once('value', s=>{
+            const cfg=s.val()||{};
+            if(cfg.comissao_pct) document.getElementById('comPctGlobal').value=cfg.comissao_pct;
+            if(cfg.imposto_pct!==undefined) document.getElementById('comImpGlobal').value=cfg.imposto_pct;
+        });
+        navAdmin('vinhos');
+        renderAdminList();
+    } else toast('Senha incorreta!','err');
+}
+
+function loadOrders(){
+    const body=document.getElementById('ordersBody');
+    body.innerHTML='<p style="color:#9e8e8e;padding:1rem">Carregando...</p>';
+    db.ref('orders').orderByChild('timestamp').limitToLast(100).once('value',snap=>{
+        const data=snap.val();
+        if(!data){body.innerHTML='<div class="empty-orders"><p>📋 Nenhum pedido ainda.</p></div>';return;}
+        const orders=Object.values(data).sort((a,b)=>b.timestamp-a.timestamp);
+        body.innerHTML='';
+        orders.forEach(o=>{
+            const card=document.createElement('div');card.className='order-card';
+            const itens=(o.itens||[]).map(i=>`• ${i.nome} — ${i.qty}x R$${fmt(i.preco)}`).join('<br>');
+            card.innerHTML=`<div class="order-header">
+                <div><span class="order-vendedor">👤 ${o.vendedor}</span>
+                <div class="order-meta">${o.data} às ${o.hora} &nbsp;|&nbsp; ${o.cliente} &nbsp;|&nbsp; ${o.telefone}${o.endereco?' &nbsp;|&nbsp; '+o.endereco:''}</div></div>
+                <span class="order-total-badge">R$ ${fmt(o.total)}</span>
+            </div><div class="order-items">${itens}</div>`;
+            body.appendChild(card);
+        });
+    });
+}
+
+function loadComissoesInit(){
+    // Populate vendor select if empty
+    const sv=document.getElementById('comVendedor');
+    if(sv.options.length<=1){
+        VENDEDORES.slice(1).forEach(v=>{
+            const o=document.createElement('option');o.value=v;o.textContent=v;sv.appendChild(o);
+        });
+    }
+    const hoje=new Date().toISOString().split('T')[0];
+    const ini=new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().split('T')[0];
+    if(!document.getElementById('comDe').value) document.getElementById('comDe').value=ini;
+    if(!document.getElementById('comAte').value) document.getElementById('comAte').value=hoje;
+}
+
+// ── Edit pedido inline ──
+function openEditPed(key){
+    db.ref('orders/'+key).once('value', snap=>{
+        const o=snap.val(); if(!o){toast('Pedido não encontrado','err');return;}
+        const sv=document.getElementById('epVendedor');
+        sv.innerHTML='';
+        VENDEDORES.slice(1).forEach(v=>{
+            const opt=document.createElement('option');opt.value=v;opt.textContent=v;
+            if(v===o.vendedor)opt.selected=true;sv.appendChild(opt);
+        });
+        document.getElementById('epKey').value      =key;
+        document.getElementById('epCliente').value  =o.cliente||'';
+        document.getElementById('epTelefone').value =o.telefone||'';
+        document.getElementById('epEndereco').value =o.endereco||'';
+        document.getElementById('epStatus').value   =o.status||'aberto';
+        const list=document.getElementById('epItensList');
+        list.innerHTML='';
+        (o.itens||[]).forEach(item=>epAddItemRow(item.nome,item.qty,item.preco));
+        epCalcTotal();
+        const el=document.getElementById('editPedInline');
+        el.classList.add('open');
+        el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    });
+}
+function closeEditPed(){
+    document.getElementById('editPedInline').classList.remove('open');
+}
+function epAddItemRow(nome='',qty=1,preco=0){
+    const list=document.getElementById('epItensList');
+    const row=document.createElement('div');row.className='ep-item-row';
+    row.innerHTML=`<input type="text" class="ep-nome" value="${nome}" placeholder="Produto" oninput="epCalcTotal()">
+        <input type="number" class="ep-qty" value="${qty}" min="1" step="1" oninput="epCalcTotal()">
+        <input type="number" class="ep-preco" value="${preco}" min="0" step="0.01" oninput="epCalcTotal()">
+        <button class="btn-ep-del-item" onclick="this.parentElement.remove();epCalcTotal()" title="Remover">✕</button>`;
+    list.appendChild(row);
+}
+function epAddItem(){epAddItemRow('',1,0);}
+function epCalcTotal(){
+    let total=0;
+    document.querySelectorAll('#epItensList .ep-item-row').forEach(row=>{
+        total+=(parseFloat(row.querySelector('.ep-qty').value)||0)*(parseFloat(row.querySelector('.ep-preco').value)||0);
+    });
+    document.getElementById('epTotalDisplay').textContent='R$ '+fmt(total);
+    return total;
+}
+async function saveEditPed(){
+    const key=document.getElementById('epKey').value;
+    const vendedor=document.getElementById('epVendedor').value;
+    const cliente=document.getElementById('epCliente').value.trim();
+    const telefone=document.getElementById('epTelefone').value.trim();
+    const endereco=document.getElementById('epEndereco').value.trim();
+    const status=document.getElementById('epStatus').value;
+    if(!cliente||!telefone){toast('Preencha cliente e telefone!','err');return;}
+    const itens=[];
+    document.querySelectorAll('#epItensList .ep-item-row').forEach(row=>{
+        const nome=row.querySelector('.ep-nome').value.trim();
+        const qty=parseFloat(row.querySelector('.ep-qty').value)||0;
+        const preco=parseFloat(row.querySelector('.ep-preco').value)||0;
+        if(nome&&qty>0)itens.push({nome,qty,preco});
+    });
+    if(!itens.length){toast('Adicione pelo menos um item!','err');return;}
+    const total=itens.reduce((s,i)=>s+i.qty*i.preco,0);
+    try{
+        await db.ref('orders/'+key).update({vendedor,cliente,telefone,endereco,status,itens,total});
+        toast('✅ Pedido atualizado!');
+        closeEditPed();
+        loadPedidos();
+    }catch(e){toast('Erro: '+e.message,'err');}
+}
+async function confirmDelPed(key,cliente){
+    if(!confirm('Excluir o pedido de "'+cliente+'"?\nEsta ação não pode ser desfeita.'))return;
+    try{
+        await db.ref('orders/'+key).remove();
+        toast('Pedido excluído.','info');
+        loadPedidos();
+    }catch(e){toast('Erro: '+e.message,'err');}
+}
+
 function fmt(n){return n.toFixed(2).replace('.',',');}
 function toast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className=`toast show ${type}`;clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3500);}
 
 initFirebase();
+
 </script>
 </body>
 </html>
