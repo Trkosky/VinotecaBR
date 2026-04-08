@@ -31,6 +31,14 @@
     const WHATSAPP_NUMBER = "5511965866812";
     const STORE_NAME      = "VinotecaBR";
     const ADMIN_PASSWORD  = "vinho123";
+
+    // 🔐 CONTROLE DE ACESSO MENSAL
+    // UNLOCK_CODE: contra-senha mensal para desbloquear o sistema
+    // LOCK_DAY: dia do mês em que o sistema bloqueia (padrão: 5 dias após virada)
+    const UNLOCK_CODE   = "libera2025";   // ← troque toda vez que renovar
+    const LOCK_DAY      = 5;              // bloqueia no dia 5 de cada mês
+    const PRODUTO_NOME  = "VinotecaBR Pro";
+
     const VENDEDORES = ["Selecione o vendedor...","Eric","Monique"];
 
     /* ╔══════════════════════════════════════════════════════════════════╗
@@ -177,20 +185,20 @@
         .catalog-header{text-align:center;border-bottom:3px double #7A2832;padding-bottom:1.5rem;margin-bottom:2rem}
         .catalog-header h1{font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:#4A1820;letter-spacing:2px}
         .catalog-header p{color:#888;font-style:italic;font-size:1rem;margin-top:.3rem}
-        .catalog-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+        .catalog-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
         .label-card{border:1.5px solid #C9A84C;border-radius:10px;overflow:hidden;page-break-inside:avoid;break-inside:avoid}
-        .label-img{width:100%;height:240px;object-fit:cover;background:#f5f0e8;display:block}
-        .label-img-placeholder{width:100%;height:240px;background:linear-gradient(135deg,#f5f0e8,#ede0cc);display:flex;align-items:center;justify-content:center;font-size:3rem;color:#C9A84C;opacity:.4}
-        .label-body{padding:1rem 1.2rem}
+        .label-img{width:100%;height:160px;object-fit:cover;background:#f5f0e8;display:block}
+        .label-img-placeholder{width:100%;height:160px;background:linear-gradient(135deg,#f5f0e8,#ede0cc);display:flex;align-items:center;justify-content:center;font-size:3rem;color:#C9A84C;opacity:.4}
+        .label-body{padding:.65rem .85rem}
         .label-type-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
         .label-badge{padding:.2rem .7rem;border-radius:10px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
         .lb-tinto{background:#f0d0d0;color:#6B0000}.lb-branco{background:#f5f5dc;color:#555;border:1px solid #ccc}.lb-rose{background:#fce4ec;color:#880e4f}.lb-espumante{background:#fff8dc;color:#5d4037;border:1px solid #e6c46a}
         .label-year{font-size:.8rem;color:#999}
-        .label-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:#4A1820;line-height:1.2;margin-bottom:.2rem}
+        .label-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:#4A1820;line-height:1.2;margin-bottom:.15rem}
         .label-origin{font-size:.8rem;color:#888;margin-bottom:.5rem}
         .label-desc{font-size:.82rem;color:#555;line-height:1.5;margin-bottom:.7rem;border-top:1px solid #f0e8d8;padding-top:.7rem}
         .label-price-row{display:flex;justify-content:space-between;align-items:center}
-        .label-price{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#C9A84C}
+        .label-price{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:#C9A84C}
         .label-stock-badge{font-size:.75rem;padding:.2rem .6rem;border-radius:10px;font-weight:600}
         .lsb-ok{background:#e8f5e9;color:#2E7D32}.lsb-med{background:#fff3e0;color:#E65100}.lsb-low{background:#ffebee;color:#c62828}
         .label-card-footer{display:flex;justify-content:flex-end;padding:.6rem 1rem .8rem;background:#fdf6ec;border-top:1px solid rgba(201,168,76,.2)}
@@ -536,11 +544,42 @@
         .btn-ep-cancel{padding:.65rem 1rem;background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--ouro-lt);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer}
         .ep-total-display{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--ouro);margin-top:.25rem}
 
-        @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(2,1fr) !important}}
+
+        /* ══ BLOQUEIO MENSAL ══ */
+        #lockScreen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#1a1010 0%,#2d1010 100%);z-index:99999;align-items:center;justify-content:center;padding:1rem}
+        #lockScreen.show{display:flex}
+        .lock-box{background:#1a1010;border:2px solid #7A2832;border-radius:20px;padding:2.5rem;max-width:440px;width:100%;text-align:center}
+        .lock-icon{font-size:3.5rem;margin-bottom:1rem}
+        .lock-title{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--ouro-lt);margin-bottom:.5rem}
+        .lock-sub{font-size:.9rem;color:#9e8e8e;line-height:1.6;margin-bottom:1.5rem}
+        .lock-input{width:100%;max-width:280px;padding:.85rem 1rem;border-radius:10px;border:1.5px solid rgba(201,168,76,.3);background:rgba(255,255,255,.05);color:var(--creme);font-size:1rem;text-align:center;letter-spacing:6px;margin-bottom:.8rem;display:block;margin:0 auto .8rem}
+        .lock-input:focus{outline:none;border-color:var(--ouro)}
+        .btn-unlock{padding:.8rem 2rem;background:linear-gradient(135deg,var(--vinho),var(--vinho-dk));color:var(--ouro-lt);border:1px solid var(--ouro);border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;width:100%}
+        .lock-error{color:#EF5350;font-size:.85rem;margin-top:.5rem;min-height:1.2rem}
+        .lock-contact{margin-top:1.2rem;font-size:.8rem;color:#6b5b5b}
+
+        @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(4,1fr) !important}}
         @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
 </head>
 <body>
+
+
+<!-- TELA DE BLOQUEIO MENSAL -->
+<div id="lockScreen">
+    <div class="lock-box">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-title">Acesso Bloqueado</div>
+        <div class="lock-sub">
+            Seu acesso ao <strong style="color:var(--ouro-lt)" id="lockProdNome"></strong> está temporariamente suspenso.<br>
+            Para continuar usando, entre em contato e informe o código de renovação.
+        </div>
+        <input class="lock-input" type="password" id="unlockInput" placeholder="••••••••••" onkeyup="if(event.key==='Enter')tryUnlock()">
+        <button class="btn-unlock" onclick="tryUnlock()">🔓 Desbloquear</button>
+        <div class="lock-error" id="lockError"></div>
+        <div class="lock-contact">Suporte: <span id="lockWpp"></span></div>
+    </div>
+</div>
 
 <div id="loadingScreen">
     <div class="load-title">🍷 VinotecaBR</div>
@@ -827,11 +866,55 @@ VENDEDORES.forEach(v=>{
 
 
 
+
+// ══ BLOQUEIO MENSAL ══
+function checkMonthlyLock(){
+    const hoje = new Date();
+    const dia  = hoje.getDate();
+    const mes  = hoje.getMonth();  // 0-11
+    const ano  = hoje.getFullYear();
+
+    // Chave de desbloqueio salva no localStorage: "unlocked_MM_YYYY"
+    const lockKey    = `unlocked_${mes}_${ano}`;
+    const unlocked   = localStorage.getItem(lockKey);
+    const unlockedAll= localStorage.getItem('unlocked_permanent');
+
+    if(unlocked === 'true' || unlockedAll === 'true') return false; // liberado
+    if(dia < LOCK_DAY) return false; // ainda dentro do prazo do mês
+
+    return true; // deve bloquear
+}
+
+function showLock(){
+    document.getElementById('lockProdNome').textContent = PRODUTO_NOME;
+    document.getElementById('lockWpp').textContent = WHATSAPP_NUMBER;
+    document.getElementById('lockScreen').classList.add('show');
+}
+
+function tryUnlock(){
+    const input = document.getElementById('unlockInput').value.trim();
+    const err   = document.getElementById('lockError');
+
+    if(input === UNLOCK_CODE){
+        // Salva liberação para o mês corrente
+        const hoje   = new Date();
+        const lockKey= `unlocked_${hoje.getMonth()}_${hoje.getFullYear()}`;
+        localStorage.setItem(lockKey, 'true');
+        document.getElementById('lockScreen').classList.remove('show');
+        err.textContent = '';
+        toast('✅ Sistema desbloqueado! Bom trabalho.');
+    } else {
+        err.textContent = 'Código incorreto. Entre em contato para renovar.';
+        document.getElementById('unlockInput').value = '';
+    }
+}
+
 // ══ FIREBASE INIT ══
 function configOk(){ return FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey!=='COLE_AQUI'; }
 
 async function initFirebase(){
     setLS('Verificando configuração...');
+    if(checkMonthlyLock()){ showLock(); document.getElementById('loadingScreen').style.display='none'; return; }
     if(!configOk()){
         document.getElementById('loadingScreen').style.display='none';
         document.getElementById('configAlert').classList.add('show');
@@ -1340,7 +1423,7 @@ function loadComissoes(){
                     <div class="com-stat"><div class="com-stat-lbl">Comissão (${pct}%)</div><div class="com-stat-val green">R$ ${fmt(comV)}</div></div>
                 </div>
                 <div style="margin-top:.8rem">
-                    <button onclick="gerarPdfComissao('${nome}',${JSON.stringify(v.orders).replace(/'/g,"\'")},'${de}','${ate}',${pct},${imp})"
+                    <button onclick="gerarPdfComissaoById('${_pdfStoreKey(nome,v.orders,de,ate,pct,imp)}')"
                         style="padding:.45rem 1rem;background:linear-gradient(135deg,#7A2832,#4A1820);color:var(--ouro-lt);border:1px solid var(--ouro);border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer">
                         📄 Gerar PDF
                     </button>
@@ -1348,6 +1431,20 @@ function loadComissoes(){
             cards.appendChild(card);
         });
     });
+}
+
+
+// ── PDF store (avoids JSON-in-onclick quoting issues) ──
+const _pdfStore = {};
+function _pdfStoreKey(vendedor, orders, de, ate, pct, imp){
+    const key = 'pdf_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+    _pdfStore[key] = {vendedor, orders, de, ate, pct, imp};
+    return key;
+}
+function gerarPdfComissaoById(key){
+    const d = _pdfStore[key];
+    if(!d){ console.error('PDF data not found for key:', key); return; }
+    gerarPdfComissao(d.vendedor, d.orders, d.de, d.ate, d.pct, d.imp);
 }
 
 // ── GERAR PDF DE COMISSÃO ──
