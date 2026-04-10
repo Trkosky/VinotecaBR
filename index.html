@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
     <script>
     /* ╔══════════════════════════════════════════════════════════════════╗
@@ -568,6 +569,20 @@
         .lock-error{color:#EF5350;font-size:.85rem;margin-top:.5rem;min-height:1.2rem}
         .lock-contact{margin-top:1.2rem;font-size:.8rem;color:#6b5b5b}
 
+
+        /* ══ RELATÓRIOS ══ */
+        .stock-alert{display:flex;justify-content:space-between;align-items:center;padding:.55rem .9rem;border-radius:8px;margin-bottom:.4rem;font-size:.83rem}
+        .sa-critical{background:rgba(198,40,40,.15);border:1px solid rgba(198,40,40,.25);color:#EF9595}
+        .sa-warn{background:rgba(230,81,0,.12);border:1px solid rgba(230,81,0,.2);color:#FFCC80}
+        .sa-ok{background:rgba(46,125,50,.1);border:1px solid rgba(46,125,50,.2);color:#A5D6A7}
+        .cliente-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem .7rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.83rem}
+        .cliente-row:last-child{border-bottom:none}
+        .meta-field{display:flex;flex-direction:column;gap:.2rem}
+        .meta-field label{font-size:.72rem;color:#888}
+        .meta-field input{width:110px;padding:.42rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem}
+        .meta-field input:focus{outline:none;border-color:var(--ouro)}
+        .btn-save-metas{padding:.42rem .9rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;align-self:flex-end}
+
         @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(4,1fr) !important}}
         @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
@@ -728,6 +743,9 @@
         <button class="adm-nav-btn" id="nav-margem" onclick="navAdmin('margem')"><span class="mi">📦</span>Margem por Vinho</button>
         <button class="adm-nav-btn" id="nav-despesas" onclick="navAdmin('despesas')"><span class="mi">💸</span>Despesas</button>
         <button class="adm-nav-btn" id="nav-comissoes" onclick="navAdmin('comissoes')"><span class="mi">🏆</span>Comissões</button>
+
+        <div class="adm-section-lbl">Relatórios</div>
+        <button class="adm-nav-btn" id="nav-relatorios" onclick="navAdmin('relatorios')"><span class="mi">📊</span>Dashboard</button>
       </div>
 
       <!-- CONTENT AREA -->
@@ -846,6 +864,120 @@
           <div id="comCards"></div>
         </div>
 
+
+        <!-- ── RELATÓRIOS ── -->
+        <div class="admin-section" id="sec-relatorios">
+
+          <!-- filtro de período global -->
+          <div style="display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1.2rem;background:rgba(255,255,255,.04);padding:.8rem 1rem;border-radius:10px;border:1px solid rgba(201,168,76,.1)">
+            <div><label style="display:block;font-size:.7rem;color:#888;margin-bottom:.2rem">De</label><input type="date" id="relDe" style="padding:.45rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem"></div>
+            <div><label style="display:block;font-size:.7rem;color:#888;margin-bottom:.2rem">Até</label><input type="date" id="relAte" style="padding:.45rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.82rem"></div>
+            <button onclick="loadDashboard()" style="padding:.45rem 1rem;background:var(--vinho);color:var(--ouro-lt);border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer">📊 Atualizar</button>
+          </div>
+
+          <!-- sub-tabs -->
+          <div class="fin-tabs" id="relTabs">
+            <button class="fin-tab active" onclick="relTab(0,this)">💰 Vendas</button>
+            <button class="fin-tab" onclick="relTab(1,this)">🍷 Produtos</button>
+            <button class="fin-tab" onclick="relTab(2,this)">📦 Estoque</button>
+            <button class="fin-tab" onclick="relTab(3,this)">💵 Fluxo de Caixa</button>
+            <button class="fin-tab" onclick="relTab(4,this)">👤 Vendedores</button>
+            <button class="fin-tab" onclick="relTab(5,this)">🧑 Clientes</button>
+          </div>
+
+          <!-- TAB 0: VENDAS -->
+          <div id="relSec0" style="padding-top:.8rem">
+            <div class="kpi-grid" id="relVendasKpis"></div>
+            <div style="margin-bottom:1.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Vendas por dia</div>
+              <canvas id="chartVendasDia" height="90"></canvas>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+              <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+                <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Pedidos: Aberto x Pago</div>
+                <canvas id="chartPedStatus" height="140"></canvas>
+              </div>
+              <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+                <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Ticket médio por vendedor</div>
+                <canvas id="chartTicketVend" height="140"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 1: PRODUTOS -->
+          <div id="relSec1" style="display:none;padding-top:.8rem">
+            <div class="kpi-grid" id="relProdKpis"></div>
+            <div style="margin-bottom:1.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Top 8 — Quantidade vendida</div>
+              <canvas id="chartRankQty" height="110"></canvas>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Top 8 — Receita gerada (R$)</div>
+              <canvas id="chartRankRec" height="110"></canvas>
+            </div>
+          </div>
+
+          <!-- TAB 2: ESTOQUE -->
+          <div id="relSec2" style="display:none;padding-top:.8rem">
+            <div class="kpi-grid" id="relEstoqueKpis"></div>
+            <div style="margin-bottom:1.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Estoque atual por vinho</div>
+              <canvas id="chartEstoque" height="110"></canvas>
+            </div>
+            <div id="relEstoqueAlerts" style="margin-top:.6rem"></div>
+          </div>
+
+          <!-- TAB 3: FLUXO DE CAIXA -->
+          <div id="relSec3" style="display:none;padding-top:.8rem">
+            <div class="kpi-grid" id="relFluxoKpis"></div>
+            <div style="margin-bottom:1.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Receitas x Despesas por mês</div>
+              <canvas id="chartFluxo" height="110"></canvas>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Despesas por categoria</div>
+              <canvas id="chartDespCat" height="140"></canvas>
+            </div>
+          </div>
+
+          <!-- TAB 4: VENDEDORES -->
+          <div id="relSec4" style="display:none;padding-top:.8rem">
+            <div class="kpi-grid" id="relVendKpis"></div>
+            <!-- metas -->
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:.9rem;margin-bottom:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Meta mensal por vendedor (R$)</div>
+              <div id="relMetasForm" style="display:flex;gap:.6rem;flex-wrap:wrap"></div>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem;margin-bottom:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Realizado x Meta</div>
+              <canvas id="chartMetas" height="100"></canvas>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Pedidos por vendedor</div>
+              <canvas id="chartPedVend" height="100"></canvas>
+            </div>
+          </div>
+
+          <!-- TAB 5: CLIENTES -->
+          <div id="relSec5" style="display:none;padding-top:.8rem">
+            <div class="kpi-grid" id="relClientesKpis"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+              <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+                <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Top clientes — Valor total (R$)</div>
+                <canvas id="chartTopClientes" height="150"></canvas>
+              </div>
+              <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+                <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Top clientes — Frequência</div>
+                <canvas id="chartFreqClientes" height="150"></canvas>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:.9rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.7rem;text-transform:uppercase;letter-spacing:.4px">Lista de clientes</div>
+              <div id="relClientesList"></div>
+            </div>
+          </div>
+
+        </div><!-- /sec-relatorios -->
       </div><!-- /admin-main -->
     </div><!-- /admin-inner -->
   </div><!-- /admin-panel -->
@@ -1672,7 +1804,8 @@ const _sectionTitles = {
     historico: '📋 Histórico de Pedidos',
     margem:    '📦 Margem por Vinho',
     despesas:  '💸 Despesas',
-    comissoes: '🏆 Comissões',
+    comissoes:  '🏆 Comissões',
+    relatorios: '📊 Dashboard Gerencial',
 };
 
 function navAdmin(section){
@@ -1695,6 +1828,7 @@ function navAdmin(section){
     if(section==='margem')    loadMargem();
     if(section==='despesas')  loadDespesas();
     if(section==='comissoes') loadComissoesInit();
+    if(section==='relatorios') loadDashboard();
 }
 
 function openAdmin(){
@@ -1843,6 +1977,339 @@ async function confirmDelPed(key,cliente){
         toast('Pedido excluído.','info');
         loadPedidos();
     }catch(e){toast('Erro: '+e.message,'err');}
+}
+
+
+// ══════════════════════════════════════════════════
+//  DASHBOARD GERENCIAL
+// ══════════════════════════════════════════════════
+
+// Chart instances — destroy before recreate to avoid canvas conflicts
+const _charts = {};
+function _mkChart(id, config){
+    if(_charts[id]) _charts[id].destroy();
+    const ctx = document.getElementById(id);
+    if(!ctx) return;
+    _charts[id] = new Chart(ctx, config);
+    return _charts[id];
+}
+
+// Chart defaults — dark theme
+Chart.defaults.color = '#9e8e8e';
+Chart.defaults.borderColor = 'rgba(201,168,76,0.1)';
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+
+const _OURO   = '#C9A84C';
+const _VINHO  = '#7A2832';
+const _GREEN  = '#2E7D32';
+const _RED    = '#c62828';
+const _BLUE   = '#185FA5';
+const _ORANGE = '#E65100';
+const _PALETTE= ['#C9A84C','#7A2832','#2E7D32','#185FA5','#E65100','#6B0000','#3B6D11','#854F0B'];
+
+function relTab(n, btn){
+    for(let i=0;i<6;i++) document.getElementById('relSec'+i).style.display = i===n ? '' : 'none';
+    document.querySelectorAll('#relTabs .fin-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function _initRelDates(){
+    const hoje = new Date().toISOString().split('T')[0];
+    const ini  = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+    if(!document.getElementById('relDe').value)  document.getElementById('relDe').value  = ini;
+    if(!document.getElementById('relAte').value) document.getElementById('relAte').value = hoje;
+}
+
+async function loadDashboard(){
+    _initRelDates();
+    const de  = document.getElementById('relDe').value;
+    const ate = document.getElementById('relAte').value;
+    const deTs  = de  ? new Date(de +'T00:00:00').getTime() : 0;
+    const ateTs = ate ? new Date(ate+'T23:59:59').getTime() : Infinity;
+
+    // Load orders + despesas in parallel
+    const [snapOrders, snapDesp] = await Promise.all([
+        db.ref('orders').orderByChild('timestamp').once('value'),
+        db.ref('despesas').once('value')
+    ]);
+
+    const allOrders = snapOrders.val() ? Object.values(snapOrders.val()) : [];
+    const allDesp   = snapDesp.val()   ? Object.values(snapDesp.val())   : [];
+
+    // Filter orders by period
+    const orders = allOrders.filter(o => {
+        const ts = o.timestamp||0;
+        return ts >= deTs && ts <= ateTs;
+    });
+
+    _buildVendas(orders, de, ate);
+    _buildProdutos(orders);
+    _buildEstoque();
+    _buildFluxo(orders, allOrders, allDesp);
+    _buildVendedores(orders);
+    _buildClientes(orders);
+}
+
+// ── TAB 0: VENDAS ──
+function _buildVendas(orders, de, ate){
+    const totalVendas = orders.reduce((s,o)=>s+o.total,0);
+    const pagos  = orders.filter(o=>o.status==='pago');
+    const aberto = orders.filter(o=>(o.status||'aberto')==='aberto');
+    const ticket = orders.length ? totalVendas/orders.length : 0;
+
+    document.getElementById('relVendasKpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Total Vendido</div><div class="kpi-value">R$ ${fmt(totalVendas)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Pedidos</div><div class="kpi-value">${orders.length}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Ticket Médio</div><div class="kpi-value">R$ ${fmt(ticket)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Pagos / Em Aberto</div><div class="kpi-value pos">${pagos.length} <span style="color:#9e8e8e;font-size:1rem">/ ${aberto.length}</span></div></div>`;
+
+    // Sales by day
+    const byDay = {};
+    orders.forEach(o=>{
+        const d = o.data || (o.timestamp ? new Date(o.timestamp).toLocaleDateString('pt-BR') : '?');
+        byDay[d] = (byDay[d]||0) + o.total;
+    });
+    const dayLabels = Object.keys(byDay).sort((a,b)=>{
+        const [da,ma,ya]=a.split('/'); const [db2,mb,yb]=b.split('/');
+        return new Date(`${ya}-${ma}-${da}`) - new Date(`${yb}-${mb}-${db2}`);
+    });
+    _mkChart('chartVendasDia',{
+        type:'bar',
+        data:{ labels:dayLabels, datasets:[{label:'Vendas (R$)', data:dayLabels.map(d=>byDay[d]), backgroundColor:_OURO+'99', borderColor:_OURO, borderWidth:1, borderRadius:4}]},
+        options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>'R$'+fmt(v)}}}}
+    });
+
+    // Pie: aberto x pago
+    _mkChart('chartPedStatus',{
+        type:'doughnut',
+        data:{ labels:['Pagos','Em aberto'], datasets:[{data:[pagos.length, aberto.length], backgroundColor:[_GREEN+'cc',_ORANGE+'cc'], borderColor:[_GREEN,_ORANGE], borderWidth:2}]},
+        options:{responsive:true, plugins:{legend:{position:'bottom'}}}
+    });
+
+    // Ticket by vendedor
+    const vTicket = {};
+    orders.forEach(o=>{
+        if(!vTicket[o.vendedor]) vTicket[o.vendedor]={total:0,n:0};
+        vTicket[o.vendedor].total+=o.total; vTicket[o.vendedor].n++;
+    });
+    const vNames = Object.keys(vTicket);
+    _mkChart('chartTicketVend',{
+        type:'bar',
+        data:{ labels:vNames, datasets:[{label:'Ticket médio', data:vNames.map(v=>vTicket[v].total/vTicket[v].n), backgroundColor:_PALETTE.slice(0,vNames.length), borderRadius:4}]},
+        options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>'R$'+fmt(v)}}}}
+    });
+}
+
+// ── TAB 1: PRODUTOS ──
+function _buildProdutos(orders){
+    const byProd = {};
+    orders.forEach(o=>{
+        (o.itens||[]).forEach(i=>{
+            if(!byProd[i.nome]) byProd[i.nome]={qty:0,rec:0};
+            byProd[i.nome].qty += i.qty;
+            byProd[i.nome].rec += i.qty*i.preco;
+        });
+    });
+    const sorted = Object.entries(byProd).sort((a,b)=>b[1].qty-a[1].qty).slice(0,8);
+    const sortedRec = Object.entries(byProd).sort((a,b)=>b[1].rec-a[1].rec).slice(0,8);
+
+    const totalItens = Object.values(byProd).reduce((s,v)=>s+v.qty,0);
+    const topProd = sorted[0]?sorted[0][0]:'—';
+    document.getElementById('relProdKpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Produtos diferentes</div><div class="kpi-value">${Object.keys(byProd).length}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total de itens vendidos</div><div class="kpi-value">${totalItens}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Mais vendido (qtd)</div><div class="kpi-value" style="font-size:.95rem">${topProd}</div></div>`;
+
+    _mkChart('chartRankQty',{
+        type:'bar',
+        data:{ labels:sorted.map(([n])=>n.length>22?n.substr(0,22)+'…':n), datasets:[{label:'Qtd vendida', data:sorted.map(([,v])=>v.qty), backgroundColor:_OURO+'aa', borderColor:_OURO, borderWidth:1, borderRadius:4}]},
+        options:{indexAxis:'y', responsive:true, plugins:{legend:{display:false}}}
+    });
+    _mkChart('chartRankRec',{
+        type:'bar',
+        data:{ labels:sortedRec.map(([n])=>n.length>22?n.substr(0,22)+'…':n), datasets:[{label:'Receita (R$)', data:sortedRec.map(([,v])=>v.rec), backgroundColor:_VINHO+'cc', borderColor:_VINHO+'ff', borderWidth:1, borderRadius:4}]},
+        options:{indexAxis:'y', responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{callback:v=>'R$'+fmt(v)}}}}
+    });
+}
+
+// ── TAB 2: ESTOQUE ──
+function _buildEstoque(){
+    const labels = wines.map(w=>w.name.length>20?w.name.substr(0,20)+'…':w.name);
+    const data   = wines.map(w=>w.stock||0);
+    const colors = wines.map(w=> w.stock===0?_RED+'99': w.stock<=3?_RED+'88': w.stock<=8?_ORANGE+'88':_GREEN+'88');
+    const borders= wines.map(w=> w.stock===0?_RED: w.stock<=3?_RED: w.stock<=8?_ORANGE:_GREEN);
+
+    const totalUnid    = wines.reduce((s,w)=>s+(w.stock||0),0);
+    const valorEstoque = wines.reduce((s,w)=>s+(w.stock||0)*(w.price||0),0);
+    const custoEstoque = wines.reduce((s,w)=>s+(w.stock||0)*(w.custo||0),0);
+    const criticos     = wines.filter(w=>(w.stock||0)<=3).length;
+
+    document.getElementById('relEstoqueKpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Total em Estoque</div><div class="kpi-value">${totalUnid} un</div></div>
+        <div class="kpi-card"><div class="kpi-label">Valor de Venda</div><div class="kpi-value">R$ ${fmt(valorEstoque)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Custo de Compra</div><div class="kpi-value neg">R$ ${fmt(custoEstoque)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Críticos (≤3 un)</div><div class="kpi-value ${criticos>0?'neg':'pos'}">${criticos}</div></div>`;
+
+    _mkChart('chartEstoque',{
+        type:'bar',
+        data:{ labels, datasets:[{label:'Estoque', data, backgroundColor:colors, borderColor:borders, borderWidth:1, borderRadius:4}]},
+        options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}}
+    });
+
+    // Alerts
+    const alerts = wines
+        .filter(w=>(w.stock||0)<=8)
+        .sort((a,b)=>(a.stock||0)-(b.stock||0));
+    const alertEl = document.getElementById('relEstoqueAlerts');
+    if(!alerts.length){ alertEl.innerHTML='<p style="color:#66BB6A;font-size:.83rem;padding:.5rem">✅ Todos os estoques estão satisfatórios.</p>'; return; }
+    alertEl.innerHTML = '<div style="font-size:.72rem;color:#9e8e8e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.4rem">Alertas de estoque</div>' +
+        alerts.map(w=>`<div class="stock-alert ${(w.stock||0)===0?'sa-critical':(w.stock||0)<=3?'sa-critical':'sa-warn'}">
+            <span>${w.name}</span>
+            <span style="font-weight:600">${(w.stock||0)===0?'⛔ ESGOTADO':'⚠️ '+w.stock+' un'}</span>
+        </div>`).join('');
+}
+
+// ── TAB 3: FLUXO DE CAIXA ──
+function _buildFluxo(orders, allOrders, allDesp){
+    const recTotal  = orders.filter(o=>o.status==='pago').reduce((s,o)=>s+o.total,0);
+    const despTotal = allDesp.reduce((s,d)=>s+d.valor,0);
+    const saldo     = recTotal - despTotal;
+
+    document.getElementById('relFluxoKpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Receitas (pagos)</div><div class="kpi-value pos">R$ ${fmt(recTotal)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Despesas</div><div class="kpi-value neg">R$ ${fmt(despTotal)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Saldo</div><div class="kpi-value ${saldo>=0?'pos':'neg'}">R$ ${fmt(saldo)}</div></div>`;
+
+    // Group by month
+    const months = {};
+    allOrders.filter(o=>o.status==='pago').forEach(o=>{
+        const d = o.data||'';
+        const [,mes,ano] = d.split('/');
+        const k = `${ano||'?'}-${mes||'?'}`;
+        if(!months[k]) months[k]={rec:0,desp:0};
+        months[k].rec += o.total||0;
+    });
+    allDesp.forEach(d=>{
+        const parts = (d.data||'').split('-');
+        const k = parts.length===3 ? `${parts[0]}-${parts[1]}` : '?-?';
+        if(!months[k]) months[k]={rec:0,desp:0};
+        months[k].desp += d.valor||0;
+    });
+    const mLabels = Object.keys(months).filter(k=>k!=='?-?').sort();
+    const mDisplay = mLabels.map(k=>{ const [a,m]=k.split('-'); return `${m}/${a}`; });
+
+    _mkChart('chartFluxo',{
+        type:'bar',
+        data:{ labels:mDisplay, datasets:[
+            {label:'Receitas', data:mLabels.map(k=>months[k]?.rec||0), backgroundColor:_GREEN+'88', borderColor:_GREEN, borderWidth:1, borderRadius:4},
+            {label:'Despesas', data:mLabels.map(k=>months[k]?.desp||0), backgroundColor:_RED+'88', borderColor:_RED, borderWidth:1, borderRadius:4}
+        ]},
+        options:{responsive:true, scales:{y:{ticks:{callback:v=>'R$'+fmt(v)}}}}
+    });
+
+    // Pie: despesas por categoria
+    const byCat = {};
+    allDesp.forEach(d=>{ byCat[d.categoria] = (byCat[d.categoria]||0)+d.valor; });
+    const catK = Object.keys(byCat);
+    _mkChart('chartDespCat',{
+        type:'doughnut',
+        data:{ labels:catK, datasets:[{data:catK.map(k=>byCat[k]), backgroundColor:_PALETTE.slice(0,catK.length).map(c=>c+'cc'), borderColor:_PALETTE.slice(0,catK.length), borderWidth:2}]},
+        options:{responsive:true, plugins:{legend:{position:'right'}}}
+    });
+}
+
+// ── TAB 4: VENDEDORES ──
+function _buildVendedores(orders){
+    const byVend = {};
+    orders.forEach(o=>{
+        if(!byVend[o.vendedor]) byVend[o.vendedor]={total:0,n:0,itens:0};
+        byVend[o.vendedor].total += o.total||0;
+        byVend[o.vendedor].n    += 1;
+        byVend[o.vendedor].itens+= (o.itens||[]).reduce((s,i)=>s+i.qty,0);
+    });
+    const vNames = VENDEDORES.slice(1);
+    const melhor = Object.entries(byVend).sort((a,b)=>b[1].total-a[1].total)[0];
+
+    document.getElementById('relVendKpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Vendedores ativos</div><div class="kpi-value">${Object.keys(byVend).length}</div></div>
+        ${melhor?`<div class="kpi-card"><div class="kpi-label">Top vendedor</div><div class="kpi-value" style="font-size:1rem">${melhor[0]}<br><span style="color:var(--ouro);font-size:1.2rem">R$ ${fmt(melhor[1].total)}</span></div></div>`:''}`;
+
+    // Metas form
+    const metasForm = document.getElementById('relMetasForm');
+    metasForm.innerHTML = vNames.map(v=>`
+        <div class="meta-field">
+            <label>${v}</label>
+            <input type="number" id="meta_${v.replace(/\s/g,'_')}" placeholder="Meta R$"
+                value="${localStorage.getItem('meta_'+v)||''}" min="0" step="100">
+        </div>`).join('') +
+        `<button class="btn-save-metas" onclick="saveMetas()">💾 Salvar Metas</button>`;
+
+    // Bar: realizado x meta
+    const realizados = vNames.map(v=>(byVend[v]||{total:0}).total);
+    const metas      = vNames.map(v=>parseFloat(localStorage.getItem('meta_'+v))||0);
+    _mkChart('chartMetas',{
+        type:'bar',
+        data:{ labels:vNames, datasets:[
+            {label:'Realizado', data:realizados, backgroundColor:_OURO+'aa', borderColor:_OURO, borderWidth:1, borderRadius:4},
+            {label:'Meta',      data:metas,      backgroundColor:'rgba(255,255,255,.05)', borderColor:'rgba(255,255,255,.25)', borderWidth:2, borderRadius:4, type:'bar'}
+        ]},
+        options:{responsive:true, scales:{y:{ticks:{callback:v=>'R$'+fmt(v)}}}}
+    });
+
+    // Pedidos por vendedor
+    const nPed = vNames.map(v=>(byVend[v]||{n:0}).n);
+    _mkChart('chartPedVend',{
+        type:'bar',
+        data:{ labels:vNames, datasets:[{label:'Pedidos', data:nPed, backgroundColor:_VINHO+'cc', borderColor:_VINHO, borderWidth:1, borderRadius:4}]},
+        options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{stepSize:1}}}}
+    });
+}
+function saveMetas(){
+    VENDEDORES.slice(1).forEach(v=>{
+        const val = document.getElementById('meta_'+v.replace(/\s/g,'_'))?.value;
+        if(val) localStorage.setItem('meta_'+v, val);
+    });
+    toast('Metas salvas! ✅');
+    loadDashboard();
+}
+
+// ── TAB 5: CLIENTES ──
+function _buildClientes(orders){
+    const byCliente = {};
+    orders.forEach(o=>{
+        const k = o.cliente+'||'+o.telefone;
+        if(!byCliente[k]) byCliente[k]={nome:o.cliente,tel:o.telefone,total:0,n:0};
+        byCliente[k].total += o.total||0;
+        byCliente[k].n     += 1;
+    });
+    const list = Object.values(byCliente).sort((a,b)=>b.total-a.total);
+    const top8V = list.slice(0,8);
+    const top8F = [...list].sort((a,b)=>b.n-a.n).slice(0,8);
+
+    document.getElementById('relClientesKpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Clientes únicos</div><div class="kpi-value">${list.length}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Maior comprador</div><div class="kpi-value" style="font-size:.95rem">${list[0]?.nome||'—'}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Ticket médio geral</div><div class="kpi-value">R$ ${fmt(list.length?list.reduce((s,c)=>s+c.total,0)/list.length:0)}</div></div>`;
+
+    _mkChart('chartTopClientes',{
+        type:'bar',
+        data:{ labels:top8V.map(c=>c.nome.split(' ')[0]), datasets:[{label:'Total R$', data:top8V.map(c=>c.total), backgroundColor:_OURO+'99', borderColor:_OURO, borderWidth:1, borderRadius:4}]},
+        options:{indexAxis:'y', responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{callback:v=>'R$'+fmt(v)}}}}
+    });
+    _mkChart('chartFreqClientes',{
+        type:'bar',
+        data:{ labels:top8F.map(c=>c.nome.split(' ')[0]), datasets:[{label:'Pedidos', data:top8F.map(c=>c.n), backgroundColor:_BLUE+'99', borderColor:_BLUE, borderWidth:1, borderRadius:4}]},
+        options:{indexAxis:'y', responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{stepSize:1}}}}
+    });
+
+    const el = document.getElementById('relClientesList');
+    el.innerHTML = list.slice(0,20).map(c=>`
+        <div class="cliente-row">
+            <span style="font-weight:500;color:var(--ouro-lt)">${c.nome}</span>
+            <span style="color:#9e8e8e;font-size:.78rem">${c.tel}</span>
+            <span style="color:#9e8e8e">${c.n} pedido${c.n>1?'s':''}</span>
+            <span style="color:var(--ouro);font-weight:600">R$ ${fmt(c.total)}</span>
+        </div>`).join('');
 }
 
 function fmt(n){return n.toFixed(2).replace('.',',');}
