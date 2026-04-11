@@ -583,6 +583,15 @@
         .meta-field input:focus{outline:none;border-color:var(--ouro)}
         .btn-save-metas{padding:.42rem .9rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;align-self:flex-end}
 
+
+        /* ── WATERFALL / RESULTADO ── */
+        .wf-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.5rem;font-size:.84rem}
+        .wf-label{width:180px;flex-shrink:0;color:#c5b5b5;text-align:right}
+        .wf-bar-wrap{flex:1;background:rgba(255,255,255,.04);border-radius:4px;height:22px;position:relative;overflow:hidden}
+        .wf-bar{height:100%;border-radius:4px;transition:width .5s ease}
+        .wf-val{width:110px;flex-shrink:0;text-align:right;font-weight:600;font-size:.85rem}
+        .wf-divider{border-top:1px dashed rgba(201,168,76,.2);margin:.4rem 0}
+
         @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(4,1fr) !important}}
         @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
@@ -883,6 +892,7 @@
             <button class="fin-tab" onclick="relTab(3,this)">💵 Fluxo de Caixa</button>
             <button class="fin-tab" onclick="relTab(4,this)">👤 Vendedores</button>
             <button class="fin-tab" onclick="relTab(5,this)">🧑 Clientes</button>
+            <button class="fin-tab" onclick="relTab(6,this)">📈 Resultado</button>
           </div>
 
           <!-- TAB 0: VENDAS -->
@@ -976,6 +986,50 @@
               <div id="relClientesList"></div>
             </div>
           </div>
+
+
+          <!-- TAB 6: RESULTADO FINANCEIRO -->
+          <div id="relSec6" style="display:none;padding-top:.8rem">
+
+            <!-- config row -->
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.1rem;background:rgba(255,255,255,.04);padding:.85rem 1rem;border-radius:10px;border:1px solid rgba(201,168,76,.1);align-items:flex-end">
+              <div><label style="display:block;font-size:.7rem;color:#888;margin-bottom:.25rem">% Imposto</label>
+                <input type="number" id="resImp" min="0" max="100" step="0.1" value="0" style="width:80px;padding:.42rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem">
+              </div>
+              <div><label style="display:block;font-size:.7rem;color:#888;margin-bottom:.25rem">% Comissão</label>
+                <input type="number" id="resCom" min="0" max="100" step="0.1" value="0" style="width:80px;padding:.42rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem">
+              </div>
+              <button onclick="calcResultado()" style="padding:.5rem 1.1rem;background:var(--vinho);color:var(--ouro-lt);border:1px solid rgba(201,168,76,.3);border-radius:6px;font-size:.85rem;font-weight:600;cursor:pointer">Calcular</button>
+            </div>
+
+            <!-- KPIs principais -->
+            <div class="kpi-grid" id="resKpis"></div>
+
+            <!-- Waterfall visual -->
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem;margin-bottom:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.4px">Composição do resultado</div>
+              <div id="resWaterfall"></div>
+            </div>
+
+            <!-- Dois cenários lado a lado -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+              <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+                <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Sem comissão</div>
+                <canvas id="chartResSemCom" height="160"></canvas>
+              </div>
+              <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+                <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Com comissão descontada</div>
+                <canvas id="chartResComCom" height="160"></canvas>
+              </div>
+            </div>
+
+            <!-- Evolução por mês -->
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.1);border-radius:10px;padding:1rem">
+              <div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Lucro líquido por mês</div>
+              <canvas id="chartResLucroMes" height="90"></canvas>
+            </div>
+
+          </div><!-- /relSec6 -->
 
         </div><!-- /sec-relatorios -->
       </div><!-- /admin-main -->
@@ -1828,7 +1882,7 @@ function navAdmin(section){
     if(section==='margem')    loadMargem();
     if(section==='despesas')  loadDespesas();
     if(section==='comissoes') loadComissoesInit();
-    if(section==='relatorios') loadDashboard();
+    if(section==='relatorios'){ loadDashboard(); }
 }
 
 function openAdmin(){
@@ -2008,7 +2062,8 @@ const _ORANGE = '#E65100';
 const _PALETTE= ['#C9A84C','#7A2832','#2E7D32','#185FA5','#E65100','#6B0000','#3B6D11','#854F0B'];
 
 function relTab(n, btn){
-    for(let i=0;i<6;i++) document.getElementById('relSec'+i).style.display = i===n ? '' : 'none';
+    for(let i=0;i<7;i++){ const el=document.getElementById('relSec'+i); if(el) el.style.display = i===n ? '' : 'none'; }
+    if(n===6) calcResultado();
     document.querySelectorAll('#relTabs .fin-tab').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
 }
@@ -2310,6 +2365,140 @@ function _buildClientes(orders){
             <span style="color:#9e8e8e">${c.n} pedido${c.n>1?'s':''}</span>
             <span style="color:var(--ouro);font-weight:600">R$ ${fmt(c.total)}</span>
         </div>`).join('');
+}
+
+
+// ══ RELATÓRIO DE RESULTADO FINANCEIRO ══
+async function calcResultado(){
+    // Load saved percentages from comissoes tab as defaults
+    const savedCfg = await db.ref('config').once('value').then(s=>s.val()||{});
+
+    const impInput = document.getElementById('resImp');
+    const comInput = document.getElementById('resCom');
+    if(!impInput.value && savedCfg.imposto_pct)  impInput.value = savedCfg.imposto_pct;
+    if(!comInput.value && savedCfg.comissao_pct) comInput.value = savedCfg.comissao_pct;
+
+    const pctImp = parseFloat(impInput.value)||0;
+    const pctCom = parseFloat(comInput.value)||0;
+
+    const de  = document.getElementById('relDe').value;
+    const ate = document.getElementById('relAte').value;
+    const deTs  = de  ? new Date(de +'T00:00:00').getTime() : 0;
+    const ateTs = ate ? new Date(ate+'T23:59:59').getTime() : Infinity;
+
+    const [snapOrders, snapDesp] = await Promise.all([
+        db.ref('orders').orderByChild('timestamp').once('value'),
+        db.ref('despesas').once('value')
+    ]);
+
+    const allOrders = snapOrders.val() ? Object.values(snapOrders.val()) : [];
+    const allDesp   = snapDesp.val()   ? Object.values(snapDesp.val())   : [];
+
+    const orders = allOrders.filter(o=>{
+        const ts = o.timestamp||0;
+        return ts >= deTs && ts <= ateTs;
+    });
+
+    // Calc cost of goods sold
+    const custoPorNome = {};
+    wines.forEach(w=>{ custoPorNome[w.name] = w.custo||0; });
+
+    let totalVendido = 0, custoMercadoria = 0;
+    orders.forEach(o=>{
+        totalVendido += o.total||0;
+        (o.itens||[]).forEach(i=>{ custoMercadoria += (custoPorNome[i.nome]||0)*i.qty; });
+    });
+
+    const despPeriodo  = allDesp.reduce((s,d)=>s+d.valor,0);
+    const impostoVal   = totalVendido * pctImp / 100;
+    const lucroBreto   = totalVendido - custoMercadoria - despPeriodo;
+    const lucroSemCom  = lucroBreto - impostoVal;
+    const comissaoVal  = Math.max(0, lucroSemCom) * pctCom / 100;
+    const lucroComCom  = lucroSemCom - comissaoVal;
+
+    // ── KPIs ──
+    document.getElementById('resKpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Receita Bruta</div><div class="kpi-value">R$ ${fmt(totalVendido)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Imposto (${pctImp}%)</div><div class="kpi-value neg">− R$ ${fmt(impostoVal)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Custo de Compra</div><div class="kpi-value neg">− R$ ${fmt(custoMercadoria)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Despesas Op.</div><div class="kpi-value neg">− R$ ${fmt(despPeriodo)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Lucro s/ Comissão</div><div class="kpi-value ${lucroSemCom>=0?'pos':'neg'}">R$ ${fmt(lucroSemCom)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Comissão (${pctCom}%)</div><div class="kpi-value neg">− R$ ${fmt(comissaoVal)}</div></div>
+        <div class="kpi-card" style="border-color:var(--ouro)"><div class="kpi-label">Lucro Líquido Final</div><div class="kpi-value ${lucroComCom>=0?'pos':'neg'}" style="font-size:1.6rem">R$ ${fmt(lucroComCom)}</div></div>`;
+
+    // ── Waterfall ──
+    const maxVal = totalVendido || 1;
+    const rows = [
+        {label:'Receita bruta',        val:totalVendido,   color:'#C9A84C', op:'+'},
+        {label:'(-) Custo de compra',  val:custoMercadoria, color:'#c62828', op:'-'},
+        {label:'(-) Despesas op.',     val:despPeriodo,    color:'#c62828', op:'-'},
+        {label:'(-) Imposto '+pctImp+'%', val:impostoVal,  color:'#E65100', op:'-'},
+        {label:'= Lucro s/ comissão',  val:lucroSemCom,    color: lucroSemCom>=0?'#2E7D32':'#c62828', op:'='},
+        {label:'(-) Comissão '+pctCom+'%',val:comissaoVal, color:'#854F0B', op:'-'},
+        {label:'= Lucro líquido final',val:lucroComCom,    color: lucroComCom>=0?'#1B5E20':'#b71c1c', op:'='},
+    ];
+    document.getElementById('resWaterfall').innerHTML = rows.map(r=>`
+        <div class="wf-row">
+            <div class="wf-label">${r.label}</div>
+            <div class="wf-bar-wrap">
+                <div class="wf-bar" style="width:${Math.min(100,Math.abs(r.val)/maxVal*100).toFixed(1)}%;background:${r.color}${r.op==='='?'':'88'}"></div>
+            </div>
+            <div class="wf-val" style="color:${r.op==='-'?'#EF9595':r.op==='='&&r.val>=0?'#66BB6A':r.op==='='?'#EF5350':'var(--ouro)'}">
+                ${r.op==='-'?'−':r.op==='+'?'':''} R$ ${fmt(Math.abs(r.val))}
+            </div>
+        </div>
+        ${(r.op==='=')? '<div class="wf-divider"></div>' : ''}`).join('');
+
+    // ── Pie: sem comissão ──
+    _mkChart('chartResSemCom',{
+        type:'doughnut',
+        data:{ labels:['Custo Compra','Despesas Op.','Imposto','Lucro Líquido'],
+               datasets:[{data:[custoMercadoria, despPeriodo, impostoVal, Math.max(0,lucroSemCom)],
+                           backgroundColor:['#c62828cc','#E65100cc','#854F0Bcc','#2E7D32cc'],
+                           borderColor:['#c62828','#E65100','#854F0B','#2E7D32'], borderWidth:2}]},
+        options:{responsive:true, plugins:{legend:{position:'bottom', labels:{font:{size:11}}}}}
+    });
+
+    // ── Pie: com comissão ──
+    _mkChart('chartResComCom',{
+        type:'doughnut',
+        data:{ labels:['Custo Compra','Despesas Op.','Imposto','Comissão','Lucro Líquido'],
+               datasets:[{data:[custoMercadoria, despPeriodo, impostoVal, comissaoVal, Math.max(0,lucroComCom)],
+                           backgroundColor:['#c62828cc','#E65100cc','#854F0Bcc','#185FA5cc','#1B5E20cc'],
+                           borderColor:['#c62828','#E65100','#854F0B','#185FA5','#1B5E20'], borderWidth:2}]},
+        options:{responsive:true, plugins:{legend:{position:'bottom', labels:{font:{size:11}}}}}
+    });
+
+    // ── Evolução mensal do lucro líquido ──
+    const byMonth = {};
+    allOrders.forEach(o=>{
+        const d=o.data||''; const [,mes,ano]=d.split('/');
+        const k=`${ano||'?'}-${mes||'?'}`;
+        if(!byMonth[k]) byMonth[k]={venda:0,custo:0};
+        byMonth[k].venda += o.total||0;
+        (o.itens||[]).forEach(i=>{ byMonth[k].custo += (custoPorNome[i.nome]||0)*i.qty; });
+    });
+    const despByM={};
+    allDesp.forEach(d=>{
+        const p=(d.data||'').split('-');
+        const k=p.length===3?`${p[0]}-${p[1]}`:'?-?';
+        despByM[k]=(despByM[k]||0)+d.valor;
+    });
+    const mKeys = Object.keys(byMonth).filter(k=>k!=='?-?').sort();
+    const mLucros = mKeys.map(k=>{
+        const v=byMonth[k].venda; const c=byMonth[k].custo; const d=despByM[k]||0;
+        const imp=v*pctImp/100; const lb=v-c-d-imp; const com=Math.max(0,lb)*pctCom/100;
+        return lb-com;
+    });
+    _mkChart('chartResLucroMes',{
+        type:'bar',
+        data:{ labels:mKeys.map(k=>{ const[a,m]=k.split('-'); return `${m}/${a}`; }),
+               datasets:[{label:'Lucro Líquido', data:mLucros,
+                           backgroundColor:mLucros.map(v=>v>=0?'#2E7D3288':'#c6282888'),
+                           borderColor:mLucros.map(v=>v>=0?'#2E7D32':'#c62828'),
+                           borderWidth:1, borderRadius:4}]},
+        options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>'R$'+fmt(v)}}}}
+    });
 }
 
 function fmt(n){return n.toFixed(2).replace('.',',');}
