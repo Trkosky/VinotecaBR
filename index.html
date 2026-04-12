@@ -592,6 +592,19 @@
         .wf-val{width:110px;flex-shrink:0;text-align:right;font-weight:600;font-size:.85rem}
         .wf-divider{border-top:1px dashed rgba(201,168,76,.2);margin:.4rem 0}
 
+
+        /* ── VENDEDORES ── */
+        .vend-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.12);border-radius:10px;padding:.85rem 1rem;margin-bottom:.6rem;display:grid;grid-template-columns:1fr 90px 130px auto;gap:.7rem;align-items:center}
+        .vend-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--ouro-lt)}
+        .vend-meta{font-size:.78rem;color:#9e8e8e}
+        .vend-pct{font-size:.88rem;font-weight:600;color:var(--ouro);text-align:center}
+        .vend-wpp{font-size:.78rem;color:#9e8e8e}
+        .btn-vend-edit{padding:.35rem .7rem;background:rgba(201,168,76,.1);color:var(--ouro);border:1px solid rgba(201,168,76,.25);border-radius:6px;font-size:.78rem;cursor:pointer;white-space:nowrap}
+        .btn-vend-del{padding:.35rem .65rem;background:rgba(198,40,40,.12);color:#EF5350;border:1px solid rgba(198,40,40,.25);border-radius:6px;font-size:.78rem;cursor:pointer}
+        .vend-edit-row{grid-column:1/-1;display:none;grid-template-columns:1fr 80px 130px;gap:.5rem;padding-top:.5rem;border-top:1px solid rgba(201,168,76,.1)}
+        .vend-edit-row.open{display:grid}
+        .vend-edit-row input{padding:.45rem .6rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.06);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.83rem;width:100%}
+
         @media print{body>*:not(.catalog-overlay){display:none !important}.catalog-overlay{position:static !important;background:none !important;padding:0 !important;display:block !important}.catalog-toolbar,.label-card-footer{display:none !important}.catalog-grid{grid-template-columns:repeat(4,1fr) !important}}
         @media(max-width:640px){.cart-fab{top:auto;bottom:5rem;right:1.5rem}}
     </style>
@@ -744,6 +757,8 @@
         <div class="adm-section-lbl">Catálogo</div>
         <button class="adm-nav-btn active" id="nav-vinhos" onclick="navAdmin('vinhos')"><span class="mi">🍷</span>Gerenciar Vinhos</button>
 
+        <button class="adm-nav-btn" id="nav-vendedores" onclick="navAdmin('vendedores')"><span class="mi">👥</span>Vendedores</button>
+
         <div class="adm-section-lbl">Vendas</div>
         <button class="adm-nav-btn" id="nav-pedidos" onclick="navAdmin('pedidos')"><span class="mi">🧾</span>Pedidos em Aberto</button>
         <button class="adm-nav-btn" id="nav-historico" onclick="navAdmin('historico')"><span class="mi">📋</span>Histórico</button>
@@ -771,6 +786,35 @@
             <button class="btn-admin btn-add-wine" onclick="addWineAdmin()">➕ Novo Vinho</button>
             <button class="btn-admin btn-save"     onclick="applyAdmin()">☁️ Salvar no Firebase</button>
           </div>
+        </div>
+
+
+        <!-- ── VENDEDORES ── -->
+        <div class="admin-section" id="sec-vendedores">
+          <div class="admin-note">
+            Gerencie os vendedores e defina a <strong>comissão individual</strong> de cada um.<br>
+            O percentual aqui cadastrado será usado automaticamente nos relatórios.
+          </div>
+
+          <!-- Formulário novo vendedor -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.12);border-radius:10px;padding:.9rem 1rem;margin-bottom:1.1rem">
+            <div style="font-size:.75rem;color:#9e8e8e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:.6rem">Novo Vendedor</div>
+            <div style="display:grid;grid-template-columns:1fr 100px 120px auto;gap:.6rem;align-items:flex-end">
+              <div><label style="display:block;font-size:.72rem;color:#888;margin-bottom:.2rem">Nome *</label>
+                <input type="text" id="nvNome" placeholder="Nome do vendedor" style="width:100%;padding:.55rem .7rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem">
+              </div>
+              <div><label style="display:block;font-size:.72rem;color:#888;margin-bottom:.2rem">% Comissão</label>
+                <input type="number" id="nvComPct" min="0" max="100" step="0.1" placeholder="5" style="width:100%;padding:.55rem .7rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem">
+              </div>
+              <div><label style="display:block;font-size:.72rem;color:#888;margin-bottom:.2rem">WhatsApp</label>
+                <input type="tel" id="nvWpp" placeholder="(11) 99999-9999" style="width:100%;padding:.55rem .7rem;border:1px solid rgba(122,40,50,.4);border-radius:6px;background:rgba(255,255,255,.05);color:var(--creme);font-family:'DM Sans',sans-serif;font-size:.85rem">
+              </div>
+              <button onclick="addVendedor()" style="padding:.55rem 1.1rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;white-space:nowrap">➕ Adicionar</button>
+            </div>
+          </div>
+
+          <!-- Lista de vendedores -->
+          <div id="vendedoresList"></div>
         </div>
 
         <!-- ── PEDIDOS EM ABERTO ── -->
@@ -859,10 +903,12 @@
         <!-- ── COMISSÕES ── -->
         <div class="admin-section" id="sec-comissoes">
           <div class="com-config-row">
-            <div><label>% Comissão</label><input type="number" id="comPctGlobal" min="0" max="100" step="0.1" value="5"></div>
-            <div><label>% Imposto</label><input type="number" id="comImpGlobal" min="0" max="100" step="0.1" value="0"></div>
-            <button onclick="saveComConfig()" style="padding:.5rem 1rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer">Salvar</button>
+            <div><label>% Imposto (global)</label><input type="number" id="comImpGlobal" min="0" max="100" step="0.1" value="0" style="width:80px"></div>
+            <button onclick="saveComConfig()" style="padding:.5rem 1rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer">Salvar imposto</button>
+            <span style="font-size:.78rem;color:#888;align-self:center">A % de comissão vem do cadastro de cada vendedor</span>
           </div>
+          <!-- comissão individual por vendedor (preenchido via JS) -->
+          <div id="comVendPctRow" style="margin-bottom:.8rem"></div>
           <div class="com-filter">
             <div><label>De</label><input type="date" id="comDe"></div>
             <div><label>Até</label><input type="date" id="comAte"></div>
@@ -1041,6 +1087,7 @@
 
 <script>
 let db=null, wines=[], cart=[], filter='todos', adminAuth=false, nextId=1;
+let vendedoresData = {}; // {nome: {comPct, wpp}}
 let labelDataUrl='', labelWineName='';
 
 document.getElementById('storeTitle').textContent = STORE_NAME;
@@ -1597,7 +1644,7 @@ function loadComissoes(){
         const impGeral    = totalGeral * imp/100;
         const custoGeral  = Object.values(byVend).reduce((s,v)=>s+v.custo,0);
         const baseGeral   = Math.max(0, totalGeral - impGeral - custoGeral);
-        const comTotal    = baseGeral * pct/100;
+        const comTotal    = Object.entries(byVend).reduce((s,[n,v])=>{ const impV=v.total*imp/100; const base=Math.max(0,v.total-impV-v.custo); return s+base*getVendPct(n)/100; },0);
 
         kpis.innerHTML = `
             <div class="kpi-card"><div class="kpi-label">Total Vendido</div><div class="kpi-value">R$ ${fmt(totalGeral)}</div></div>
@@ -1613,9 +1660,10 @@ function loadComissoes(){
         }
 
         Object.entries(byVend).sort((a,b)=>b[1].total-a[1].total).forEach(([nome, v])=>{
-            const impV  = v.total * imp/100;
-            const baseV = Math.max(0, v.total - impV - v.custo);
-            const comV  = baseV * pct/100;
+            const impV    = v.total * imp/100;
+            const baseV   = Math.max(0, v.total - impV - v.custo);
+            const vendPct = getVendPct(nome);
+            const comV    = baseV * vendPct/100;
             const card  = document.createElement('div');
             card.className = 'com-vendor-card';
             card.innerHTML = `
@@ -1625,7 +1673,7 @@ function loadComissoes(){
                     <div class="com-stat"><div class="com-stat-lbl">Itens</div><div class="com-stat-val">${v.itens}</div></div>
                     <div class="com-stat"><div class="com-stat-lbl">Total Vendido</div><div class="com-stat-val gold">R$ ${fmt(v.total)}</div></div>
                     <div class="com-stat"><div class="com-stat-lbl">Base Líquida</div><div class="com-stat-val">R$ ${fmt(baseV)}</div></div>
-                    <div class="com-stat"><div class="com-stat-lbl">Comissão (${pct}%)</div><div class="com-stat-val green">R$ ${fmt(comV)}</div></div>
+                    <div class="com-stat"><div class="com-stat-lbl">Comissão (${vendPct}%)</div><div class="com-stat-val green">R$ ${fmt(comV)}</div></div>
                 </div>
                 <div style="margin-top:.8rem">
                     <button onclick="gerarPdfComissaoById('${_pdfStoreKey(nome,v.orders,de,ate,pct,imp)}')"
@@ -1851,9 +1899,150 @@ async function setPedStatus(key, novoStatus){
 }
 
 
+
+// ══════════════════════════════════════════════════
+//  GESTÃO DE VENDEDORES
+// ══════════════════════════════════════════════════
+
+async function loadVendedores(){
+    const snap = await db.ref('vendedores').once('value');
+    vendedoresData = snap.val() || {};
+
+    // Ensure static VENDEDORES are in the DB with defaults
+    const updates = {};
+    VENDEDORES.slice(1).forEach(nome=>{
+        if(!vendedoresData[nome]){
+            vendedoresData[nome] = {nome, comPct:5, wpp:''};
+            updates['vendedores/'+nome] = vendedoresData[nome];
+        }
+    });
+    if(Object.keys(updates).length) await db.ref().update(updates);
+
+    _renderVendedoresList();
+    _syncVendedoresSelects();
+}
+
+function _renderVendedoresList(){
+    const el = document.getElementById('vendedoresList');
+    if(!el) return;
+    const list = Object.values(vendedoresData).sort((a,b)=>a.nome.localeCompare(b.nome));
+    if(!list.length){ el.innerHTML='<p style="color:#6b5b5b;padding:1rem">Nenhum vendedor cadastrado.</p>'; return; }
+    el.innerHTML = list.map(v=>`
+        <div class="vend-card" id="vcard_${v.nome.replace(/\s/g,'_')}">
+            <div><div class="vend-name">${v.nome}</div></div>
+            <div class="vend-pct">${v.comPct||0}%<div style="font-size:.68rem;color:#888;font-weight:400">comissão</div></div>
+            <div class="vend-wpp">${v.wpp||'—'}</div>
+            <div style="display:flex;gap:.4rem">
+                <button class="btn-vend-edit" onclick="toggleVendEdit('${v.nome}')">✏️</button>
+                <button class="btn-vend-del"  onclick="delVendedor('${v.nome}')">🗑️</button>
+            </div>
+            <!-- inline edit -->
+            <div class="vend-edit-row" id="vedit_${v.nome.replace(/\s/g,'_')}">
+                <div><label style="font-size:.7rem;color:#888;display:block;margin-bottom:.2rem">Nome</label>
+                    <input id="ve_nome_${v.nome.replace(/\s/g,'_')}" value="${v.nome}"></div>
+                <div><label style="font-size:.7rem;color:#888;display:block;margin-bottom:.2rem">% Comissão</label>
+                    <input type="number" id="ve_pct_${v.nome.replace(/\s/g,'_')}" value="${v.comPct||0}" min="0" max="100" step="0.1"></div>
+                <div><label style="font-size:.7rem;color:#888;display:block;margin-bottom:.2rem">WhatsApp</label>
+                    <input id="ve_wpp_${v.nome.replace(/\s/g,'_')}" value="${v.wpp||''}"></div>
+                <div style="display:flex;gap:.4rem;align-items:flex-end;padding-bottom:.05rem">
+                    <button onclick="saveVendedor('${v.nome}')" style="padding:.42rem .85rem;background:var(--ok);color:#fff;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer">✅</button>
+                    <button onclick="toggleVendEdit('${v.nome}')" style="padding:.42rem .75rem;background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--ouro-lt);border-radius:6px;font-size:.8rem;cursor:pointer">✕</button>
+                </div>
+            </div>
+        </div>`).join('');
+}
+
+function toggleVendEdit(nome){
+    const key = nome.replace(/\s/g,'_');
+    const el  = document.getElementById('vedit_'+key);
+    if(el) el.classList.toggle('open');
+}
+
+async function addVendedor(){
+    const nome   = document.getElementById('nvNome').value.trim();
+    const comPct = parseFloat(document.getElementById('nvComPct').value)||5;
+    const wpp    = document.getElementById('nvWpp').value.trim();
+    if(!nome){ toast('Informe o nome do vendedor!','err'); return; }
+    if(vendedoresData[nome]){ toast('Vendedor já cadastrado!','err'); return; }
+    const data = {nome, comPct, wpp};
+    await db.ref('vendedores/'+nome).set(data);
+    vendedoresData[nome] = data;
+    document.getElementById('nvNome').value='';
+    document.getElementById('nvComPct').value='';
+    document.getElementById('nvWpp').value='';
+    _renderVendedoresList();
+    _syncVendedoresSelects();
+    toast('Vendedor adicionado! ✅');
+}
+
+async function saveVendedor(nomeOld){
+    const key    = nomeOld.replace(/\s/g,'_');
+    const nome   = document.getElementById('ve_nome_'+key)?.value.trim()||nomeOld;
+    const comPct = parseFloat(document.getElementById('ve_pct_'+key)?.value)||0;
+    const wpp    = document.getElementById('ve_wpp_'+key)?.value.trim()||'';
+    const data   = {nome, comPct, wpp};
+    const updates = {};
+    if(nome !== nomeOld){
+        updates['vendedores/'+nomeOld] = null; // delete old
+    }
+    updates['vendedores/'+nome] = data;
+    await db.ref().update(updates);
+    if(nome !== nomeOld) delete vendedoresData[nomeOld];
+    vendedoresData[nome] = data;
+    _renderVendedoresList();
+    _syncVendedoresSelects();
+    toast('Salvo! ✅');
+}
+
+async function delVendedor(nome){
+    if(!confirm('Remover "'+nome+'" do cadastro?')) return;
+    await db.ref('vendedores/'+nome).remove();
+    delete vendedoresData[nome];
+    _renderVendedoresList();
+    _syncVendedoresSelects();
+    toast('Vendedor removido.','info');
+}
+
+// Sync all vendor selects across the app
+function _syncVendedoresSelects(){
+    const nomes = Object.keys(vendedoresData).sort();
+    ['selVendedor','pedVend','comVendedor'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        const curVal = el.value;
+        // keep first option (placeholder or "Todos")
+        const first = el.options[0];
+        el.innerHTML = '';
+        el.appendChild(first);
+        nomes.forEach(n=>{
+            const o = document.createElement('option');
+            o.value=n; o.textContent=n;
+            if(n===curVal) o.selected=true;
+            el.appendChild(o);
+        });
+    });
+
+    // Show per-vendor % in comissoes tab
+    const row = document.getElementById('comVendPctRow');
+    if(row){
+        row.innerHTML = nomes.length ? '<div style="font-size:.75rem;color:#9e8e8e;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.4px">Comissão por vendedor</div>' +
+            nomes.map(n=>`<div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem">
+                <span style="color:var(--creme)">${n}</span>
+                <span style="color:var(--ouro);font-weight:600">${vendedoresData[n]?.comPct||0}%</span>
+            </div>`).join('') : '';
+    }
+}
+
+// Get commission % for a vendor (falls back to global)
+function getVendPct(nome){
+    if(vendedoresData[nome]?.comPct !== undefined) return vendedoresData[nome].comPct;
+    return parseFloat(document.getElementById('comPctGlobal')?.value)||0;
+}
+
 // ══ ADMIN UNIFICADO — NAVEGAÇÃO ══
 const _sectionTitles = {
     vinhos:    '🍷 Gerenciar Vinhos',
+    vendedores:'👥 Cadastro de Vendedores',
     pedidos:   '🧾 Pedidos em Aberto',
     historico: '📋 Histórico de Pedidos',
     margem:    '📦 Margem por Vinho',
@@ -1878,6 +2067,7 @@ function navAdmin(section){
 
     // Load data for section
     if(section==='pedidos')   loadPedidos();
+    if(section==='vendedores') loadVendedores();
     if(section==='historico') loadOrders();
     if(section==='margem')    loadMargem();
     if(section==='despesas')  loadDespesas();
@@ -1915,7 +2105,7 @@ function doLogin(){
             if(cfg.comissao_pct) document.getElementById('comPctGlobal').value=cfg.comissao_pct;
             if(cfg.imposto_pct!==undefined) document.getElementById('comImpGlobal').value=cfg.imposto_pct;
         });
-        navAdmin('vinhos');
+        loadVendedores().then(()=>{ navAdmin('vinhos'); });
         renderAdminList();
     } else toast('Senha incorreta!','err');
 }
@@ -2301,6 +2491,7 @@ function _buildVendedores(orders){
 
     // Bar: realizado x meta
     const realizados = vNames.map(v=>(byVend[v]||{total:0}).total);
+    const vendPcts  = vNames.map(v=>(vendedoresData[v]?.comPct||0)+'%');
     const metas      = vNames.map(v=>parseFloat(localStorage.getItem('meta_'+v))||0);
     _mkChart('chartMetas',{
         type:'bar',
@@ -2379,7 +2570,8 @@ async function calcResultado(){
     if(!comInput.value && savedCfg.comissao_pct) comInput.value = savedCfg.comissao_pct;
 
     const pctImp = parseFloat(impInput.value)||0;
-    const pctCom = parseFloat(comInput.value)||0;
+    // pctCom here is used as override/display only — actual calc uses per-vendor rates
+    const pctComOverride = parseFloat(comInput.value)||null;
 
     const de  = document.getElementById('relDe').value;
     const ate = document.getElementById('relAte').value;
@@ -2413,7 +2605,23 @@ async function calcResultado(){
     const impostoVal   = totalVendido * pctImp / 100;
     const lucroBreto   = totalVendido - custoMercadoria - despPeriodo;
     const lucroSemCom  = lucroBreto - impostoVal;
-    const comissaoVal  = Math.max(0, lucroSemCom) * pctCom / 100;
+    // Per-vendor commission sum
+    let comissaoVal = 0;
+    const pctComEff = pctComOverride !== null ? pctComOverride : null;
+    if(pctComEff !== null){
+        comissaoVal = Math.max(0, lucroSemCom) * pctComEff / 100;
+    } else {
+        // use per-vendor rates from vendedoresData
+        orders.forEach(o=>{
+            const vp = getVendPct(o.vendedor)/100;
+            const vTotal = o.total||0;
+            const vCusto = (o.itens||[]).reduce((s,i)=>(custoPorNome[i.nome]||0)*i.qty+s,0);
+            const vImp   = vTotal * pctImp/100;
+            const vBase  = Math.max(0, vTotal-vCusto-(despPeriodo*(vTotal/totalVendido||0))-vImp);
+            comissaoVal += vBase * vp;
+        });
+    }
+    const pctCom = pctComEff !== null ? pctComEff : (totalVendido ? comissaoVal/(Math.max(1,lucroSemCom))*100 : 0);
     const lucroComCom  = lucroSemCom - comissaoVal;
 
     // ── KPIs ──
@@ -2423,7 +2631,7 @@ async function calcResultado(){
         <div class="kpi-card"><div class="kpi-label">Custo de Compra</div><div class="kpi-value neg">− R$ ${fmt(custoMercadoria)}</div></div>
         <div class="kpi-card"><div class="kpi-label">Despesas Op.</div><div class="kpi-value neg">− R$ ${fmt(despPeriodo)}</div></div>
         <div class="kpi-card"><div class="kpi-label">Lucro s/ Comissão</div><div class="kpi-value ${lucroSemCom>=0?'pos':'neg'}">R$ ${fmt(lucroSemCom)}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Comissão (${pctCom}%)</div><div class="kpi-value neg">− R$ ${fmt(comissaoVal)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Comissão (vendedores)</div><div class="kpi-value neg">− R$ ${fmt(comissaoVal)}</div></div>
         <div class="kpi-card" style="border-color:var(--ouro)"><div class="kpi-label">Lucro Líquido Final</div><div class="kpi-value ${lucroComCom>=0?'pos':'neg'}" style="font-size:1.6rem">R$ ${fmt(lucroComCom)}</div></div>`;
 
     // ── Waterfall ──
