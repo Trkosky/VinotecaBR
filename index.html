@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍷 VinotecaBR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBy7irmpOni2O3tCzfLwwqr2gRAt44EBIQ",
+  authDomain: "vinotecabr-bfffd.firebaseapp.com",
+  databaseURL: "https://vinotecabr-bfffd-default-rtdb.firebaseio.com/",
+  projectId: "vinotecabr-bfffd",
+  storageBucket: "vinotecabr-bfffd.firebasestorage.app",
+  messagingSenderId: "852209724042",
+  appId: "1:852209724042:web:b03dc7ee9776f452fe9b73",
+  measurementId: "G-CMSZ826SDZ"
+};
+const WHATSAPP_NUMBER = "5511965866812";
+const STORE_NAME      = "VinotecaBR";
+const ADMIN_PASSWORD  = "vinho123";
+const UNLOCK_CODE     = "libera2025";
+const LOCK_DAY        = 5;
+const PRODUTO_NOME    = "VinotecaBR Pro";
+const APP_TOKEN = (()=>{ let t = localStorage.getItem('app_install_token'); if(!t){ t = 'tok_'+Date.now()+'_'+Math.random().toString(36).substr(2,9); localStorage.setItem('app_install_token',t); } return t; })();
+const VENDEDORES = ["Selecione o vendedor...","Eric","Monique"];
+const WINES_INICIAL = [
+  {id:1,name:"DV CATENA CABERNET MALBEC",type:"tinto",origin:"ARGENTINA",year:0,description:"Produtor Catena Zapata.",price:89.90,stock:12,image:"images/DV_CB_M_GIT.jpeg"},
+  {id:2,name:"DV CATENA MALBEC MALBEC",type:"tinto",origin:"ARGENTINA",year:0,description:"Produtor Catena Zapata.",price:104.90,stock:8,image:"images/DV_MB_MB_GIT.jpeg"},
+  {id:3,name:"DV CATENA HISTORICO MALBEC PETIT VERDOT",type:"tinto",origin:"ARGENTINA",year:0,description:"Produtor Catena Zapata.",price:164.90,stock:15,image:"images/DV_PETIT_VERDOT_GIT.jpeg"},
+  {id:4,name:"EL ENEMIGO MALBEC",type:"tinto",origin:"ARGENTINA",year:0,description:"Produtor El Enemigo.",price:124.90,stock:6,image:"images/EL_MB_GIT.jpeg"},
+  {id:5,name:"LUCA OLD VINE MALBEC",type:"tinto",origin:"ARGENTINA",year:0,description:"Produtor Luca (Laura Catena).",price:169.00,stock:6,image:"images/LUCA_MB_GIT.jpeg"},
+  {id:6,name:"LUIGI BOSCA MALBEC",type:"tinto",origin:"ARGENTINA",year:0,description:"Produtor Bodega Luigi Bosca.",price:89.90,stock:18,image:"images/LUIGI_MB_GIT.jpeg"},
+  {id:7,name:"NICASSIA VINEYARDS MALBEC",type:"tinto",origin:"ARGENTINA",year:0,description:"Produtor Catena Zapata.",price:69.90,stock:12,image:"images/NICASSIA_MB_GIT.jpeg"},
+  {id:8,name:"SUSANA BALBO SIGNATURA TORRONTES",type:"branco",origin:"ARGENTINA",year:0,description:"Produtor Susana Balbo.",price:137.90,stock:6,image:"images/prosecco.jpg"}
+];
+let taxasConfig = {credito:2.5, debito:1.5, pix:0, imposto:0, nomeLojaConfig: STORE_NAME};
+</script>
+<style>
+:root {
+  --vinho:#722F37;
+  --vinho-dark:#5a252c;
+  --ouro:#C9A84C;
+  --creme:#F9F4EE;
+  --dark:#1a1a2e;
+  --cinza:#6b7280;
+  --verde:#16a34a;
+  --vermelho:#dc2626;
+  --azul:#2563eb;
+  --bg:#f3f0eb;
+  --card:#fff;
+  --border:#e5ddd5;
+  --shadow:0 2px 8px rgba(0,0,0,.08);
+  --radius:12px;
+  --font-title:'Cormorant Garamond',serif;
+  --font-body:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg);color:var(--dark);min-height:100vh}
+h1,h2,h3,h4{font-family:var(--font-title)}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:var(--font-body)}
+input,select,textarea{font-family:var(--font-body)}
+
+/* ── STORE ── */
+#storeView{display:block}
+#adminView{display:none}
+
+/* Header */
+.store-header{background:var(--vinho);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.store-header h1{font-family:var(--font-title);font-size:1.6rem;letter-spacing:.03em}
+.header-right{display:flex;align-items:center;gap:12px}
+.cart-btn{background:var(--ouro);color:var(--dark);border:none;border-radius:20px;padding:8px 16px;font-weight:500;display:flex;align-items:center;gap:6px;font-size:.9rem;transition:transform .15s}
+.cart-btn:hover{transform:scale(1.05)}
+.cart-badge{background:#fff;color:var(--vinho);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700}
+.admin-link-btn{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:6px 12px;font-size:.8rem}
+
+/* Filters */
+.filters-bar{background:#fff;padding:12px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--border);position:sticky;top:64px;z-index:90}
+.filter-btn{background:transparent;border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.83rem;color:var(--cinza);transition:all .15s}
+.filter-btn.active{background:var(--vinho);border-color:var(--vinho);color:#fff}
+.search-input{border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.85rem;outline:none;min-width:180px}
+.search-input:focus{border-color:var(--vinho)}
+
+/* Wine grid */
+.wines-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;padding:24px 20px;max-width:1200px;margin:0 auto}
+.wine-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column}
+.wine-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.wine-img{width:100%;height:200px;object-fit:cover;background:#f0e8e0}
+.wine-img-placeholder{width:100%;height:200px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0e8e0,#e8dcd0);font-size:3rem}
+.wine-body{padding:14px;flex:1;display:flex;flex-direction:column}
+.wine-badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.badge-tinto{background:#fce8ea;color:#9b1c2e}
+.badge-branco{background:#fefce8;color:#854d0e}
+.badge-rose{background:#fce7f3;color:#9d174d}
+.badge-espumante{background:#eff6ff;color:#1e40af}
+.wine-name{font-family:var(--font-title);font-size:1.05rem;font-weight:600;line-height:1.3;margin-bottom:4px}
+.wine-origin{font-size:.78rem;color:var(--cinza);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.wine-desc{font-size:.82rem;color:var(--cinza);flex:1;margin-bottom:12px;line-height:1.5}
+.wine-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.wine-price{font-family:var(--font-title);font-size:1.3rem;font-weight:600;color:var(--vinho)}
+.wine-stock{font-size:.75rem;color:var(--cinza)}
+.add-cart-btn{background:var(--vinho);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:.85rem;font-weight:500;transition:background .15s}
+.add-cart-btn:hover{background:var(--vinho-dark)}
+.add-cart-btn:disabled{background:#ccc;cursor:default}
+
+/* Cart overlay */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.cart-modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:24px}
+.cart-modal h2{font-family:var(--font-title);font-size:1.5rem;color:var(--vinho);margin-bottom:16px}
+.cart-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.cart-item-name{flex:1;font-size:.9rem;font-weight:500}
+.qty-ctrl{display:flex;align-items:center;gap:8px}
+.qty-btn{background:var(--vinho);color:#fff;border:none;border-radius:6px;width:28px;height:28px;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.qty-num{font-weight:600;min-width:20px;text-align:center}
+.item-total{font-weight:600;color:var(--vinho);min-width:70px;text-align:right;font-size:.9rem}
+.cart-empty{text-align:center;padding:32px;color:var(--cinza)}
+.modal-ft{border-top:2px solid var(--border);padding-top:16px;margin-top:8px}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fld label{font-size:.8rem;font-weight:500;color:var(--cinza)}
+.fld input,.fld select,.fld textarea{border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.9rem;outline:none;transition:border-color .15s}
+.fld input:focus,.fld select:focus{border-color:var(--vinho)}
+.cart-total-block{background:var(--creme);border-radius:10px;padding:12px;margin:12px 0;font-size:.85rem}
+.cart-total-block .total-line{display:flex;justify-content:space-between;padding:2px 0;color:var(--cinza)}
+.cart-total-block .total-line.main{font-size:1rem;font-weight:700;color:var(--dark);border-top:1px solid var(--border);padding-top:6px;margin-top:4px}
+.send-btn{width:100%;background:#25D366;color:#fff;border:none;border-radius:12px;padding:14px;font-size:1rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;transition:background .15s}
+.send-btn:hover{background:#1db954}
+.close-btn{background:transparent;border:none;font-size:1.4rem;color:var(--cinza);float:right;margin-top:-4px}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;border-radius:20px;font-size:.88rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* Price suggest popup */
+.suggest-popup{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center}
+.suggest-popup.open{display:flex}
+.suggest-box{background:#fff;border-radius:16px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.suggest-box h3{font-family:var(--font-title);color:var(--vinho);margin-bottom:16px}
+.suggest-box label{font-size:.82rem;color:var(--cinza);display:block;margin-bottom:4px}
+.suggest-box input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:12px;font-size:.9rem;outline:none}
+.suggest-box input:focus{border-color:var(--vinho)}
+.suggest-result{background:var(--creme);border-radius:8px;padding:10px;font-size:.9rem;margin-bottom:12px;font-weight:500}
+.suggest-close{background:var(--vinho);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:.9rem;width:100%}
+
+/* ── ADMIN ── */
+#adminView{background:var(--bg);min-height:100vh;display:flex;flex-direction:column}
+.admin-topbar{background:var(--vinho);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.admin-topbar h1{font-family:var(--font-title);font-size:1.4rem}
+.admin-topbar-right{display:flex;gap:10px;align-items:center}
+.admin-layout{display:flex;flex:1;min-height:0}
+.admin-sidebar{width:200px;background:var(--dark);padding:16px 0;flex-shrink:0}
+.adm-nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:12px 20px;background:transparent;border:none;color:rgba(255,255,255,.7);font-size:.88rem;text-align:left;transition:all .15s;border-left:3px solid transparent}
+.adm-nav-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+.adm-nav-btn.active{background:rgba(201,168,76,.15);color:var(--ouro);border-left-color:var(--ouro)}
+.adm-nav-btn .mi{font-size:1.1rem}
+.admin-content{flex:1;overflow-y:auto;padding:24px}
+.admin-section{display:none}
+.admin-section.active{display:block}
+.sec-title{font-family:var(--font-title);font-size:1.6rem;color:var(--vinho);margin-bottom:20px}
+
+/* Cards / panels */
+.panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+.panel-title{font-family:var(--font-title);font-size:1.1rem;color:var(--vinho);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:#fff;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center}
+.kpi-val{font-family:var(--font-title);font-size:1.6rem;font-weight:600;color:var(--vinho)}
+.kpi-lbl{font-size:.75rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+
+/* Tables */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{background:var(--creme);color:var(--vinho);padding:10px 12px;text-align:left;font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:#fafaf8}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--vinho);color:#fff}
+.btn-primary:hover{background:var(--vinho-dark)}
+.btn-secondary{background:var(--ouro);color:var(--dark)}
+.btn-danger{background:var(--vermelho);color:#fff}
+.btn-sm{padding:5px 10px;font-size:.78rem}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--cinza)}
+.btn-ghost:hover{border-color:var(--vinho);color:var(--vinho)}
+
+/* Form styles in admin */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:16px}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.form-field label{font-size:.78rem;font-weight:500;color:var(--cinza);text-transform:uppercase;letter-spacing:.04em}
+.form-field input,.form-field select,.form-field textarea{border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:.88rem;outline:none;transition:border-color .15s;background:#fff}
+.form-field input:focus,.form-field select:focus{border-color:var(--vinho)}
+.form-field .read-label{padding:8px 10px;background:var(--creme);border-radius:8px;font-size:.88rem;font-weight:600}
+.form-field .read-label.verde{color:var(--verde)}
+.form-field .read-label.vermelho{color:var(--vermelho)}
+.form-field .read-label.amarelo{color:#b45309}
+
+/* Pedido cards */
+.pedido-card{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:16px;margin-bottom:14px;border-left:4px solid var(--vinho)}
+.pedido-card.pago{border-left-color:var(--verde)}
+.pedido-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.pedido-id{font-size:.75rem;color:var(--cinza)}
+.pedido-nome{font-weight:600;font-size:1rem}
+.pedido-data{font-size:.78rem;color:var(--cinza)}
+.pedido-body{font-size:.85rem;color:var(--dark);margin-bottom:10px;line-height:1.6}
+.pedido-footer{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pedido-total{font-family:var(--font-title);font-size:1.1rem;font-weight:600;color:var(--vinho)}
+.pgto-badge{display:inline-flex;align-items:center;gap:4px;font-size:.75rem;padding:3px 8px;border-radius:10px;font-weight:500}
+.pgto-pix{background:#dcfce7;color:#15803d}
+.pgto-dinheiro{background:#f0fdf4;color:#166534}
+.pgto-credito{background:#eff6ff;color:#1e40af}
+.pgto-debito{background:#faf5ff;color:#7e22ce}
+
+/* Comissão card */
+.comissao-card{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.comissao-nome{font-family:var(--font-title);font-size:1.2rem;font-weight:600;color:var(--vinho);margin-bottom:12px}
+.comissao-row{display:flex;justify-content:space-between;font-size:.85rem;padding:4px 0;border-bottom:1px solid #f0f0f0}
+.comissao-row:last-child{border-bottom:none;font-weight:700;font-size:.95rem;color:var(--vinho)}
+.comissao-label{color:var(--cinza)}
+.comissao-val{font-weight:500}
+
+/* Dashboard */
+.chart-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+.chart-wrap h3{font-family:var(--font-title);font-size:1rem;color:var(--vinho);margin-bottom:14px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:20px;background:#fff;padding:6px;border-radius:10px;box-shadow:var(--shadow)}
+.tab-btn{padding:8px 14px;border:none;border-radius:7px;font-size:.83rem;background:transparent;color:var(--cinza);font-weight:500;transition:all .15s}
+.tab-btn.active{background:var(--vinho);color:#fff}
+
+/* Waterfall */
+.waterfall{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+.wf-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;margin-bottom:4px;font-size:.9rem}
+.wf-row.receita{background:#dcfce7}
+.wf-row.deducao{background:#fee2e2}
+.wf-row.neutro{background:#f1f5f9}
+.wf-row.total{background:var(--vinho);color:#fff;font-weight:700;font-size:1rem;margin-top:8px}
+.wf-row.subtotal{background:#1e40af;color:#fff;font-weight:600}
+.wf-label{font-weight:500}
+.wf-val{font-weight:600;font-family:var(--font-title);font-size:1.05rem}
+
+/* Login */
+.login-screen{display:none;position:fixed;inset:0;background:var(--dark);z-index:1000;align-items:center;justify-content:center}
+.login-screen.open{display:flex}
+.login-box{background:#fff;border-radius:20px;padding:40px;max-width:360px;width:90%;text-align:center}
+.login-box h2{font-family:var(--font-title);font-size:1.8rem;color:var(--vinho);margin-bottom:8px}
+.login-box p{color:var(--cinza);font-size:.88rem;margin-bottom:24px}
+.login-box input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px;font-size:1rem;outline:none;margin-bottom:12px;text-align:center;letter-spacing:.1em}
+.login-box input:focus{border-color:var(--vinho)}
+.login-btn{width:100%;background:var(--vinho);color:#fff;border:none;border-radius:10px;padding:13px;font-size:1rem;font-weight:600}
+.login-err{color:var(--vermelho);font-size:.85rem;margin-top:8px}
+
+/* Config section */
+.config-group{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.config-group-title{font-family:var(--font-title);font-size:1.1rem;color:var(--vinho);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Responsive */
+@media(max-width:768px){
+  .admin-sidebar{display:none}
+  .wines-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:14px}
+  .fld-row{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr 1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .wines-grid{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:1fr 1fr}
+}
+
+/* Utility */
+.d-none{display:none!important}
+.text-center{text-align:center}
+.mt8{margin-top:8px}
+.mt16{margin-top:16px}
+.mb8{margin-bottom:8px}
+.mb16{margin-bottom:16px}
+.flex{display:flex}
+.gap8{gap:8px}
+.gap12{gap:12px}
+.align-center{align-items:center}
+.justify-between{justify-content:space-between}
+.flex-wrap{flex-wrap:wrap}
+.fw600{font-weight:600}
+.text-vinho{color:var(--vinho)}
+.text-verde{color:var(--verde)}
+.text-vermelho{color:var(--vermelho)}
+.text-cinza{color:var(--cinza)}
+.small{font-size:.8rem}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ STORE VIEW ═══════════════════════ -->
+<div id="storeView">
+  <header class="store-header">
+    <h1>🍷 <span id="storeName">VinotecaBR</span></h1>
+    <div class="header-right">
+      <button class="cart-btn" onclick="openCart()" aria-label="Abrir carrinho">
+        🛒 Carrinho <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+      <button class="admin-link-btn" onclick="openLogin()">Admin</button>
+    </div>
+  </header>
+
+  <div class="filters-bar" role="search" aria-label="Filtros de vinho">
+    <button class="filter-btn active" onclick="filterWines('all',this)">Todos</button>
+    <button class="filter-btn" onclick="filterWines('tinto',this)">Tinto</button>
+    <button class="filter-btn" onclick="filterWines('branco',this)">Branco</button>
+    <button class="filter-btn" onclick="filterWines('rose',this)">Rosé</button>
+    <button class="filter-btn" onclick="filterWines('espumante',this)">Espumante</button>
+    <input class="search-input" type="search" id="searchInput" placeholder="Buscar vinho..." oninput="filterWines(currentFilter,null)" aria-label="Buscar vinho">
+  </div>
+
+  <main>
+    <div class="wines-grid" id="winesGrid" role="list" aria-label="Catálogo de vinhos"></div>
+  </main>
+</div>
+
+<!-- ═══════════════════════ CART OVERLAY ═══════════════════════ -->
+<div class="overlay" id="cartOverlay" role="dialog" aria-modal="true" aria-label="Carrinho de compras" onclick="closeCartOutside(event)">
+  <div class="cart-modal">
+    <button class="close-btn" onclick="closeCart()" aria-label="Fechar carrinho">✕</button>
+    <h2>🛒 Seu Pedido</h2>
+    <div id="cartItems"></div>
+    <div class="modal-ft" id="cartFt" style="display:none">
+      <div class="fld-row">
+        <div class="fld">
+          <label for="clientName">👤 Seu nome *</label>
+          <input type="text" id="clientName" placeholder="Como se chama?" autocomplete="given-name">
+        </div>
+        <div class="fld">
+          <label for="vendedorSelect">🧑‍💼 Vendedor *</label>
+          <select id="vendedorSelect">
+            <option value="">Selecione...</option>
+            <option value="Eric">Eric</option>
+            <option value="Monique">Monique</option>
+          </select>
+        </div>
+      </div>
+      <div class="fld">
+        <label for="clientAddr">📍 Endereço de entrega</label>
+        <input type="text" id="clientAddr" placeholder="Rua, número, bairro (opcional)">
+      </div>
+      <div class="fld-row">
+        <div class="fld">
+          <label for="formaPgto">💳 Forma de Pagamento *</label>
+          <select id="formaPgto" onchange="updateCartTotals()">
+            <option value="">Selecione...</option>
+            <option value="pix">PIX (sem taxa)</option>
+            <option value="dinheiro">Dinheiro (sem taxa)</option>
+            <option value="credito">Cartão de Crédito</option>
+            <option value="debito">Cartão de Débito</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label for="taxaEntrega">🚚 Taxa de Entrega R$</label>
+          <input type="number" id="taxaEntrega" placeholder="0,00" step="0.01" min="0" value="0" oninput="updateCartTotals()">
+        </div>
+      </div>
+      <div class="fld">
+        <label for="descontoVal">🏷️ Desconto R$</label>
+        <input type="number" id="descontoVal" placeholder="0,00" step="0.01" min="0" value="0" oninput="updateCartTotals()">
+      </div>
+      <div class="cart-total-block" id="cartTotalBlock">
+        <div class="total-line"><span>Subtotal</span><span id="ttSubtotal">R$ 0,00</span></div>
+        <div class="total-line" id="ttCartaoRow" style="display:none"><span id="ttCartaoLabel">Taxa cartão</span><span id="ttCartaoVal">R$ 0,00</span></div>
+        <div class="total-line" id="ttEntregaRow" style="display:none"><span>+ Entrega</span><span id="ttEntregaVal">R$ 0,00</span></div>
+        <div class="total-line" id="ttDescontoRow" style="display:none"><span>- Desconto</span><span id="ttDescontoVal">R$ 0,00</span></div>
+        <div class="total-line main"><span>Total</span><span id="ttFinal">R$ 0,00</span></div>
+      </div>
+      <button class="send-btn" onclick="sendWhatsApp()" aria-label="Enviar pedido via WhatsApp">
+        📲 Enviar pedido via WhatsApp
+      </button>
+      <p style="text-align:center;font-size:.75rem;color:var(--cinza);margin-top:8px">Você será redirecionado para o WhatsApp</p>
+    </div>
+    <div class="cart-empty" id="cartEmpty">
+      <p style="font-size:2rem">🍷</p>
+      <p>Seu carrinho está vazio</p>
+      <p class="small text-cinza mt8">Adicione vinhos ao carrinho para fazer seu pedido</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PRICE SUGGEST POPUP ═══════════════════════ -->
+<div class="suggest-popup" id="suggestPopup" role="dialog" aria-modal="true" aria-label="Sugerir preço">
+  <div class="suggest-box">
+    <h3>💡 Sugerir preço de venda</h3>
+    <p style="font-size:.82rem;color:var(--cinza);margin-bottom:14px">Vinho: <strong id="suggestWineName"></strong></p>
+    <label style="font-size:.82rem;color:var(--cinza)">Custo real (custo + frete): R$ <strong id="suggestCustoReal"></strong></label>
+    <br><br>
+    <label for="suggestMargem">Margem desejada %</label>
+    <input type="number" id="suggestMargem" value="40" min="0" max="500" oninput="calcSuggestPrice()">
+    <div class="suggest-result" id="suggestResult">Preço sugerido: R$ --</div>
+    <button class="suggest-close" onclick="closeSuggest()">Fechar</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TOAST ═══════════════════════ -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ═══════════════════════ LOGIN ═══════════════════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h2>🍷 Admin</h2>
+    <p>Acesso restrito ao painel administrativo</p>
+    <input type="password" id="loginInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <p class="login-err" id="loginErr"></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ADMIN VIEW ═══════════════════════ -->
+<div id="adminView">
+  <div class="admin-topbar">
+    <h1>🍷 VinotecaBR — Admin</h1>
+    <div class="admin-topbar-right">
+      <span style="font-size:.8rem;opacity:.7" id="adminWelcome"></span>
+      <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="exitAdmin()">Sair</button>
+    </div>
+  </div>
+  <div class="admin-layout">
+    <nav class="admin-sidebar" aria-label="Navegação admin">
+      <button class="adm-nav-btn active" id="nav-dashboard" onclick="navAdmin('dashboard')"><span class="mi">📊</span>Dashboard</button>
+      <button class="adm-nav-btn" id="nav-vinhos" onclick="navAdmin('vinhos')"><span class="mi">🍷</span>Vinhos</button>
+      <button class="adm-nav-btn" id="nav-vendedores" onclick="navAdmin('vendedores')"><span class="mi">🧑‍💼</span>Vendedores</button>
+      <button class="adm-nav-btn" id="nav-pedidos" onclick="navAdmin('pedidos')"><span class="mi">📋</span>Pedidos</button>
+      <button class="adm-nav-btn" id="nav-historico" onclick="navAdmin('historico')"><span class="mi">📜</span>Histórico</button>
+      <button class="adm-nav-btn" id="nav-despesas" onclick="navAdmin('despesas')"><span class="mi">💸</span>Despesas</button>
+      <button class="adm-nav-btn" id="nav-comissoes" onclick="navAdmin('comissoes')"><span class="mi">💰</span>Comissões</button>
+      <button class="adm-nav-btn" id="nav-relatorios" onclick="navAdmin('relatorios')"><span class="mi">📈</span>Relatórios</button>
+      <button class="adm-nav-btn" id="nav-config" onclick="navAdmin('config')"><span class="mi">⚙️</span>Configurações</button>
+    </nav>
+    <div class="admin-content">
+
+      <!-- DASHBOARD -->
+      <div class="admin-section active" id="sec-dashboard">
+        <h2 class="sec-title">📊 Dashboard</h2>
+        <div class="kpi-row" id="dashKpis"></div>
+        <div class="chart-wrap">
+          <h3>Vendas por Tipo</h3>
+          <canvas id="chartTipo" height="80"></canvas>
+        </div>
+        <div class="chart-wrap">
+          <h3>Vendas Recentes (últimos pedidos)</h3>
+          <canvas id="chartVendas" height="80"></canvas>
+        </div>
+      </div>
+
+      <!-- VINHOS -->
+      <div class="admin-section" id="sec-vinhos">
+        <h2 class="sec-title">🍷 Gerenciar Vinhos</h2>
+        <div class="panel">
+          <div class="panel-title">➕ Adicionar / Editar Vinho</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Nome *</label>
+              <input type="text" id="wf-name" placeholder="Nome do vinho">
+            </div>
+            <div class="form-field">
+              <label>Tipo *</label>
+              <select id="wf-type">
+                <option value="tinto">Tinto</option>
+                <option value="branco">Branco</option>
+                <option value="rose">Rosé</option>
+                <option value="espumante">Espumante</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Origem</label>
+              <input type="text" id="wf-origin" placeholder="Ex: ARGENTINA">
+            </div>
+            <div class="form-field">
+              <label>Ano</label>
+              <input type="number" id="wf-year" placeholder="2020">
+            </div>
+            <div class="form-field">
+              <label>Preço de Venda R$ *</label>
+              <input type="number" id="wf-price" placeholder="0.00" step="0.01">
+            </div>
+            <div class="form-field">
+              <label>Estoque</label>
+              <input type="number" id="wf-stock" placeholder="0">
+            </div>
+            <div class="form-field">
+              <label>Custo de Compra R$</label>
+              <input type="number" id="wf-cost" placeholder="0.00" step="0.01" oninput="updateCustoReal()">
+            </div>
+            <div class="form-field">
+              <label>Frete por un. R$</label>
+              <input type="number" id="wf-frete" placeholder="0.00" step="0.01" oninput="updateCustoReal()">
+            </div>
+            <div class="form-field">
+              <label>Custo Real (custo+frete)</label>
+              <div class="read-label" id="wf-custo-real-label">R$ 0,00</div>
+            </div>
+            <div class="form-field">
+              <label>Margem Real %</label>
+              <div class="read-label" id="wf-margem-real-label">— %</div>
+            </div>
+            <div class="form-field" style="align-self:end">
+              <label>&nbsp;</label>
+              <button class="btn btn-ghost btn-sm" onclick="openSuggest()" style="height:38px">💡 Sugerir preço</button>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-field" style="grid-column:1/-1">
+              <label>Descrição</label>
+              <textarea id="wf-desc" rows="2" style="border:1.5px solid var(--border);border-radius:8px;padding:8px;resize:vertical;outline:none"></textarea>
+            </div>
+            <div class="form-field">
+              <label>URL da Imagem</label>
+              <input type="text" id="wf-image" placeholder="images/nome.jpg">
+            </div>
+          </div>
+          <input type="hidden" id="wf-id">
+          <div class="flex gap8 mt8 flex-wrap">
+            <button class="btn btn-primary" onclick="saveWine()">💾 Salvar Vinho</button>
+            <button class="btn btn-ghost" onclick="clearWineForm()">✕ Limpar</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📋 Catálogo Atual</div>
+          <div class="tbl-wrap">
+            <table id="winesTable">
+              <thead>
+                <tr>
+                  <th>Nome</th><th>Tipo</th><th>Preço</th><th>Custo</th><th>Frete/un</th><th>Custo Real</th><th>Margem Real</th><th>Estoque</th><th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="winesTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VENDEDORES -->
+      <div class="admin-section" id="sec-vendedores">
+        <h2 class="sec-title">🧑‍💼 Gerenciar Vendedores</h2>
+        <div class="panel">
+          <div class="panel-title">➕ Adicionar Vendedor</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Nome *</label><input type="text" id="vf-name" placeholder="Nome do vendedor"></div>
+            <div class="form-field"><label>Comissão %</label><input type="number" id="vf-comissao" placeholder="5" step="0.1"></div>
+          </div>
+          <input type="hidden" id="vf-id">
+          <div class="flex gap8">
+            <button class="btn btn-primary" onclick="saveVendedor()">💾 Salvar</button>
+            <button class="btn btn-ghost" onclick="clearVendedorForm()">✕ Limpar</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📋 Vendedores</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Nome</th><th>Comissão %</th><th>Ações</th></tr></thead>
+              <tbody id="vendedoresTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PEDIDOS EM ABERTO -->
+      <div class="admin-section" id="sec-pedidos">
+        <h2 class="sec-title">📋 Pedidos em Aberto</h2>
+        <div class="flex gap8 mb16 flex-wrap align-center">
+          <button class="btn btn-ghost btn-sm" onclick="loadPedidos()">🔄 Atualizar</button>
+          <span class="small text-cinza" id="pedidosCount"></span>
+        </div>
+        <div id="pedidosList"></div>
+      </div>
+
+      <!-- HISTÓRICO -->
+      <div class="admin-section" id="sec-historico">
+        <h2 class="sec-title">📜 Histórico de Pedidos</h2>
+        <div class="flex gap8 mb16 flex-wrap align-center">
+          <button class="btn btn-ghost btn-sm" onclick="loadHistorico()">🔄 Atualizar</button>
+          <select id="filtroHistVendedor" class="btn btn-ghost btn-sm" style="height:32px" onchange="loadHistorico()">
+            <option value="">Todos vendedores</option>
+          </select>
+          <select id="filtroHistMes" class="btn btn-ghost btn-sm" style="height:32px" onchange="loadHistorico()">
+            <option value="">Todos os meses</option>
+          </select>
+          <span class="small text-cinza" id="historicoTotal"></span>
+        </div>
+        <div id="historicoList"></div>
+      </div>
+
+      <!-- DESPESAS -->
+      <div class="admin-section" id="sec-despesas">
+        <h2 class="sec-title">💸 Despesas Operacionais</h2>
+        <div class="panel">
+          <div class="panel-title">➕ Registrar Despesa</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Descrição *</label><input type="text" id="df-desc" placeholder="Aluguel, embalagens..."></div>
+            <div class="form-field"><label>Valor R$ *</label><input type="number" id="df-valor" placeholder="0.00" step="0.01"></div>
+            <div class="form-field"><label>Data</label><input type="date" id="df-data"></div>
+            <div class="form-field"><label>Categoria</label>
+              <select id="df-cat">
+                <option value="operacional">Operacional</option>
+                <option value="marketing">Marketing</option>
+                <option value="logistica">Logística</option>
+                <option value="outros">Outros</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="saveDespesa()">💾 Registrar</button>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📋 Despesas Registradas</div>
+          <div class="flex gap8 mb8 flex-wrap align-center">
+            <select id="filtroDespMes" class="btn btn-ghost btn-sm" style="height:32px" onchange="loadDespesas()">
+              <option value="">Todos os meses</option>
+            </select>
+            <span class="fw600" id="despesasTotal"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Descrição</th><th>Categoria</th><th>Data</th><th>Valor</th><th>Ações</th></tr></thead>
+              <tbody id="despesasTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMISSÕES -->
+      <div class="admin-section" id="sec-comissoes">
+        <h2 class="sec-title">💰 Comissões</h2>
+        <div class="panel">
+          <div class="flex gap12 mb16 flex-wrap align-center">
+            <select id="filtroComMes" class="btn btn-ghost btn-sm" style="height:32px" onchange="loadComissoes()">
+              <option value="">Todos os meses</option>
+            </select>
+            <label class="flex align-center gap8 small">
+              <input type="checkbox" id="apenasPageos" checked onchange="loadComissoes()"> Apenas pedidos pagos
+            </label>
+            <button class="btn btn-ghost btn-sm" onclick="loadComissoes()">🔄 Calcular</button>
+          </div>
+          <div id="comissoesList"></div>
+        </div>
+      </div>
+
+      <!-- RELATÓRIOS -->
+      <div class="admin-section" id="sec-relatorios">
+        <h2 class="sec-title">📈 Relatórios & Resultado</h2>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="tabRelatorio(0,this)">Resultado Financeiro</button>
+          <button class="tab-btn" onclick="tabRelatorio(1,this)">Margem por Produto</button>
+          <button class="tab-btn" onclick="tabRelatorio(2,this)">Por Vendedor</button>
+        </div>
+        <div id="tab-rel-0">
+          <div class="flex gap8 mb16 flex-wrap align-center">
+            <select id="filtroRelMes" class="btn btn-ghost btn-sm" style="height:32px" onchange="calcResultado()">
+              <option value="">Todos os meses</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="calcResultado()">🔄 Recalcular</button>
+          </div>
+          <div class="kpi-row" id="relKpis"></div>
+          <div class="waterfall" id="waterfall"></div>
+        </div>
+        <div id="tab-rel-1" style="display:none">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Vinho</th><th>Preço Venda</th><th>Custo</th><th>Frete/un</th><th>Custo Real</th><th>Margem Real %</th></tr></thead>
+              <tbody id="margemTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="tab-rel-2" style="display:none">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Vendedor</th><th>Pedidos</th><th>Valor Bruto</th><th>Comissão %</th><th>Comissão R$</th></tr></thead>
+              <tbody id="vendasVendedorTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIGURAÇÕES -->
+      <div class="admin-section" id="sec-config">
+        <h2 class="sec-title">⚙️ Configurações</h2>
+        <div class="config-group">
+          <div class="config-group-title">🏪 Dados da Loja</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Nome da Loja</label>
+              <input type="text" id="cfg-nome-loja" placeholder="VinotecaBR">
+            </div>
+          </div>
+        </div>
+        <div class="config-group">
+          <div class="config-group-title">💳 Taxas de Pagamento</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Taxa Cartão de Crédito %</label>
+              <input type="number" id="cfg-taxa-credito" placeholder="2.5" step="0.1" min="0">
+            </div>
+            <div class="form-field">
+              <label>Taxa Cartão de Débito %</label>
+              <input type="number" id="cfg-taxa-debito" placeholder="1.5" step="0.1" min="0">
+            </div>
+            <div class="form-field">
+              <label>Taxa PIX %</label>
+              <input type="number" id="cfg-taxa-pix" placeholder="0" step="0.1" min="0">
+            </div>
+          </div>
+        </div>
+        <div class="config-group">
+          <div class="config-group-title">🧾 Provisões</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>% Provisão Imposto (controle interno)</label>
+              <input type="number" id="cfg-imposto" placeholder="0" step="0.1" min="0">
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveConfig()">💾 Salvar Configurações</button>
+        <p class="small text-cinza mt8" id="configSaveMsg"></p>
+      </div>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-layout -->
+</div><!-- /adminView -->
+
+<script>
+// ═══════════════════════════════════════════════════
+//  FIREBASE INIT
+// ═══════════════════════════════════════════════════
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.database();
+
+// ═══════════════════════════════════════════════════
+//  GLOBALS
+// ═══════════════════════════════════════════════════
+let cart = [];
+let currentFilter = 'all';
+let wines = [];
+let vendedores = [];
+let pedidos = [];
+let historico = [];
+let despesas = [];
+let chartTipo = null;
+let chartVendas = null;
+let suggestWineData = null;
+
+// ═══════════════════════════════════════════════════
+//  UTILITY
+// ═══════════════════════════════════════════════════
+const brl = v => 'R$ ' + (parseFloat(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct = v => (parseFloat(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '%';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+const fmtDate = ts => { if(!ts) return '—'; const d = new Date(ts); return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); };
+const mesLabel = ts => { if(!ts) return ''; const d = new Date(ts); return d.toISOString().substr(0,7); };
+const showToast = (msg, dur=2000) => { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), dur); };
+
+function optMeses(selectId, dados, campo='timestamp') {
+  const sel = document.getElementById(selectId);
+  if(!sel) return;
+  const cur = sel.value;
+  const meses = [...new Set(dados.map(d => mesLabel(d[campo])).filter(Boolean))].sort().reverse();
+  sel.innerHTML = '<option value="">Todos os meses</option>' + meses.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  TAXAS
+// ═══════════════════════════════════════════════════
+function calcTaxaCartao() {
+  const forma = (document.getElementById('formaPgto')||{}).value || '';
+  const subtotal = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  if(forma === 'credito') return subtotal * (taxasConfig.credito||2.5) / 100;
+  if(forma === 'debito')  return subtotal * (taxasConfig.debito||1.5) / 100;
+  return 0;
+}
+
+function taxaCartaoPedido(pedido) {
+  if(pedido.taxaCartao != null) return parseFloat(pedido.taxaCartao)||0;
+  const sub = (pedido.items||[]).reduce((s,i) => s + (i.price||0)*(i.qty||1), 0);
+  if(pedido.formaPgto === 'credito') return sub * (taxasConfig.credito||2.5) / 100;
+  if(pedido.formaPgto === 'debito')  return sub * (taxasConfig.debito||1.5) / 100;
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════
+//  CART TOTALS UPDATE
+// ═══════════════════════════════════════════════════
+function updateCartTotals() {
+  const subtotal = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const taxa = calcTaxaCartao();
+  const entrega = parseFloat((document.getElementById('taxaEntrega')||{}).value)||0;
+  const desconto = parseFloat((document.getElementById('descontoVal')||{}).value)||0;
+  const total = subtotal + taxa + entrega - desconto;
+  const forma = (document.getElementById('formaPgto')||{}).value || '';
+
+  const el = id => document.getElementById(id);
+  if(el('ttSubtotal')) el('ttSubtotal').textContent = brl(subtotal);
+  if(el('ttFinal'))    el('ttFinal').textContent = brl(Math.max(0,total));
+
+  if(el('ttCartaoRow')) {
+    const show = taxa > 0 || (forma === 'credito' || forma === 'debito');
+    el('ttCartaoRow').style.display = show ? '' : 'none';
+    if(el('ttCartaoLabel')) {
+      if(forma==='credito') el('ttCartaoLabel').textContent = `+ Taxa crédito (${taxasConfig.credito||2.5}%)`;
+      else if(forma==='debito') el('ttCartaoLabel').textContent = `+ Taxa débito (${taxasConfig.debito||1.5}%)`;
+      else el('ttCartaoLabel').textContent = 'Taxa cartão';
+    }
+    if(el('ttCartaoVal')) el('ttCartaoVal').textContent = brl(taxa);
+  }
+  if(el('ttEntregaRow')) {
+    el('ttEntregaRow').style.display = entrega > 0 ? '' : 'none';
+    if(el('ttEntregaVal')) el('ttEntregaVal').textContent = brl(entrega);
+  }
+  if(el('ttDescontoRow')) {
+    el('ttDescontoRow').style.display = desconto > 0 ? '' : 'none';
+    if(el('ttDescontoVal')) el('ttDescontoVal').textContent = brl(desconto);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  STORE — WINE LISTING
+// ═══════════════════════════════════════════════════
+function renderWines(list) {
+  const grid = document.getElementById('winesGrid');
+  if(!list.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--cinza)">Nenhum vinho encontrado</div>'; return; }
+  grid.innerHTML = list.map(w => {
+    const badge = `badge-${w.type||'tinto'}`;
+    const typeLabel = {tinto:'Tinto',branco:'Branco',rose:'Rosé',espumante:'Espumante'}[w.type]||w.type;
+    const imgEl = w.image ? `<img class="wine-img" src="${w.image}" alt="${w.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="wine-img-placeholder" style="display:none">🍷</div>` : `<div class="wine-img-placeholder">🍷</div>`;
+    const inStock = (w.stock||0) > 0;
+    return `<article class="wine-card" role="listitem">
+      ${imgEl}
+      <div class="wine-body">
+        <span class="wine-badge ${badge}">${typeLabel}</span>
+        <div class="wine-name">${w.name}</div>
+        <div class="wine-origin">${w.origin||''}${w.year?' · '+w.year:''}</div>
+        <div class="wine-desc">${w.description||''}</div>
+        <div class="wine-footer">
+          <div>
+            <div class="wine-price">${brl(w.price)}</div>
+            <div class="wine-stock">${inStock ? w.stock+' em estoque' : 'Esgotado'}</div>
+          </div>
+          <button class="add-cart-btn" ${!inStock?'disabled':''} onclick="addToCart(${w.id})" aria-label="Adicionar ${w.name} ao carrinho">${inStock ? '+ Carrinho' : 'Esgotado'}</button>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function filterWines(type, btn) {
+  if(btn) {
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  currentFilter = type;
+  const q = (document.getElementById('searchInput').value||'').toLowerCase();
+  let list = wines;
+  if(type !== 'all') list = list.filter(w => w.type === type);
+  if(q) list = list.filter(w => w.name.toLowerCase().includes(q) || (w.description||'').toLowerCase().includes(q) || (w.origin||'').toLowerCase().includes(q));
+  renderWines(list);
+}
+
+// ═══════════════════════════════════════════════════
+//  CART
+// ═══════════════════════════════════════════════════
+function addToCart(wineId) {
+  const wine = wines.find(w => w.id == wineId);
+  if(!wine) return;
+  const ex = cart.find(i => i.id == wineId);
+  if(ex) {
+    if(ex.qty < (wine.stock||99)) { ex.qty++; showToast('Quantidade atualizada'); }
+    else { showToast('Estoque máximo atingido'); return; }
+  } else {
+    cart.push({...wine, qty:1});
+    showToast('Adicionado ao carrinho 🍷');
+  }
+  updateBadge();
+  if(document.getElementById('cartOverlay').classList.contains('open')) renderCart();
+}
+
+function updateBadge() {
+  const total = cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartBadge').textContent = total;
+}
+
+function openCart() {
+  document.getElementById('cartOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderCart();
+  updateCartTotals();
+}
+
+function closeCart() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeCartOutside(e) {
+  if(e.target === document.getElementById('cartOverlay')) closeCart();
+}
+
+function renderCart() {
+  const container = document.getElementById('cartItems');
+  const ft = document.getElementById('cartFt');
+  const empty = document.getElementById('cartEmpty');
+  if(!cart.length) {
+    container.innerHTML = '';
+    ft.style.display = 'none';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+  ft.style.display = '';
+  container.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-name">${item.name}</div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${item.id},-1)" aria-label="Diminuir quantidade">−</button>
+        <span class="qty-num" aria-label="Quantidade: ${item.qty}">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id},1)" aria-label="Aumentar quantidade">+</button>
+      </div>
+      <div class="item-total">${brl(item.price * item.qty)}</div>
+      <button style="background:none;border:none;color:var(--cinza);font-size:1.1rem;cursor:pointer" onclick="removeFromCart(${item.id})" aria-label="Remover item">🗑</button>
+    </div>
+  `).join('');
+  updateCartTotals();
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(i=>i.id==id);
+  if(!item) return;
+  const wine = wines.find(w=>w.id==id);
+  const maxStock = wine ? (wine.stock||99) : 99;
+  item.qty = Math.min(Math.max(1, item.qty + delta), maxStock);
+  renderCart();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(i=>i.id!=id);
+  updateBadge();
+  renderCart();
+}
+
+function sendWhatsApp() {
+  const name = document.getElementById('clientName').value.trim();
+  const vendedor = document.getElementById('vendedorSelect').value;
+  const addr = document.getElementById('clientAddr').value.trim();
+  const forma = document.getElementById('formaPgto').value;
+
+  if(!name) { showToast('Por favor informe seu nome'); return; }
+  if(!vendedor) { showToast('Por favor selecione o vendedor'); return; }
+  if(!forma) { showToast('Por favor selecione a forma de pagamento'); return; }
+  if(!cart.length) { showToast('Carrinho vazio'); return; }
+
+  const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const taxaCartao = calcTaxaCartao();
+  const entrega = parseFloat(document.getElementById('taxaEntrega').value)||0;
+  const desconto = parseFloat(document.getElementById('descontoVal').value)||0;
+  const totalFinal = Math.max(0, subtotal + taxaCartao + entrega - desconto);
+
+  const pedidoId = uid();
+  const timestamp = Date.now();
+
+  const pgtoLabel = {pix:'PIX',dinheiro:'Dinheiro',credito:'Cartão de Crédito',debito:'Cartão de Débito'}[forma]||forma;
+
+  let msg = `🍷 *Novo Pedido — ${STORE_NAME}*\n\n`;
+  msg += `👤 *Cliente:* ${name}\n`;
+  msg += `🧑‍💼 *Vendedor:* ${vendedor}\n`;
+  if(addr) msg += `📍 *Endereço:* ${addr}\n`;
+  msg += `\n*Itens:*\n`;
+  cart.forEach(i => { msg += `• ${i.name} × ${i.qty} = ${brl(i.price*i.qty)}\n`; });
+  msg += `\n💰 Subtotal: ${brl(subtotal)}`;
+  if(taxaCartao > 0) msg += `\n💳 Taxa ${pgtoLabel}: + ${brl(taxaCartao)}`;
+  if(entrega > 0) msg += `\n🚚 Entrega: + ${brl(entrega)}`;
+  if(desconto > 0) msg += `\n🏷️ Desconto: - ${brl(desconto)}`;
+  msg += `\n✅ *Total: ${brl(totalFinal)}*`;
+  msg += `\n💳 *Pagamento: ${pgtoLabel}*`;
+  msg += `\n\n🔖 Pedido: #${pedidoId}`;
+
+  const pedidoObj = {
+    id: pedidoId,
+    timestamp,
+    cliente: name,
+    vendedor,
+    endereco: addr,
+    formaPgto: forma,
+    taxaCartao,
+    taxaEntrega: entrega,
+    desconto,
+    subtotal,
+    totalFinal,
+    items: cart.map(i=>({id:i.id,name:i.name,price:i.price,qty:i.qty,cost:i.cost||0,frete:i.frete||0})),
+    status: 'aberto'
+  };
+
+  db.ref('pedidos/' + pedidoId).set(pedidoObj).catch(e=>console.warn('Firebase err',e));
+
+  // Update stock
+  cart.forEach(i => {
+    const wine = wines.find(w=>w.id==i.id);
+    if(wine && wine.fbKey) {
+      db.ref('wines/'+wine.fbKey+'/stock').set(Math.max(0,(wine.stock||0)-i.qty));
+    }
+  });
+
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  cart = [];
+  updateBadge();
+  closeCart();
+  showToast('Pedido enviado! 🎉');
+}
+
+// ═══════════════════════════════════════════════════
+//  LOGIN / ADMIN NAV
+// ═══════════════════════════════════════════════════
+function openLogin() { document.getElementById('loginScreen').classList.add('open'); document.getElementById('loginInput').value=''; document.getElementById('loginErr').textContent=''; }
+function closeLogin() { document.getElementById('loginScreen').classList.remove('open'); }
+
+function doLogin() {
+  const pwd = document.getElementById('loginInput').value;
+  if(pwd === ADMIN_PASSWORD) {
+    closeLogin();
+    document.getElementById('storeView').style.display = 'none';
+    document.getElementById('adminView').style.display = 'flex';
+    document.getElementById('adminView').style.flexDirection = 'column';
+    loadConfig().then(() => {
+      loadAdminData();
+      navAdmin('dashboard');
+    });
+  } else {
+    document.getElementById('loginErr').textContent = 'Senha incorreta';
+  }
+}
+
+function exitAdmin() {
+  document.getElementById('adminView').style.display = 'none';
+  document.getElementById('storeView').style.display = 'block';
+}
+
+function navAdmin(sec) {
+  document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.adm-nav-btn').forEach(b=>b.classList.remove('active'));
+  const secEl = document.getElementById('sec-'+sec);
+  const navEl = document.getElementById('nav-'+sec);
+  if(secEl) secEl.classList.add('active');
+  if(navEl) navEl.classList.add('active');
+
+  switch(sec) {
+    case 'dashboard':  loadDashboard(); break;
+    case 'vinhos':     loadWinesTable(); break;
+    case 'vendedores': loadVendedoresTable(); break;
+    case 'pedidos':    loadPedidos(); break;
+    case 'historico':  loadHistorico(); break;
+    case 'despesas':   loadDespesas(); break;
+    case 'comissoes':  loadComissoes(); break;
+    case 'relatorios': calcResultado(); loadMargemTable(); loadVendasVendedor(); break;
+    case 'config':     loadConfig(); break;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  LOAD ALL ADMIN DATA
+// ═══════════════════════════════════════════════════
+function loadAdminData() {
+  // Wines
+  db.ref('wines').on('value', snap => {
+    wines = [];
+    snap.forEach(c => {
+      const w = c.val();
+      w.fbKey = c.key;
+      if(!w.id) w.id = c.key;
+      wines.push(w);
+    });
+    if(!wines.length) {
+      // seed initial wines
+      WINES_INICIAL.forEach(w => {
+        const ref = db.ref('wines').push();
+        w.fbKey = ref.key;
+        ref.set(w);
+        wines.push(w);
+      });
+    }
+    filterWines(currentFilter, null);
+    loadVendedorSelectOptions();
+  });
+
+  // Vendedores
+  db.ref('vendedores').on('value', snap => {
+    vendedores = [];
+    snap.forEach(c => { const v = c.val(); v.fbKey = c.key; vendedores.push(v); });
+    loadVendedorSelectOptions();
+  });
+
+  // Pedidos
+  db.ref('pedidos').on('value', snap => {
+    pedidos = [];
+    snap.forEach(c => { const p = c.val(); p.fbKey = c.key; pedidos.push(p); });
+    pedidos.sort((a,b)=>b.timestamp-a.timestamp);
+  });
+
+  // Despesas
+  db.ref('despesas').on('value', snap => {
+    despesas = [];
+    snap.forEach(c => { const d = c.val(); d.fbKey = c.key; despesas.push(d); });
+    despesas.sort((a,b)=>b.timestamp-a.timestamp);
+  });
+}
+
+function loadVendedorSelectOptions() {
+  const sel = document.getElementById('vendedorSelect');
+  if(!sel) return;
+  const cur = sel.value;
+  // Build from static list + DB
+  const names = VENDEDORES.slice(1);
+  vendedores.forEach(v => { if(!names.includes(v.nome)) names.push(v.nome); });
+  sel.innerHTML = '<option value="">Selecione...</option>' + names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════
+function loadDashboard() {
+  const abertos = pedidos.filter(p=>p.status==='aberto');
+  const pagos = pedidos.filter(p=>p.status==='pago');
+  const totalPago = pagos.reduce((s,p)=>s+(p.totalFinal||p.subtotal||0),0);
+  const totalAberto = abertos.reduce((s,p)=>s+(p.totalFinal||p.subtotal||0),0);
+
+  document.getElementById('dashKpis').innerHTML = `
+    <div class="kpi"><div class="kpi-val">${pedidos.length}</div><div class="kpi-lbl">Total Pedidos</div></div>
+    <div class="kpi"><div class="kpi-val">${abertos.length}</div><div class="kpi-lbl">Em Aberto</div></div>
+    <div class="kpi"><div class="kpi-val text-verde">${brl(totalPago)}</div><div class="kpi-lbl">Receita Paga</div></div>
+    <div class="kpi"><div class="kpi-val text-vinho">${brl(totalAberto)}</div><div class="kpi-lbl">A Receber</div></div>
+    <div class="kpi"><div class="kpi-val">${wines.length}</div><div class="kpi-lbl">Produtos</div></div>
+    <div class="kpi"><div class="kpi-val">${despesas.reduce((s,d)=>s+(d.valor||0),0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div><div class="kpi-lbl">Despesas</div></div>
+  `;
+
+  // Chart tipo
+  const tipos = {tinto:0,branco:0,rose:0,espumante:0};
+  pagos.forEach(p => (p.items||[]).forEach(i => {
+    const w = wines.find(w=>w.id==i.id||w.name===i.name);
+    if(w) tipos[w.type] = (tipos[w.type]||0) + i.qty;
+  }));
+  const ctx1 = document.getElementById('chartTipo').getContext('2d');
+  if(chartTipo) chartTipo.destroy();
+  chartTipo = new Chart(ctx1, {
+    type:'doughnut',
+    data:{ labels:['Tinto','Branco','Rosé','Espumante'], datasets:[{data:Object.values(tipos), backgroundColor:['#722F37','#C9A84C','#e879a3','#3b82f6']}] },
+    options:{ plugins:{legend:{position:'bottom'}} }
+  });
+
+  // Chart vendas recentes
+  const recent = [...pedidos].sort((a,b)=>b.timestamp-a.timestamp).slice(0,10).reverse();
+  const ctx2 = document.getElementById('chartVendas').getContext('2d');
+  if(chartVendas) chartVendas.destroy();
+  chartVendas = new Chart(ctx2, {
+    type:'bar',
+    data:{
+      labels: recent.map(p=>p.cliente||'?'),
+      datasets:[{label:'Total R$', data: recent.map(p=>p.totalFinal||p.subtotal||0), backgroundColor:'#722F37'}]
+    },
+    options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  WINES ADMIN
+// ═══════════════════════════════════════════════════
+function updateCustoReal() {
+  const cost = parseFloat(document.getElementById('wf-cost').value)||0;
+  const frete = parseFloat(document.getElementById('wf-frete').value)||0;
+  const price = parseFloat(document.getElementById('wf-price').value)||0;
+  const custoReal = cost + frete;
+  const margemReal = custoReal > 0 ? (price - custoReal)/custoReal*100 : 0;
+
+  const lbl = document.getElementById('wf-custo-real-label');
+  const mlbl = document.getElementById('wf-margem-real-label');
+  if(lbl) lbl.textContent = brl(custoReal);
+  if(mlbl) {
+    mlbl.textContent = pct(margemReal);
+    mlbl.className = 'read-label ' + (margemReal >= 30 ? 'verde' : margemReal >= 10 ? 'amarelo' : 'vermelho');
+  }
+}
+
+function loadWinesTable() {
+  const tbody = document.getElementById('winesTbody');
+  if(!tbody) return;
+  tbody.innerHTML = wines.map(w => {
+    const custoReal = (w.cost||0) + (w.frete||0);
+    const margem = custoReal > 0 ? (w.price - custoReal)/custoReal*100 : 0;
+    const mClass = margem >= 30 ? 'text-verde' : margem >= 10 ? '' : 'text-vermelho';
+    return `<tr>
+      <td><strong>${w.name}</strong></td>
+      <td>${w.type||'—'}</td>
+      <td>${brl(w.price)}</td>
+      <td>${w.cost ? brl(w.cost) : '—'}</td>
+      <td>${w.frete ? brl(w.frete) : '—'}</td>
+      <td>${brl(custoReal)}</td>
+      <td class="${mClass}" style="font-weight:600">${custoReal > 0 ? pct(margem) : '—'}</td>
+      <td>${w.stock||0}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="editWine('${w.fbKey||w.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteWine('${w.fbKey||w.id}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function saveWine() {
+  const name = document.getElementById('wf-name').value.trim();
+  const price = parseFloat(document.getElementById('wf-price').value);
+  if(!name) { showToast('Nome obrigatório'); return; }
+  if(!price) { showToast('Preço obrigatório'); return; }
+
+  const data = {
+    name,
+    type: document.getElementById('wf-type').value,
+    origin: document.getElementById('wf-origin').value.trim().toUpperCase(),
+    year: parseInt(document.getElementById('wf-year').value)||0,
+    price,
+    stock: parseInt(document.getElementById('wf-stock').value)||0,
+    cost: parseFloat(document.getElementById('wf-cost').value)||0,
+    frete: parseFloat(document.getElementById('wf-frete').value)||0,
+    description: document.getElementById('wf-desc').value.trim(),
+    image: document.getElementById('wf-image').value.trim()
+  };
+
+  const editId = document.getElementById('wf-id').value;
+  if(editId) {
+    const wine = wines.find(w=>w.fbKey===editId||String(w.id)===editId);
+    const key = wine ? wine.fbKey : editId;
+    db.ref('wines/'+key).update(data).then(()=>{ showToast('Vinho atualizado'); clearWineForm(); });
+  } else {
+    data.id = uid();
+    db.ref('wines').push(data).then(()=>{ showToast('Vinho adicionado'); clearWineForm(); });
+  }
+}
+
+function editWine(key) {
+  const wine = wines.find(w=>w.fbKey===key||String(w.id)===key);
+  if(!wine) return;
+  document.getElementById('wf-id').value = wine.fbKey||key;
+  document.getElementById('wf-name').value = wine.name||'';
+  document.getElementById('wf-type').value = wine.type||'tinto';
+  document.getElementById('wf-origin').value = wine.origin||'';
+  document.getElementById('wf-year').value = wine.year||'';
+  document.getElementById('wf-price').value = wine.price||'';
+  document.getElementById('wf-stock').value = wine.stock||'';
+  document.getElementById('wf-cost').value = wine.cost||'';
+  document.getElementById('wf-frete').value = wine.frete||'';
+  document.getElementById('wf-desc').value = wine.description||'';
+  document.getElementById('wf-image').value = wine.image||'';
+  updateCustoReal();
+  document.getElementById('wf-name').focus();
+  document.querySelector('#sec-vinhos').scrollTop = 0;
+}
+
+function deleteWine(key) {
+  if(!confirm('Excluir este vinho?')) return;
+  const wine = wines.find(w=>w.fbKey===key||String(w.id)===key);
+  const fbKey = wine ? wine.fbKey : key;
+  db.ref('wines/'+fbKey).remove().then(()=>showToast('Vinho removido'));
+}
+
+function clearWineForm() {
+  ['wf-id','wf-name','wf-origin','wf-year','wf-price','wf-stock','wf-cost','wf-frete','wf-desc','wf-image'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('wf-type').value = 'tinto';
+  document.getElementById('wf-custo-real-label').textContent = 'R$ 0,00';
+  document.getElementById('wf-margem-real-label').textContent = '— %';
+  document.getElementById('wf-margem-real-label').className = 'read-label';
+}
+
+// Price suggest
+function openSuggest() {
+  const name = document.getElementById('wf-name').value.trim();
+  const cost = parseFloat(document.getElementById('wf-cost').value)||0;
+  const frete = parseFloat(document.getElementById('wf-frete').value)||0;
+  const custoReal = cost + frete;
+  suggestWineData = {name: name||'(sem nome)', custoReal};
+  document.getElementById('suggestWineName').textContent = suggestWineData.name;
+  document.getElementById('suggestCustoReal').textContent = custoReal.toLocaleString('pt-BR',{minimumFractionDigits:2});
+  calcSuggestPrice();
+  document.getElementById('suggestPopup').classList.add('open');
+}
+
+function calcSuggestPrice() {
+  if(!suggestWineData) return;
+  const margem = parseFloat(document.getElementById('suggestMargem').value)||0;
+  const preco = suggestWineData.custoReal * (1 + margem/100);
+  document.getElementById('suggestResult').textContent = `Com margem de ${margem}% o preço seria ${brl(preco)}`;
+}
+
+function closeSuggest() {
+  document.getElementById('suggestPopup').classList.remove('open');
+  suggestWineData = null;
+}
+
+// ═══════════════════════════════════════════════════
+//  VENDEDORES ADMIN
+// ═══════════════════════════════════════════════════
+function saveVendedor() {
+  const nome = document.getElementById('vf-name').value.trim();
+  if(!nome) { showToast('Nome obrigatório'); return; }
+  const data = { nome, comissao: parseFloat(document.getElementById('vf-comissao').value)||5 };
+  const editId = document.getElementById('vf-id').value;
+  if(editId) {
+    db.ref('vendedores/'+editId).update(data).then(()=>{ showToast('Vendedor atualizado'); clearVendedorForm(); });
+  } else {
+    db.ref('vendedores').push(data).then(()=>{ showToast('Vendedor adicionado'); clearVendedorForm(); });
+  }
+}
+
+function loadVendedoresTable() {
+  const tbody = document.getElementById('vendedoresTbody');
+  if(!tbody) return;
+  tbody.innerHTML = vendedores.map(v=>`<tr>
+    <td>${v.nome}</td>
+    <td>${pct(v.comissao||5)}</td>
+    <td>
+      <button class="btn btn-ghost btn-sm" onclick="editVendedor('${v.fbKey}')">✏️</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteVendedor('${v.fbKey}')">🗑</button>
+    </td>
+  </tr>`).join('') || '<tr><td colspan="3" class="text-center text-cinza">Nenhum vendedor cadastrado</td></tr>';
+}
+
+function editVendedor(key) {
+  const v = vendedores.find(v=>v.fbKey===key);
+  if(!v) return;
+  document.getElementById('vf-id').value = v.fbKey;
+  document.getElementById('vf-name').value = v.nome;
+  document.getElementById('vf-comissao').value = v.comissao||5;
+}
+
+function deleteVendedor(key) {
+  if(!confirm('Excluir vendedor?')) return;
+  db.ref('vendedores/'+key).remove().then(()=>showToast('Vendedor removido'));
+}
+
+function clearVendedorForm() {
+  document.getElementById('vf-id').value='';
+  document.getElementById('vf-name').value='';
+  document.getElementById('vf-comissao').value='';
+}
+
+// ═══════════════════════════════════════════════════
+//  PEDIDOS EM ABERTO
+// ═══════════════════════════════════════════════════
+function loadPedidos() {
+  const list = document.getElementById('pedidosList');
+  const abertos = pedidos.filter(p=>p.status==='aberto');
+  document.getElementById('pedidosCount').textContent = `${abertos.length} pedido(s) em aberto`;
+
+  // Update historico filter options
+  const filtroHistVendedor = document.getElementById('filtroHistVendedor');
+  if(filtroHistVendedor) {
+    const nomes = [...new Set(pedidos.map(p=>p.vendedor).filter(Boolean))];
+    const cur = filtroHistVendedor.value;
+    filtroHistVendedor.innerHTML = '<option value="">Todos vendedores</option>' + nomes.map(n=>`<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join('');
+  }
+
+  if(!abertos.length) { list.innerHTML = '<div class="text-center text-cinza" style="padding:32px">Nenhum pedido em aberto 🎉</div>'; return; }
+  list.innerHTML = abertos.map(p=>renderPedidoCard(p, false)).join('');
+}
+
+function renderPedidoCard(p, isHistorico) {
+  const pgtoLabel = {pix:'PIX',dinheiro:'Dinheiro',credito:'Crédito',debito:'Débito'}[p.formaPgto]||'—';
+  const pgtoClass = {pix:'pgto-pix',dinheiro:'pgto-dinheiro',credito:'pgto-credito',debito:'pgto-debito'}[p.formaPgto]||'';
+  const pgtoIcon = {pix:'⚡',dinheiro:'💵',credito:'💳',debito:'💳'}[p.formaPgto]||'💳';
+  const taxaCartao = taxaCartaoPedido(p);
+  const total = p.totalFinal || p.subtotal || 0;
+
+  let pgtoInfo = '';
+  if(p.formaPgto) {
+    pgtoInfo = `<span class="pgto-badge ${pgtoClass}">${pgtoIcon} ${pgtoLabel}${taxaCartao>0?' — taxa: '+brl(taxaCartao):''}</span>`;
+  }
+
+  const itens = (p.items||[]).map(i=>`${i.name} × ${i.qty}`).join(', ');
+  const acoes = isHistorico
+    ? `<button class="btn btn-danger btn-sm" onclick="deletePedido('${p.fbKey}')">🗑 Excluir</button>`
+    : `<button class="btn btn-secondary btn-sm" onclick="marcarPago('${p.fbKey}')">✅ Marcar Pago</button>
+       <button class="btn btn-danger btn-sm" onclick="deletePedido('${p.fbKey}')">🗑</button>`;
+
+  const entregaInfo = (p.taxaEntrega||0) > 0 ? ` | 🚚 Entrega: ${brl(p.taxaEntrega)}` : '';
+  const descontoInfo = (p.desconto||0) > 0 ? ` | 🏷️ Desconto: -${brl(p.desconto)}` : '';
+
+  return `<div class="pedido-card ${p.status==='pago'?'pago':''}">
+    <div class="pedido-header">
+      <div>
+        <div class="pedido-id">#${p.id||p.fbKey}</div>
+        <div class="pedido-nome">${p.cliente||'Cliente'}</div>
+        <div class="pedido-data">${fmtDate(p.timestamp)} · 🧑‍💼 ${p.vendedor||'—'}</div>
+      </div>
+      <div class="pedido-total">${brl(total)}</div>
+    </div>
+    <div class="pedido-body">
+      ${itens}
+      ${p.endereco ? `<br>📍 ${p.endereco}` : ''}
+      ${entregaInfo}${descontoInfo}
+    </div>
+    <div class="pedido-footer">
+      ${pgtoInfo}
+      ${acoes}
+    </div>
+  </div>`;
+}
+
+function marcarPago(key) {
+  db.ref('pedidos/'+key).update({status:'pago', paidAt: Date.now()}).then(()=>{ showToast('Pedido marcado como pago'); loadPedidos(); });
+}
+
+function deletePedido(key) {
+  if(!confirm('Excluir pedido?')) return;
+  db.ref('pedidos/'+key).remove().then(()=>{ showToast('Pedido excluído'); loadPedidos(); loadHistorico(); });
+}
+
+// ═══════════════════════════════════════════════════
+//  HISTÓRICO
+// ═══════════════════════════════════════════════════
+function loadHistorico() {
+  const vendFilter = (document.getElementById('filtroHistVendedor')||{}).value||'';
+  const mesFilter = (document.getElementById('filtroHistMes')||{}).value||'';
+  let list = pedidos.filter(p=>p.status==='pago');
+  if(vendFilter) list = list.filter(p=>p.vendedor===vendFilter);
+  if(mesFilter) list = list.filter(p=>mesLabel(p.timestamp)===mesFilter);
+
+  optMeses('filtroHistMes', pedidos.filter(p=>p.status==='pago'));
+
+  const total = list.reduce((s,p)=>s+(p.totalFinal||p.subtotal||0),0);
+  const el = document.getElementById('historicoTotal');
+  if(el) el.textContent = `${list.length} pedidos · Total: ${brl(total)}`;
+
+  const container = document.getElementById('historicoList');
+  if(!container) return;
+  if(!list.length) { container.innerHTML = '<div class="text-center text-cinza" style="padding:32px">Nenhum pedido no histórico</div>'; return; }
+  container.innerHTML = list.map(p=>renderPedidoCard(p, true)).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  DESPESAS
+// ═══════════════════════════════════════════════════
+function saveDespesa() {
+  const desc = document.getElementById('df-desc').value.trim();
+  const valor = parseFloat(document.getElementById('df-valor').value);
+  if(!desc || !valor) { showToast('Descrição e valor obrigatórios'); return; }
+  const data = {
+    desc, valor,
+    data: document.getElementById('df-data').value || new Date().toISOString().substr(0,10),
+    categoria: document.getElementById('df-cat').value,
+    timestamp: Date.now()
+  };
+  db.ref('despesas').push(data).then(()=>{
+    showToast('Despesa registrada');
+    document.getElementById('df-desc').value='';
+    document.getElementById('df-valor').value='';
+  });
+}
+
+function loadDespesas() {
+  const mesFilter = (document.getElementById('filtroDespMes')||{}).value||'';
+  let list = [...despesas];
+  optMeses('filtroDespMes', despesas, 'timestamp');
+  if(mesFilter) list = list.filter(d=>mesLabel(d.timestamp)===mesFilter);
+  const total = list.reduce((s,d)=>s+(d.valor||0),0);
+  const el = document.getElementById('despesasTotal');
+  if(el) el.textContent = `Total: ${brl(total)}`;
+  const tbody = document.getElementById('despesasTbody');
+  if(!tbody) return;
+  tbody.innerHTML = list.map(d=>`<tr>
+    <td>${d.desc}</td>
+    <td><span style="font-size:.75rem;background:var(--creme);padding:2px 8px;border-radius:8px">${d.categoria||'—'}</span></td>
+    <td>${d.data||'—'}</td>
+    <td>${brl(d.valor)}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteDespesa('${d.fbKey}')">🗑</button></td>
+  </tr>`).join('') || '<tr><td colspan="5" class="text-center text-cinza">Nenhuma despesa registrada</td></tr>';
+}
+
+function deleteDespesa(key) {
+  if(!confirm('Excluir despesa?')) return;
+  db.ref('despesas/'+key).remove().then(()=>showToast('Despesa excluída'));
+}
+
+// ═══════════════════════════════════════════════════
+//  COMISSÕES
+// ═══════════════════════════════════════════════════
+function loadComissoes() {
+  const mesFilter = (document.getElementById('filtroComMes')||{}).value||'';
+  const apenasPageos = (document.getElementById('apenasPageos')||{}).checked !== false;
+  optMeses('filtroComMes', pedidos);
+
+  let pedidosFiltrados = [...pedidos];
+  if(apenasPageos) pedidosFiltrados = pedidosFiltrados.filter(p=>p.status==='pago');
+  if(mesFilter) pedidosFiltrados = pedidosFiltrados.filter(p=>mesLabel(p.timestamp)===mesFilter);
+
+  // Build vendedor list from DB + static
+  const vendedoresList = [];
+  vendedores.forEach(v=>vendedoresList.push({nome:v.nome, comissao:v.comissao||5}));
+  VENDEDORES.slice(1).forEach(nome=>{
+    if(!vendedoresList.find(v=>v.nome===nome)) vendedoresList.push({nome, comissao:5});
+  });
+
+  const container = document.getElementById('comissoesList');
+  if(!container) return;
+
+  if(!vendedoresList.length) { container.innerHTML = '<div class="text-center text-cinza" style="padding:24px">Nenhum vendedor cadastrado</div>'; return; }
+
+  const impPct = taxasConfig.imposto||0;
+
+  container.innerHTML = vendedoresList.map(vend => {
+    const meusPedidos = pedidosFiltrados.filter(p=>p.vendedor===vend.nome);
+    const valorBruto = meusPedidos.reduce((s,p)=>s+(p.totalFinal||p.subtotal||0),0);
+    const taxaCartaoTotal = meusPedidos.reduce((s,p)=>s+taxaCartaoPedido(p),0);
+    const custoMerch = meusPedidos.reduce((s,p)=>{
+      return s + (p.items||[]).reduce((si,i)=>{
+        const w = wines.find(w=>w.id==i.id||w.name===i.name);
+        const custoUn = w ? ((w.cost||0)+(w.frete||0)) : (i.cost||0);
+        return si + custoUn*(i.qty||1);
+      },0);
+    },0);
+    const impostoVal = valorBruto * impPct / 100;
+    const baseLiquida = Math.max(0, valorBruto - taxaCartaoTotal - custoMerch - impostoVal);
+    const comissaoVal = baseLiquida * (vend.comissao||5) / 100;
+
+    return `<div class="comissao-card">
+      <div class="comissao-nome">${vend.nome}</div>
+      <div class="comissao-row"><span class="comissao-label">Pedidos</span><span class="comissao-val">${meusPedidos.length}</span></div>
+      <div class="comissao-row"><span class="comissao-label">Valor bruto</span><span class="comissao-val">${brl(valorBruto)}</span></div>
+      <div class="comissao-row"><span class="comissao-label">(-) Taxa cartão deduzida</span><span class="comissao-val text-vermelho">- ${brl(taxaCartaoTotal)}</span></div>
+      <div class="comissao-row"><span class="comissao-label">(-) Custo mercadoria</span><span class="comissao-val text-vermelho">- ${brl(custoMerch)}</span></div>
+      ${impPct>0?`<div class="comissao-row"><span class="comissao-label">(-) Imposto provisório (${pct(impPct)})</span><span class="comissao-val text-vermelho">- ${brl(impostoVal)}</span></div>`:''}
+      <div class="comissao-row"><span class="comissao-label">Base líquida</span><span class="comissao-val">${brl(baseLiquida)}</span></div>
+      <div class="comissao-row"><span class="comissao-label">Comissão (${pct(vend.comissao||5)})</span><span class="comissao-val text-verde">${brl(comissaoVal)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  RELATÓRIOS
+// ═══════════════════════════════════════════════════
+function tabRelatorio(idx, btn) {
+  [0,1,2].forEach(i => {
+    const el = document.getElementById('tab-rel-'+i);
+    if(el) el.style.display = i===idx ? '' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(idx===0) calcResultado();
+  if(idx===1) loadMargemTable();
+  if(idx===2) loadVendasVendedor();
+}
+
+function calcResultado() {
+  const mesFilter = (document.getElementById('filtroRelMes')||{}).value||'';
+  optMeses('filtroRelMes', pedidos.filter(p=>p.status==='pago'));
+
+  let pedPagos = pedidos.filter(p=>p.status==='pago');
+  if(mesFilter) pedPagos = pedPagos.filter(p=>mesLabel(p.timestamp)===mesFilter);
+
+  // Receita bruta = soma dos subtotals (antes de taxas e descontos)
+  const receitaBruta = pedPagos.reduce((s,p)=>s+(p.subtotal||0),0);
+  // Taxa de entrega cobrada
+  const totalEntrega = pedPagos.reduce((s,p)=>s+(p.taxaEntrega||0),0);
+  // Descontos concedidos
+  const totalDesconto = pedPagos.reduce((s,p)=>s+(p.desconto||0),0);
+  // Taxa cartão deduzida
+  const totalTaxaCartao = pedPagos.reduce((s,p)=>s+taxaCartaoPedido(p),0);
+  // CMV = custo real × qtd vendida
+  let cmv = 0;
+  let freteTotalCompra = 0;
+  pedPagos.forEach(p=>{
+    (p.items||[]).forEach(i=>{
+      const w = wines.find(w=>w.id==i.id||w.name===i.name);
+      const custo = w ? (w.cost||0) : (i.cost||0);
+      const frete = w ? (w.frete||0) : 0;
+      cmv += (custo+frete) * (i.qty||1);
+      freteTotalCompra += frete * (i.qty||1);
+    });
+  });
+  const cmvSemFrete = cmv - freteTotalCompra;
+
+  // Despesas
+  let despFiltered = [...despesas];
+  if(mesFilter) despFiltered = despFiltered.filter(d=>mesLabel(d.timestamp)===mesFilter);
+  const totalDespesas = despFiltered.reduce((s,d)=>s+(d.valor||0),0);
+
+  // Impostos provisórios
+  const impPct = taxasConfig.imposto||0;
+  const impostoVal = receitaBruta * impPct / 100;
+
+  // Comissões totais
+  const impPctVal = impPct;
+  let totalComissoes = 0;
+  const vendedoresList = [];
+  vendedores.forEach(v=>vendedoresList.push({nome:v.nome, comissao:v.comissao||5}));
+  VENDEDORES.slice(1).forEach(nome=>{
+    if(!vendedoresList.find(v=>v.nome===nome)) vendedoresList.push({nome, comissao:5});
+  });
+  vendedoresList.forEach(vend=>{
+    const meusPed = pedPagos.filter(p=>p.vendedor===vend.nome);
+    const bruto = meusPed.reduce((s,p)=>s+(p.totalFinal||p.subtotal||0),0);
+    const tc = meusPed.reduce((s,p)=>s+taxaCartaoPedido(p),0);
+    const cm = meusPed.reduce((s,p)=>{
+      return s+(p.items||[]).reduce((si,i)=>{
+        const w=wines.find(w=>w.id==i.id||w.name===i.name);
+        return si+((w?(w.cost||0)+(w.frete||0):(i.cost||0)))*(i.qty||1);
+      },0);
+    },0);
+    const base = Math.max(0, bruto-tc-cm-(bruto*impPctVal/100));
+    totalComissoes += base*(vend.comissao||5)/100;
+  });
+
+  const lucroLiquido = receitaBruta + totalEntrega - totalDesconto - totalTaxaCartao - cmv - totalDespesas - impostoVal - totalComissoes;
+
+  // KPIs
+  const kpis = document.getElementById('relKpis');
+  if(kpis) kpis.innerHTML = `
+    <div class="kpi"><div class="kpi-val">${brl(receitaBruta)}</div><div class="kpi-lbl">Receita Bruta</div></div>
+    <div class="kpi"><div class="kpi-val text-vermelho">- ${brl(totalTaxaCartao)}</div><div class="kpi-lbl">Taxa Cartão</div></div>
+    <div class="kpi"><div class="kpi-val text-vermelho">- ${brl(cmv)}</div><div class="kpi-lbl">CMV (Custo Merc.)</div></div>
+    <div class="kpi"><div class="kpi-val text-vermelho">- ${brl(totalDespesas)}</div><div class="kpi-lbl">Despesas Op.</div></div>
+    <div class="kpi"><div class="kpi-val ${lucroLiquido>=0?'text-verde':'text-vermelho'}">${brl(lucroLiquido)}</div><div class="kpi-lbl">Lucro Líquido</div></div>
+  `;
+
+  // Waterfall
+  const wf = document.getElementById('waterfall');
+  if(!wf) return;
+  const wfRow = (cls, label, val, sinal='') => `
+    <div class="wf-row ${cls}">
+      <span class="wf-label">${label}</span>
+      <span class="wf-val">${sinal}${brl(val)}</span>
+    </div>`;
+
+  wf.innerHTML = `
+    <h3 style="font-family:var(--font-title);color:var(--vinho);margin-bottom:14px">Demonstrativo de Resultado (${mesFilter||'Todos os períodos'})</h3>
+    ${wfRow('receita','(+) Receita Bruta de Vendas',receitaBruta)}
+    ${totalEntrega>0?wfRow('receita','(+) Taxa de Entrega Cobrada',totalEntrega):''}
+    ${totalDesconto>0?wfRow('deducao','(-) Descontos Concedidos',totalDesconto,'- '):''}
+    ${wfRow('deducao','(-) Taxa de Cartão (real)',totalTaxaCartao,'- ')}
+    <div class="wf-row subtotal"><span class="wf-label">= Receita Líquida</span><span class="wf-val">${brl(receitaBruta+totalEntrega-totalDesconto-totalTaxaCartao)}</span></div>
+    ${wfRow('deducao','(-) Custo de Mercadoria (CMV)',cmv,'- ')}
+    <div style="padding:4px 12px;font-size:.78rem;color:var(--cinza)">
+      &nbsp;&nbsp;&nbsp;Sendo: Custo produto: ${brl(cmvSemFrete)} + Frete de compra: ${brl(freteTotalCompra)}
+    </div>
+    <div class="wf-row subtotal"><span class="wf-label">= Lucro Bruto</span><span class="wf-val">${brl(receitaBruta+totalEntrega-totalDesconto-totalTaxaCartao-cmv)}</span></div>
+    ${wfRow('deducao','(-) Despesas Operacionais',totalDespesas,'- ')}
+    ${impostoVal>0?wfRow('deducao',`(-) Provisão Impostos (${pct(impPct)})`,impostoVal,'- '):''}
+    ${wfRow('deducao','(-) Comissões de Vendedores',totalComissoes,'- ')}
+    <div class="wf-row total"><span class="wf-label">= Lucro Líquido</span><span class="wf-val">${brl(lucroLiquido)}</span></div>
+  `;
+}
+
+function loadMargemTable() {
+  const tbody = document.getElementById('margemTbody');
+  if(!tbody) return;
+  tbody.innerHTML = wines.map(w=>{
+    const custoReal = (w.cost||0)+(w.frete||0);
+    const margem = custoReal>0?(w.price-custoReal)/custoReal*100:0;
+    const cls = margem>=30?'text-verde':margem>=10?'':'text-vermelho';
+    return `<tr>
+      <td>${w.name}</td>
+      <td>${brl(w.price)}</td>
+      <td>${w.cost?brl(w.cost):'—'}</td>
+      <td>${w.frete?brl(w.frete):'—'}</td>
+      <td>${brl(custoReal)}</td>
+      <td class="${cls}" style="font-weight:600">${custoReal>0?pct(margem):'—'}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" class="text-center text-cinza">Nenhum produto cadastrado</td></tr>';
+}
+
+function loadVendasVendedor() {
+  const tbody = document.getElementById('vendasVendedorTbody');
+  if(!tbody) return;
+  const pagos = pedidos.filter(p=>p.status==='pago');
+  const mapa = {};
+  pagos.forEach(p=>{
+    const v = p.vendedor||'—';
+    if(!mapa[v]) mapa[v] = {pedidos:0,bruto:0};
+    mapa[v].pedidos++;
+    mapa[v].bruto += p.totalFinal||p.subtotal||0;
+  });
+  const vendedoresList = [];
+  vendedores.forEach(v=>vendedoresList.push({nome:v.nome, comissao:v.comissao||5}));
+  VENDEDORES.slice(1).forEach(nome=>{
+    if(!vendedoresList.find(v=>v.nome===nome)) vendedoresList.push({nome, comissao:5});
+  });
+  const rows = Object.entries(mapa).map(([nome, d])=>{
+    const pct_com = (vendedoresList.find(v=>v.nome===nome)||{comissao:5}).comissao;
+    const com = d.bruto * pct_com / 100;
+    return `<tr>
+      <td>${nome}</td>
+      <td>${d.pedidos}</td>
+      <td>${brl(d.bruto)}</td>
+      <td>${pct(pct_com)}</td>
+      <td class="text-verde">${brl(com)}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = rows.join('') || '<tr><td colspan="5" class="text-center text-cinza">Sem dados</td></tr>';
+}
+
+// ═══════════════════════════════════════════════════
+//  CONFIGURAÇÕES
+// ═══════════════════════════════════════════════════
+async function loadConfig() {
+  return db.ref('config/taxas').once('value').then(snap=>{
+    const d = snap.val();
+    if(d) {
+      taxasConfig = {...taxasConfig, ...d};
+    }
+    // populate form fields if they exist
+    const set = (id, val) => { const el=document.getElementById(id); if(el) el.value=val; };
+    set('cfg-nome-loja', taxasConfig.nomeLojaConfig || STORE_NAME);
+    set('cfg-taxa-credito', taxasConfig.credito ?? 2.5);
+    set('cfg-taxa-debito', taxasConfig.debito ?? 1.5);
+    set('cfg-taxa-pix', taxasConfig.pix ?? 0);
+    set('cfg-imposto', taxasConfig.imposto ?? 0);
+    // Update store name display
+    const sn = document.getElementById('storeName');
+    if(sn && taxasConfig.nomeLojaConfig) sn.textContent = taxasConfig.nomeLojaConfig;
+  }).catch(()=>{});
+}
+
+function saveConfig() {
+  const cfg = {
+    nomeLojaConfig: document.getElementById('cfg-nome-loja').value.trim() || STORE_NAME,
+    credito: parseFloat(document.getElementById('cfg-taxa-credito').value) || 2.5,
+    debito: parseFloat(document.getElementById('cfg-taxa-debito').value) || 1.5,
+    pix: parseFloat(document.getElementById('cfg-taxa-pix').value) || 0,
+    imposto: parseFloat(document.getElementById('cfg-imposto').value) || 0,
+  };
+  db.ref('config/taxas').set(cfg).then(()=>{
+    taxasConfig = cfg;
+    const sn = document.getElementById('storeName');
+    if(sn) sn.textContent = cfg.nomeLojaConfig;
+    showToast('Configurações salvas!');
+    const msg = document.getElementById('configSaveMsg');
+    if(msg) { msg.textContent = 'Salvo em ' + new Date().toLocaleTimeString('pt-BR'); setTimeout(()=>msg.textContent='',4000); }
+  }).catch(()=>showToast('Erro ao salvar configurações'));
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+(function init() {
+  // Set default date for despesas
+  const dfData = document.getElementById('df-data');
+  if(dfData) dfData.value = new Date().toISOString().substr(0,10);
+
+  // Load wines from Firebase
+  db.ref('wines').once('value').then(snap => {
+    wines = [];
+    snap.forEach(c => { const w = c.val(); w.fbKey = c.key; if(!w.id) w.id = c.key; wines.push(w); });
+    if(!wines.length) {
+      WINES_INICIAL.forEach(w => {
+        const ref = db.ref('wines').push();
+        w.fbKey = ref.key;
+        ref.set(w);
+        wines.push(w);
+      });
+    }
+    filterWines('all', null);
+  });
+
+  // Load config for tax display in cart
+  loadConfig();
+
+  // Setup accessibility
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') {
+      if(document.getElementById('cartOverlay').classList.contains('open')) closeCart();
+      if(document.getElementById('loginScreen').classList.contains('open')) closeLogin();
+      if(document.getElementById('suggestPopup').classList.contains('open')) closeSuggest();
+    }
+  });
+})();
+</script>
+</body>
+</html>
